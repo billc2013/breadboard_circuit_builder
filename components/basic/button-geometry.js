@@ -48,7 +48,7 @@ const BUTTON_CONFIG = {
     // Visual rendering settings
     rendering: {
         scale: 0.7,  // Smaller for better fit on breadboard
-        verticalOffset: -25  // Push button up so legs connect nicely to holes
+        verticalOffset: -10  // Adjusted so button legs insert into holes (like LED)
     },
     
     default_orientation: 'vertical',
