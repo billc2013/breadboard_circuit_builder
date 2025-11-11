@@ -1,0 +1,46 @@
+<!DOCTYPE DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breadboard Circuit Builder - POC</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Interactive Breadboard - Proof of Concept</h1>
+            <div id="info-panel">
+                <span id="hover-info">Hover over holes to see coordinates</span>
+            </div>
+        </header>
+        
+        <main>
+            <div id="breadboard-container">
+                <svg id="breadboard-svg" viewBox="0 0 400 300">
+                    <image 
+                        id="breadboard-image"
+                        href="components_svg/Half_breadboard56a.svg" 
+                        x="50" 
+                        y="50" 
+                        width="292.41" 
+                        height="189"
+                        data-config-ref="breadboard.svg"
+                    />
+                    <g id="components-layer"></g>
+                    <g id="holes-layer"></g>
+                    <g id="labels-layer"></g>
+                </svg>
+            </div>
+            <div id="controls">
+                <button id="clear-wires">Clear All Wires</button>
+                <button id="toggle-labels">Toggle Labels</button>
+                <div id="wire-count">Wires: 0</div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="breadboard-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

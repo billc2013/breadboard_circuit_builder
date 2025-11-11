@@ -1,0 +1,91 @@
+{
+  "component": {
+    "metadata": {
+      "id": "resistor-10k",
+      "name": "10kΩ Resistor",
+      "description": "A generic 10kΩ resistor (0.25W) - commonly used for pull-down/pull-up configurations",
+      "author": "Brendan Howell",
+      "tags": [
+        "Resistor",
+        "10k",
+        "pull-down",
+        "pull-up",
+        "basic resistor",
+        "fritzing core"
+      ],
+      "version": "4",
+      "created": "2009-09-08",
+      "fritzingVersion": "0.1.1201",
+      "category": "basic"
+    },
+    "pins": {
+      "pin0": {
+        "number": 1,
+        "name": "Pin 0",
+        "description": "Pin0",
+        "connectorId": "connector0"
+      },
+      "pin1": {
+        "number": 2,
+        "name": "Pin 1",
+        "description": "Pin 1",
+        "connectorId": "connector1"
+      }
+    },
+    "properties": {
+      "resistance": 10000,
+      "power": "0.25W",
+      "pinSpacing": "400 mil",
+      "package": "THT",
+      "bands": 4,
+      "tolerance": "±5%",
+      "colorBands": {
+        "band1": "Brown",
+        "band2": "Black",
+        "multiplier": "Orange",
+        "tolerance": "Gold"
+      }
+    },
+    "physical": {
+      "pinSpacing": "400 mil",
+      "package": "THT"
+    },
+    "rendering": {
+      "breadboard": {
+        "svg": "components_svg/resistor_220.svg",
+        "width": 45,
+        "height": 12,
+        "unit": "px",
+        "anchor": "center",
+        "pinOffsets": {
+          "pin0": {"x": -22.5, "y": 0},
+          "pin1": {"x": 22.5, "y": 0}
+        },
+        "renderMode": "on-breadboard",
+        "orientation": {
+          "default": "horizontal",
+          "allowed": ["horizontal", "vertical"]
+        }
+      },
+      "schematic": {
+        "svg": "schematic/resistor.svg"
+      },
+      "pcb": {
+        "svg": "pcb/axial_lay_2_400mil_pcb.svg"
+      }
+    },
+    "validation": {
+      "electricalType": "resistor",
+      "polarity": "non-polarized",
+      "rules": {
+        "checkPowerDissipation": true,
+        "maxPowerWatts": 0.25
+      },
+      "warnings": [
+        "Ensure power dissipation does not exceed 0.25W",
+        "At high temperatures, derate power rating",
+        "Common use: Pull-down or pull-up resistor for buttons/switches"
+      ]
+    }
+  }
+}

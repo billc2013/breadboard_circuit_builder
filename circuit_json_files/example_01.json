@@ -1,0 +1,117 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Simple LED Circuit",
+      "description": "PWM-controlled LED with current-limiting resistor",
+      "created": "2025-01-15T10:30:00Z",
+      "author": "human|ai|mixed",
+      "difficulty": "beginner"
+    },
+    
+    "components": [
+      {
+        "id": "led1",
+        "type": "led",
+        "subtype": "5mm",
+        "properties": {
+          "color": "red",
+          "forward_voltage": 1.8,
+          "max_current": 0.020,
+          "wavelength": "633nm"
+        },
+        "placement": {
+          "anode": "15E",
+          "cathode": "15F"
+        },
+        "orientation": "vertical"
+      },
+      {
+        "id": "r1",
+        "type": "resistor",
+        "properties": {
+          "resistance": 220,
+          "unit": "ohm",
+          "tolerance": 0.05,
+          "power_rating": 0.25
+        },
+        "placement": {
+          "pin1": "15A",
+          "pin2": "18A"
+        },
+        "orientation": "horizontal"
+      },
+      {
+        "id": "pico1",
+        "type": "microcontroller",
+        "subtype": "raspberry-pi-pico",
+        "properties": {
+          "voltage": 3.3,
+          "pins": 40
+        },
+        "placement": {
+          "pin1": "5F",
+          "pin40": "5E",
+          "span": "rows 5-24, columns E-F"
+        }
+      }
+    ],
+    
+    "wires": [
+      {
+        "id": "wire1",
+        "from": "3W",
+        "to": "15A",
+        "properties": {
+          "color": "red",
+          "gauge": 22,
+          "type": "solid",
+          "resistance": 0.001,
+          "function": "power"
+        },
+        "route": "direct"
+      },
+      {
+        "id": "wire2",
+        "from": "pico1.GP0",
+        "to": "15E",
+        "properties": {
+          "color": "yellow",
+          "gauge": 22,
+          "signal_type": "pwm",
+          "function": "signal"
+        }
+      },
+      {
+        "id": "wire3",
+        "from": "18A",
+        "to": "5X",
+        "properties": {
+          "color": "black",
+          "function": "ground"
+        }
+      }
+    ],
+    
+    "connections": [
+      {
+        "net": "power_3v3",
+        "nodes": ["3W", "r1.pin1", "pico1.3V3_OUT"]
+      },
+      {
+        "net": "led_control",
+        "nodes": ["pico1.GP0", "led1.anode", "r1.pin2"]
+      },
+      {
+        "net": "ground",
+        "nodes": ["5X", "led1.cathode", "pico1.GND"]
+      }
+    ],
+    
+    "validation": {
+      "voltage_check": true,
+      "current_limits": true,
+      "short_circuits": false,
+      "open_circuits": false
+    }
+  }
+}

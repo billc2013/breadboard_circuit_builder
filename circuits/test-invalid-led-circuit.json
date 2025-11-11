@@ -1,0 +1,84 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Invalid LED Test Circuit",
+      "description": "An intentionally broken LED circuit with multiple errors for validation testing",
+      "created": "2025-01-15T12:00:00Z",
+      "author": "test",
+      "difficulty": "beginner"
+    },
+    
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "properties": {
+          "color": "red"
+        },
+        "placement": {
+          "anode": "15E",
+          "cathode": "15D"
+        },
+        "comment": "ERROR: Both pins on bus15-bottom - SHORT CIRCUIT!"
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "properties": {
+          "resistance": 220
+        },
+        "placement": {
+          "pin0": "20A",
+          "pin1": "25A"
+        },
+        "comment": "ERROR: Not connected to LED - OPEN CIRCUIT!"
+      },
+      {
+        "id": "pico1",
+        "type": "raspberry-pi-pico",
+        "properties": {
+          "voltage": 3.3
+        },
+        "placement": {
+          "RUN": "10F",
+          "GND_3": "10E"
+        },
+        "comment": "ERROR: Using RUN pin (not GPIO) for signal!"
+      }
+    ],
+    
+    "wires": [
+      {
+        "id": "wire1",
+        "from": "pico1.RUN",
+        "to": "15C",
+        "properties": {
+          "color": "yellow",
+          "signal_type": "pwm",
+          "function": "signal"
+        },
+        "comment": "ERROR: RUN pin does not support PWM!"
+      },
+      {
+        "id": "wire2",
+        "from": "20B",
+        "to": "3W",
+        "properties": {
+          "color": "red",
+          "function": "power"
+        },
+        "comment": "Resistor connects to power rail (but not to LED)"
+      },
+      {
+        "id": "wire3",
+        "from": "pico1.GND_3",
+        "to": "5X",
+        "properties": {
+          "color": "black",
+          "function": "ground"
+        },
+        "comment": "Ground connection (OK)"
+      }
+    ]
+  }
+}

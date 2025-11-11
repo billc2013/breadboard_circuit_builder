@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="400" height="680" viewBox="0 0 400 680">
+ <defs>
+  <style type="text/css">
+   .breadboard-base { fill: #F5EFE0; stroke: #999; stroke-width: 2; }
+   .power-rail-pos { fill: #FFE6E6; stroke: #CC0000; stroke-width: 1; }
+   .power-rail-neg { fill: #E6E6FF; stroke: #0000CC; stroke-width: 1; }
+   .hole { fill: #333; stroke: none; }
+   .label-text { font-family: Arial, sans-serif; font-size: 10px; fill: #666; }
+   .divider { fill: none; stroke: #CCC; stroke-width: 2; }
+  </style>
+ </defs>
+ 
+ <g id="breadboardbreadboard">
+  <!-- Main breadboard base -->
+  <rect class="breadboard-base" x="10" y="10" width="380" height="660" rx="5"/>
+  
+  <!-- Power rails section - Top -->
+  <!-- Positive rail (red) -->
+  <rect class="power-rail-pos" x="30" y="30" width="340" height="25" rx="2"/>
+  <text class="label-text" x="20" y="47">+</text>
+  
+  <!-- Negative rail (blue) -->
+  <rect class="power-rail-neg" x="30" y="60" width="340" height="25" rx="2"/>
+  <text class="label-text" x="20" y="77">-</text>
+  
+  <!-- Power rail holes -->
+  <circle id="power_pos_1" class="hole" cx="50" cy="42.5" r="3"/>
+  <circle id="power_neg_1" class="hole" cx="50" cy="72.5" r="3"/>
+  
+  <!-- Column labels -->
+  <text class="label-text" x="45" y="110">A</text>
+  <text class="label-text" x="75" y="110">B</text>
+  <text class="label-text" x="105" y="110">C</text>
+  <text class="label-text" x="135" y="110">D</text>
+  <text class="label-text" x="165" y="110">E</text>
+  <!-- Center divider gap -->
+  <text class="label-text" x="225" y="110">F</text>
+  <text class="label-text" x="255" y="110">G</text>
+  <text class="label-text" x="285" y="110">H</text>
+  <text class="label-text" x="315" y="110">I</text>
+  <text class="label-text" x="345" y="110">J</text>
+  
+  <!-- Central divider line -->
+  <line class="divider" x1="195" y1="120" x2="195" y2="630"/>
+  
+  <!-- Main breadboard holes -->
+  <!-- Row 1 -->
+  <text class="label-text" x="20" y="132">1</text>
+  <circle id="A1" class="hole" cx="50" cy="130" r="3"/>
+  <circle id="B1" class="hole" cx="80" cy="130" r="3"/>
+  <circle id="C1" class="hole" cx="110" cy="130" r="3"/>
+  <circle id="D1" class="hole" cx="140" cy="130" r="3"/>
+  <circle id="E1" class="hole" cx="170" cy="130" r="3"/>
+  <circle id="F1" class="hole" cx="220" cy="130" r="3"/>
+  <circle id="G1" class="hole" cx="250" cy="130" r="3"/>
+  <circle id="H1" class="hole" cx="280" cy="130" r="3"/>
+  <circle id="I1" class="hole" cx="310" cy="130" r="3"/>
+  <circle id="J1" class="hole" cx="340" cy="130" r="3"/>
+
+  <!-- Row 2 -->
+  <text class="label-text" x="20" y="149">2</text>
+  <circle id="A2" class="hole" cx="50" cy="147" r="3"/>
+  <circle id="B2" class="hole" cx="80" cy="147" r="3"/>
+  <circle id="C2" class="hole" cx="110" cy="147" r="3"/>
+  <circle id="D2" class="hole" cx="140" cy="147" r="3"/>
+  <circle id="E2" class="hole" cx="170" cy="147" r="3"/>
+  <circle id="F2" class="hole" cx="220" cy="147" r="3"/>
+  <circle id="G2" class="hole" cx="250" cy="147" r="3"/>
+  <circle id="H2" class="hole" cx="280" cy="147" r="3"/>
+  <circle id="I2" class="hole" cx="310" cy="147" r="3"/>
+  <circle id="J2" class="hole" cx="340" cy="147" r="3"/>
+
+  <!-- Row 3 -->
+  <text class="label-text" x="20" y="166">3</text>
+  <circle id="A3" class="hole" cx="50" cy="164" r="3"/>
+  <circle id="B3" class="hole" cx="80" cy="164" r="3"/>
+  <circle id="C3" class="hole" cx="110" cy="164" r="3"/>
+  <circle id="D3" class="hole" cx="140" cy="164" r="3"/>
+  <circle id="E3" class="hole" cx="170" cy="164" r="3"/>
+  <circle id="F3" class="hole" cx="220" cy="164" r="3"/>
+  <circle id="G3" class="hole" cx="250" cy="164" r="3"/>
+  <circle id="H3" class="hole" cx="280" cy="164" r="3"/>
+  <circle id="I3" class="hole" cx="310" cy="164" r="3"/>
+  <circle id="J3" class="hole" cx="340" cy="164" r="3"/>
+
+  <!-- Row 4 -->
+  <text class="label-text" x="20" y="183">4</text>
+  <circle id="A4" class="hole" cx="50" cy="181" r="3"/>
+  <circle id="B4" class="hole" cx="80" cy="181" r="3"/>
+  <circle id="C4" class="hole" cx="110" cy="181" r="3"/>
+  <circle id="D4" class="hole" cx="140" cy="181" r="3"/>
+  <circle id="E4" class="hole" cx="170" cy="181" r="3"/>
+  <circle id="F4" class="hole" cx="220" cy="181" r="3"/>
+  <circle id="G4" class="hole" cx="250" cy="181" r="3"/>
+  <circle id="H4" class="hole" cx="280" cy="181" r="3"/>
+  <circle id="I4" class="hole" cx="310" cy="181" r="3"/>
+  <circle id="J4" class="hole" cx="340" cy="181" r="3"/>
+
+  <!-- Row 5 -->
+  <text class="label-text" x="20" y="200">5</text>
+  <circle id="A5" class="hole" cx="50" cy="198" r="3"/>
+  <circle id="B5" class="hole" cx="80" cy="198" r="3"/>
+  <circle id="C5" class="hole" cx="110" cy="198" r="3"/>
+  <circle id="D5" class="hole" cx="140" cy="198" r="3"/>
+  <circle id="E5" class="hole" cx="170" cy="198" r="3"/>
+  <circle id="F5" class="hole" cx="220" cy="198" r="3"/>
+  <circle id="G5" class="hole" cx="250" cy="198" r="3"/>
+  <circle id="H5" class="hole" cx="280" cy="198" r="3"/>
+  <circle id="I5" class="hole" cx="310" cy="198" r="3"/>
+  <circle id="J5" class="hole" cx="340" cy="198" r="3"/>
+
+  <!-- Row 6 -->
+  <text class="label-text" x="20" y="217">6</text>
+  <circle id="A6" class="hole" cx="50" cy="215" r="3"/>
+  <circle id="B6" class="hole" cx="80" cy="215" r="3"/>
+  <circle id="C6" class="hole" cx="110" cy="215" r="3"/>
+  <circle id="D6" class="hole" cx="140" cy="215" r="3"/>
+  <circle id="E6" class="hole" cx="170" cy="215" r="3"/>
+  <circle id="F6" class="hole" cx="220" cy="215" r="3"/>
+  <circle id="G6" class="hole" cx="250" cy="215" r="3"/>
+  <circle id="H6" class="hole" cx="280" cy="215" r="3"/>
+  <circle id="I6" class="hole" cx="310" cy="215" r="3"/>
+  <circle id="J6" class="hole" cx="340" cy="215" r="3"/>
+
+  <!-- Row 7 -->
+  <text class="label-text" x="20" y="234">7</text>
+  <circle id="A7" class="hole" cx="50" cy="232" r="3"/>
+  <circle id="B7" class="hole" cx="80" cy="232" r="3"/>
+  <circle id="C7" class="hole" cx="110" cy="232" r="3"/>
+  <circle id="D7" class="hole" cx="140" cy="232" r="3"/>
+  <circle id="E7" class="hole" cx="170" cy="232" r="3"/>
+  <circle id="F7" class="hole" cx="220" cy="232" r="3"/>
+  <circle id="G7" class="hole" cx="250" cy="232" r="3"/>
+  <circle id="H7" class="hole" cx="280" cy="232" r="3"/>
+  <circle id="I7" class="hole" cx="310" cy="232" r="3"/>
+  <circle id="J7" class="hole" cx="340" cy="232" r="3"/>
+
+  <!-- Row 8 -->
+  <text class="label-text" x="20" y="251">8</text>
+  <circle id="A8" class="hole" cx="50" cy="249" r="3"/>
+  <circle id="B8" class="hole" cx="80" cy="249" r="3"/>
+  <circle id="C8" class="hole" cx="110" cy="249" r="3"/>
+  <circle id="D8" class="hole" cx="140" cy="249" r="3"/>
+  <circle id="E8" class="hole" cx="170" cy="249" r="3"/>
+  <circle id="F8" class="hole" cx="220" cy="249" r="3"/>
+  <circle id="G8" class="hole" cx="250" cy="249" r="3"/>
+  <circle id="H8" class="hole" cx="280" cy="249" r="3"/>
+  <circle id="I8" class="hole" cx="310" cy="249" r="3"/>
+  <circle id="J8" class="hole" cx="340" cy="249" r="3"/>
+
+  <!-- Row 9 -->
+  <text class="label-text" x="20" y="268">9</text>
+  <circle id="A9" class="hole" cx="50" cy="266" r="3"/>
+  <circle id="B9" class="hole" cx="80" cy="266" r="3"/>
+  <circle id="C9" class="hole" cx="110" cy="266" r="3"/>
+  <circle id="D9" class="hole" cx="140" cy="266" r="3"/>
+  <circle id="E9" class="hole" cx="170" cy="266" r="3"/>
+  <circle id="F9" class="hole" cx="220" cy="266" r="3"/>
+  <circle id="G9" class="hole" cx="250" cy="266" r="3"/>
+  <circle id="H9" class="hole" cx="280" cy="266" r="3"/>
+  <circle id="I9" class="hole" cx="310" cy="266" r="3"/>
+  <circle id="J9" class="hole" cx="340" cy="266" r="3"/>
+
+  <!-- Row 10 -->
+  <text class="label-text" x="15" y="285">10</text>
+  <circle id="A10" class="hole" cx="50" cy="283" r="3"/>
+  <circle id="B10" class="hole" cx="80" cy="283" r="3"/>
+  <circle id="C10" class="hole" cx="110" cy="283" r="3"/>
+  <circle id="D10" class="hole" cx="140" cy="283" r="3"/>
+  <circle id="E10" class="hole" cx="170" cy="283" r="3"/>
+  <circle id="F10" class="hole" cx="220" cy="283" r="3"/>
+  <circle id="G10" class="hole" cx="250" cy="283" r="3"/>
+  <circle id="H10" class="hole" cx="280" cy="283" r="3"/>
+  <circle id="I10" class="hole" cx="310" cy="283" r="3"/>
+  <circle id="J10" class="hole" cx="340" cy="283" r="3"/>
+
+  <!-- Row 11 -->
+  <text class="label-text" x="15" y="302">11</text>
+  <circle id="A11" class="hole" cx="50" cy="300" r="3"/>
+  <circle id="B11" class="hole" cx="80" cy="300" r="3"/>
+  <circle id="C11" class="hole" cx="110" cy="300" r="3"/>
+  <circle id="D11" class="hole" cx="140" cy="300" r="3"/>
+  <circle id="E11" class="hole" cx="170" cy="300" r="3"/>
+  <circle id="F11" class="hole" cx="220" cy="300" r="3"/>
+  <circle id="G11" class="hole" cx="250" cy="300" r="3"/>
+  <circle id="H11" class="hole" cx="280" cy="300" r="3"/>
+  <circle id="I11" class="hole" cx="310" cy="300" r="3"/>
+  <circle id="J11" class="hole" cx="340" cy="300" r="3"/>
+
+  <!-- Row 12 -->
+  <text class="label-text" x="15" y="319">12</text>
+  <circle id="A12" class="hole" cx="50" cy="317" r="3"/>
+  <circle id="B12" class="hole" cx="80" cy="317" r="3"/>
+  <circle id="C12" class="hole" cx="110" cy="317" r="3"/>
+  <circle id="D12" class="hole" cx="140" cy="317" r="3"/>
+  <circle id="E12" class="hole" cx="170" cy="317" r="3"/>
+  <circle id="F12" class="hole" cx="220" cy="317" r="3"/>
+  <circle id="G12" class="hole" cx="250" cy="317" r="3"/>
+  <circle id="H12" class="hole" cx="280" cy="317" r="3"/>
+  <circle id="I12" class="hole" cx="310" cy="317" r="3"/>
+  <circle id="J12" class="hole" cx="340" cy="317" r="3"/>
+
+  <!-- Row 13 -->
+  <text class="label-text" x="15" y="336">13</text>
+  <circle id="A13" class="hole" cx="50" cy="334" r="3"/>
+  <circle id="B13" class="hole" cx="80" cy="334" r="3"/>
+  <circle id="C13" class="hole" cx="110" cy="334" r="3"/>
+  <circle id="D13" class="hole" cx="140" cy="334" r="3"/>
+  <circle id="E13" class="hole" cx="170" cy="334" r="3"/>
+  <circle id="F13" class="hole" cx="220" cy="334" r="3"/>
+  <circle id="G13" class="hole" cx="250" cy="334" r="3"/>
+  <circle id="H13" class="hole" cx="280" cy="334" r="3"/>
+  <circle id="I13" class="hole" cx="310" cy="334" r="3"/>
+  <circle id="J13" class="hole" cx="340" cy="334" r="3"/>
+
+  <!-- Row 14 -->
+  <text class="label-text" x="15" y="353">14</text>
+  <circle id="A14" class="hole" cx="50" cy="351" r="3"/>
+  <circle id="B14" class="hole" cx="80" cy="351" r="3"/>
+  <circle id="C14" class="hole" cx="110" cy="351" r="3"/>
+  <circle id="D14" class="hole" cx="140" cy="351" r="3"/>
+  <circle id="E14" class="hole" cx="170" cy="351" r="3"/>
+  <circle id="F14" class="hole" cx="220" cy="351" r="3"/>
+  <circle id="G14" class="hole" cx="250" cy="351" r="3"/>
+  <circle id="H14" class="hole" cx="280" cy="351" r="3"/>
+  <circle id="I14" class="hole" cx="310" cy="351" r="3"/>
+  <circle id="J14" class="hole" cx="340" cy="351" r="3"/>
+
+  <!-- Row 15 -->
+  <text class="label-text" x="15" y="370">15</text>
+  <circle id="A15" class="hole" cx="50" cy="368" r="3"/>
+  <circle id="B15" class="hole" cx="80" cy="368" r="3"/>
+  <circle id="C15" class="hole" cx="110" cy="368" r="3"/>
+  <circle id="D15" class="hole" cx="140" cy="368" r="3"/>
+  <circle id="E15" class="hole" cx="170" cy="368" r="3"/>
+  <circle id="F15" class="hole" cx="220" cy="368" r="3"/>
+  <circle id="G15" class="hole" cx="250" cy="368" r="3"/>
+  <circle id="H15" class="hole" cx="280" cy="368" r="3"/>
+  <circle id="I15" class="hole" cx="310" cy="368" r="3"/>
+  <circle id="J15" class="hole" cx="340" cy="368" r="3"/>
+
+  <!-- Row 16 -->
+  <text class="label-text" x="15" y="387">16</text>
+  <circle id="A16" class="hole" cx="50" cy="385" r="3"/>
+  <circle id="B16" class="hole" cx="80" cy="385" r="3"/>
+  <circle id="C16" class="hole" cx="110" cy="385" r="3"/>
+  <circle id="D16" class="hole" cx="140" cy="385" r="3"/>
+  <circle id="E16" class="hole" cx="170" cy="385" r="3"/>
+  <circle id="F16" class="hole" cx="220" cy="385" r="3"/>
+  <circle id="G16" class="hole" cx="250" cy="385" r="3"/>
+  <circle id="H16" class="hole" cx="280" cy="385" r="3"/>
+  <circle id="I16" class="hole" cx="310" cy="385" r="3"/>
+  <circle id="J16" class="hole" cx="340" cy="385" r="3"/>
+
+  <!-- Row 17 -->
+  <text class="label-text" x="15" y="404">17</text>
+  <circle id="A17" class="hole" cx="50" cy="402" r="3"/>
+  <circle id="B17" class="hole" cx="80" cy="402" r="3"/>
+  <circle id="C17" class="hole" cx="110" cy="402" r="3"/>
+  <circle id="D17" class="hole" cx="140" cy="402" r="3"/>
+  <circle id="E17" class="hole" cx="170" cy="402" r="3"/>
+  <circle id="F17" class="hole" cx="220" cy="402" r="3"/>
+  <circle id="G17" class="hole" cx="250" cy="402" r="3"/>
+  <circle id="H17" class="hole" cx="280" cy="402" r="3"/>
+  <circle id="I17" class="hole" cx="310" cy="402" r="3"/>
+  <circle id="J17" class="hole" cx="340" cy="402" r="3"/>
+
+  <!-- Row 18 -->
+  <text class="label-text" x="15" y="421">18</text>
+  <circle id="A18" class="hole" cx="50" cy="419" r="3"/>
+  <circle id="B18" class="hole" cx="80" cy="419" r="3"/>
+  <circle id="C18" class="hole" cx="110" cy="419" r="3"/>
+  <circle id="D18" class="hole" cx="140" cy="419" r="3"/>
+  <circle id="E18" class="hole" cx="170" cy="419" r="3"/>
+  <circle id="F18" class="hole" cx="220" cy="419" r="3"/>
+  <circle id="G18" class="hole" cx="250" cy="419" r="3"/>
+  <circle id="H18" class="hole" cx="280" cy="419" r="3"/>
+  <circle id="I18" class="hole" cx="310" cy="419" r="3"/>
+  <circle id="J18" class="hole" cx="340" cy="419" r="3"/>
+
+  <!-- Row 19 -->
+  <text class="label-text" x="15" y="438">19</text>
+  <circle id="A19" class="hole" cx="50" cy="436" r="3"/>
+  <circle id="B19" class="hole" cx="80" cy="436" r="3"/>
+  <circle id="C19" class="hole" cx="110" cy="436" r="3"/>
+  <circle id="D19" class="hole" cx="140" cy="436" r="3"/>
+  <circle id="E19" class="hole" cx="170" cy="436" r="3"/>
+  <circle id="F19" class="hole" cx="220" cy="436" r="3"/>
+  <circle id="G19" class="hole" cx="250" cy="436" r="3"/>
+  <circle id="H19" class="hole" cx="280" cy="436" r="3"/>
+  <circle id="I19" class="hole" cx="310" cy="436" r="3"/>
+  <circle id="J19" class="hole" cx="340" cy="436" r="3"/>
+
+  <!-- Row 20 -->
+  <text class="label-text" x="15" y="455">20</text>
+  <circle id="A20" class="hole" cx="50" cy="453" r="3"/>
+  <circle id="B20" class="hole" cx="80" cy="453" r="3"/>
+  <circle id="C20" class="hole" cx="110" cy="453" r="3"/>
+  <circle id="D20" class="hole" cx="140" cy="453" r="3"/>
+  <circle id="E20" class="hole" cx="170" cy="453" r="3"/>
+  <circle id="F20" class="hole" cx="220" cy="453" r="3"/>
+  <circle id="G20" class="hole" cx="250" cy="453" r="3"/>
+  <circle id="H20" class="hole" cx="280" cy="453" r="3"/>
+  <circle id="I20" class="hole" cx="310" cy="453" r="3"/>
+  <circle id="J20" class="hole" cx="340" cy="453" r="3"/>
+
+  <!-- Row 21 -->
+  <text class="label-text" x="15" y="472">21</text>
+  <circle id="A21" class="hole" cx="50" cy="470" r="3"/>
+  <circle id="B21" class="hole" cx="80" cy="470" r="3"/>
+  <circle id="C21" class="hole" cx="110" cy="470" r="3"/>
+  <circle id="D21" class="hole" cx="140" cy="470" r="3"/>
+  <circle id="E21" class="hole" cx="170" cy="470" r="3"/>
+  <circle id="F21" class="hole" cx="220" cy="470" r="3"/>
+  <circle id="G21" class="hole" cx="250" cy="470" r="3"/>
+  <circle id="H21" class="hole" cx="280" cy="470" r="3"/>
+  <circle id="I21" class="hole" cx="310" cy="470" r="3"/>
+  <circle id="J21" class="hole" cx="340" cy="470" r="3"/>
+
+  <!-- Row 22 -->
+  <text class="label-text" x="15" y="489">22</text>
+  <circle id="A22" class="hole" cx="50" cy="487" r="3"/>
+  <circle id="B22" class="hole" cx="80" cy="487" r="3"/>
+  <circle id="C22" class="hole" cx="110" cy="487" r="3"/>
+  <circle id="D22" class="hole" cx="140" cy="487" r="3"/>
+  <circle id="E22" class="hole" cx="170" cy="487" r="3"/>
+  <circle id="F22" class="hole" cx="220" cy="487" r="3"/>
+  <circle id="G22" class="hole" cx="250" cy="487" r="3"/>
+  <circle id="H22" class="hole" cx="280" cy="487" r="3"/>
+  <circle id="I22" class="hole" cx="310" cy="487" r="3"/>
+  <circle id="J22" class="hole" cx="340" cy="487" r="3"/>
+
+  <!-- Row 23 -->
+  <text class="label-text" x="15" y="506">23</text>
+  <circle id="A23" class="hole" cx="50" cy="504" r="3"/>
+  <circle id="B23" class="hole" cx="80" cy="504" r="3"/>
+  <circle id="C23" class="hole" cx="110" cy="504" r="3"/>
+  <circle id="D23" class="hole" cx="140" cy="504" r="3"/>
+  <circle id="E23" class="hole" cx="170" cy="504" r="3"/>
+  <circle id="F23" class="hole" cx="220" cy="504" r="3"/>
+  <circle id="G23" class="hole" cx="250" cy="504" r="3"/>
+  <circle id="H23" class="hole" cx="280" cy="504" r="3"/>
+  <circle id="I23" class="hole" cx="310" cy="504" r="3"/>
+  <circle id="J23" class="hole" cx="340" cy="504" r="3"/>
+
+  <!-- Row 24 -->
+  <text class="label-text" x="15" y="523">24</text>
+  <circle id="A24" class="hole" cx="50" cy="521" r="3"/>
+  <circle id="B24" class="hole" cx="80" cy="521" r="3"/>
+  <circle id="C24" class="hole" cx="110" cy="521" r="3"/>
+  <circle id="D24" class="hole" cx="140" cy="521" r="3"/>
+  <circle id="E24" class="hole" cx="170" cy="521" r="3"/>
+  <circle id="F24" class="hole" cx="220" cy="521" r="3"/>
+  <circle id="G24" class="hole" cx="250" cy="521" r="3"/>
+  <circle id="H24" class="hole" cx="280" cy="521" r="3"/>
+  <circle id="I24" class="hole" cx="310" cy="521" r="3"/>
+  <circle id="J24" class="hole" cx="340" cy="521" r="3"/>
+
+  <!-- Row 25 -->
+  <text class="label-text" x="15" y="540">25</text>
+  <circle id="A25" class="hole" cx="50" cy="538" r="3"/>
+  <circle id="B25" class="hole" cx="80" cy="538" r="3"/>
+  <circle id="C25" class="hole" cx="110" cy="538" r="3"/>
+  <circle id="D25" class="hole" cx="140" cy="538" r="3"/>
+  <circle id="E25" class="hole" cx="170" cy="538" r="3"/>
+  <circle id="F25" class="hole" cx="220" cy="538" r="3"/>
+  <circle id="G25" class="hole" cx="250" cy="538" r="3"/>
+  <circle id="H25" class="hole" cx="280" cy="538" r="3"/>
+  <circle id="I25" class="hole" cx="310" cy="538" r="3"/>
+  <circle id="J25" class="hole" cx="340" cy="538" r="3"/>
+
+  <!-- Row 26 -->
+  <text class="label-text" x="15" y="557">26</text>
+  <circle id="A26" class="hole" cx="50" cy="555" r="3"/>
+  <circle id="B26" class="hole" cx="80" cy="555" r="3"/>
+  <circle id="C26" class="hole" cx="110" cy="555" r="3"/>
+  <circle id="D26" class="hole" cx="140" cy="555" r="3"/>
+  <circle id="E26" class="hole" cx="170" cy="555" r="3"/>
+  <circle id="F26" class="hole" cx="220" cy="555" r="3"/>
+  <circle id="G26" class="hole" cx="250" cy="555" r="3"/>
+  <circle id="H26" class="hole" cx="280" cy="555" r="3"/>
+  <circle id="I26" class="hole" cx="310" cy="555" r="3"/>
+  <circle id="J26" class="hole" cx="340" cy="555" r="3"/>
+
+  <!-- Row 27 -->
+  <text class="label-text" x="15" y="574">27</text>
+  <circle id="A27" class="hole" cx="50" cy="572" r="3"/>
+  <circle id="B27" class="hole" cx="80" cy="572" r="3"/>
+  <circle id="C27" class="hole" cx="110" cy="572" r="3"/>
+  <circle id="D27" class="hole" cx="140" cy="572" r="3"/>
+  <circle id="E27" class="hole" cx="170" cy="572" r="3"/>
+  <circle id="F27" class="hole" cx="220" cy="572" r="3"/>
+  <circle id="G27" class="hole" cx="250" cy="572" r="3"/>
+  <circle id="H27" class="hole" cx="280" cy="572" r="3"/>
+  <circle id="I27" class="hole" cx="310" cy="572" r="3"/>
+  <circle id="J27" class="hole" cx="340" cy="572" r="3"/>
+
+  <!-- Row 28 -->
+  <text class="label-text" x="15" y="591">28</text>
+  <circle id="A28" class="hole" cx="50" cy="589" r="3"/>
+  <circle id="B28" class="hole" cx="80" cy="589" r="3"/>
+  <circle id="C28" class="hole" cx="110" cy="589" r="3"/>
+  <circle id="D28" class="hole" cx="140" cy="589" r="3"/>
+  <circle id="E28" class="hole" cx="170" cy="589" r="3"/>
+  <circle id="F28" class="hole" cx="220" cy="589" r="3"/>
+  <circle id="G28" class="hole" cx="250" cy="589" r="3"/>
+  <circle id="H28" class="hole" cx="280" cy="589" r="3"/>
+  <circle id="I28" class="hole" cx="310" cy="589" r="3"/>
+  <circle id="J28" class="hole" cx="340" cy="589" r="3"/>
+
+  <!-- Row 29 -->
+  <text class="label-text" x="15" y="608">29</text>
+  <circle id="A29" class="hole" cx="50" cy="606" r="3"/>
+  <circle id="B29" class="hole" cx="80" cy="606" r="3"/>
+  <circle id="C29" class="hole" cx="110" cy="606" r="3"/>
+  <circle id="D29" class="hole" cx="140" cy="606" r="3"/>
+  <circle id="E29" class="hole" cx="170" cy="606" r="3"/>
+  <circle id="F29" class="hole" cx="220" cy="606" r="3"/>
+  <circle id="G29" class="hole" cx="250" cy="606" r="3"/>
+  <circle id="H29" class="hole" cx="280" cy="606" r="3"/>
+  <circle id="I29" class="hole" cx="310" cy="606" r="3"/>
+  <circle id="J29" class="hole" cx="340" cy="606" r="3"/>
+
+  <!-- Row 30 -->
+  <text class="label-text" x="15" y="625">30</text>
+  <circle id="A30" class="hole" cx="50" cy="623" r="3"/>
+  <circle id="B30" class="hole" cx="80" cy="623" r="3"/>
+  <circle id="C30" class="hole" cx="110" cy="623" r="3"/>
+  <circle id="D30" class="hole" cx="140" cy="623" r="3"/>
+  <circle id="E30" class="hole" cx="170" cy="623" r="3"/>
+  <circle id="F30" class="hole" cx="220" cy="623" r="3"/>
+  <circle id="G30" class="hole" cx="250" cy="623" r="3"/>
+  <circle id="H30" class="hole" cx="280" cy="623" r="3"/>
+  <circle id="I30" class="hole" cx="310" cy="623" r="3"/>
+  <circle id="J30" class="hole" cx="340" cy="623" r="3"/>
+
+ </g>
+</svg>

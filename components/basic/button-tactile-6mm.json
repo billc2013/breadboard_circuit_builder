@@ -1,0 +1,96 @@
+{
+  "component": {
+    "metadata": {
+      "id": "button-tactile-6mm",
+      "name": "Tactile Pushbutton (6mm)",
+      "description": "A momentary tactile pushbutton switch - normally open, closes when pressed",
+      "author": "tigoe",
+      "tags": [
+        "Pushbutton",
+        "button",
+        "switch",
+        "momentary",
+        "SPST",
+        "user input"
+      ],
+      "version": "4",
+      "created": "2010-01-19",
+      "category": "basic"
+    },
+    "pins": {
+      "leg0": {
+        "number": 1,
+        "name": "leg0",
+        "description": "Button terminal 1 (either side of switch)",
+        "connectorId": "connector0",
+        "electricalType": "io"
+      },
+      "leg1": {
+        "number": 2,
+        "name": "leg1",
+        "description": "Button terminal 2 (either side of switch)",
+        "connectorId": "connector1",
+        "electricalType": "io"
+      }
+    },
+    "properties": {
+      "package": "6mm square tactile",
+      "switching_circuit": "SPST",
+      "default_state": "Normally Open",
+      "actuation_force": "160gf",
+      "travel": "0.25mm",
+      "durability": "100,000 cycles",
+      "contact_resistance": "<100mΩ"
+    },
+    "physical": {
+      "type": "tht",
+      "package": "6mm square tactile",
+      "pin_spacing": "7.2mm",
+      "height": "5mm"
+    },
+    "rendering": {
+      "breadboard": {
+        "svg": "components_svg/Pushbuttonc.svg",
+        "width": 50.562,
+        "height": 56.168,
+        "unit": "px",
+        "anchor": "center",
+        "pinOffsets": {
+          "leg0": {"x": -3.75, "y": 28},
+          "leg1": {"x": 3.75, "y": 28}
+        },
+        "renderMode": "on-breadboard",
+        "orientation": {
+          "default": "vertical",
+          "allowed": ["vertical", "horizontal"]
+        }
+      },
+      "schematic": {
+        "svg": "schematic/pushbutton.svg"
+      },
+      "pcb": {
+        "svg": "pcb/pushbutton_2_300mil_thick.svg"
+      }
+    },
+    "validation": {
+      "electricalType": "switch",
+      "polarity": "non-polarized",
+      "rules": {
+        "requiresPullResistor": true,
+        "recommendedPullResistor": {
+          "value": 10000,
+          "type": "pull-down",
+          "description": "10kΩ from button to ground for stable LOW state"
+        },
+        "typicalUse": "digital_input"
+      },
+      "warnings": [
+        "Button requires pull-down or pull-up resistor for stable readings",
+        "Typical configuration: GPIO → Button → 3.3V, with 10kΩ pull-down to GND",
+        "Alternative: Use Pico internal pull-down (software configuration)",
+        "Debouncing recommended in software (10-50ms delay)",
+        "Do not connect button directly between power and ground"
+      ]
+    }
+  }
+}

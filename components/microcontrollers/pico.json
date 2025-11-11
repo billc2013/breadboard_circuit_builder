@@ -1,0 +1,493 @@
+{
+  "component": {
+    "metadata": {
+      "id": "raspberry-pi-pico",
+      "name": "Raspberry Pi Pico",
+      "description": "RP2040 microcontroller board with 40 pins (26 GPIO). Dual-core ARM Cortex-M0+ at 133MHz with 264KB SRAM and 2MB flash. All GPIO pins support PWM (16 PWM channels shared across pins).",
+      "author": "Alasdair Allan/Jack Wills/James Hughes (modified by vanepp Jan 2021)",
+      "manufacturer": "Raspberry Pi Foundation",
+      "datasheet": "https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf",
+      "tags": [
+        "Raspberry",
+        "Picoboard",
+        "Pico",
+        "Pico 2",
+        "Raspberry Pi",
+        "Pico 2040",
+        "Pico 2350",
+        "microcontroller",
+        "rp2040"
+      ],
+      "version": "4",
+      "created": "Fri Jul 26 2024",
+      "fritzingVersion": "0.9.4",
+      "category": "microcontrollers"
+    },
+    "pins": {
+      "GP0": {
+        "number": 1,
+        "name": "GP0",
+        "description": "GPIO0 / UART0 TX / I2C0 SDA / SPI0 RX / PWM0 A",
+        "connectorId": "connector0",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "UART0_TX", "I2C0_SDA", "SPI0_RX", "PWM0_A"],
+        "pwmCapable": true,
+        "pwmChannel": "0A"
+      },
+      "GP1": {
+        "number": 2,
+        "name": "GP1",
+        "description": "GPIO1 / UART0 RX / I2C0 SCL / SPI0 CSn / PWM0 B",
+        "connectorId": "connector1",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "UART0_RX", "I2C0_SCL", "SPI0_CSn", "PWM0_B"],
+        "pwmCapable": true,
+        "pwmChannel": "0B"
+      },
+      "GND_3": {
+        "number": 3,
+        "name": "GND",
+        "description": "Ground",
+        "connectorId": "connector2",
+        "electricalType": "ground"
+      },
+      "GP2": {
+        "number": 4,
+        "name": "GP2",
+        "description": "GPIO2 / I2C1 SDA / SPI0 SCK / PWM1 A",
+        "connectorId": "connector3",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C1_SDA", "SPI0_SCK", "PWM1_A"],
+        "pwmCapable": true,
+        "pwmChannel": "1A"
+      },
+      "GP3": {
+        "number": 5,
+        "name": "GP3",
+        "description": "GPIO3 / I2C1 SCL / SPI0 TX / PWM1 B",
+        "connectorId": "connector4",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C1_SCL", "SPI0_TX", "PWM1_B"],
+        "pwmCapable": true,
+        "pwmChannel": "1B"
+      },
+      "GP4": {
+        "number": 6,
+        "name": "GP4",
+        "description": "GPIO4 / UART1 TX / I2C0 SDA / SPI0 RX / PWM2 A",
+        "connectorId": "connector5",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "UART1_TX", "I2C0_SDA", "SPI0_RX", "PWM2_A"],
+        "pwmCapable": true,
+        "pwmChannel": "2A"
+      },
+      "GP5": {
+        "number": 7,
+        "name": "GP5",
+        "description": "GPIO5 / UART1 RX / I2C0 SDA / SPI0 CSn / PWM2 B",
+        "connectorId": "connector6",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "UART1_RX", "I2C0_SDA", "SPI0_CSn", "PWM2_B"],
+        "pwmCapable": true,
+        "pwmChannel": "2B"
+      },
+      "GND_8": {
+        "number": 8,
+        "name": "GND",
+        "description": "Ground",
+        "connectorId": "connector7",
+        "electricalType": "ground"
+      },
+      "GP6": {
+        "number": 9,
+        "name": "GP6",
+        "description": "GPIO6 / I2C1 SDA / SPI0 SCK / PWM3 A",
+        "connectorId": "connector8",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C1_SDA", "SPI0_SCK", "PWM3_A"],
+        "pwmCapable": true,
+        "pwmChannel": "3A"
+      },
+      "GP7": {
+        "number": 10,
+        "name": "GP7",
+        "description": "GPIO7 / I2C1 SCL / SPI0 TX / PWM3 B",
+        "connectorId": "connector9",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C1_SCL", "SPI0_TX", "PWM3_B"],
+        "pwmCapable": true,
+        "pwmChannel": "3B"
+      },
+      "GP8": {
+        "number": 11,
+        "name": "GP8",
+        "description": "GPIO8 / UART1 TX / I2C0 SDA / SPI1 RX / PWM4 A",
+        "connectorId": "connector10",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "UART1_TX", "I2C0_SDA", "SPI1_RX", "PWM4_A"],
+        "pwmCapable": true,
+        "pwmChannel": "4A"
+      },
+      "GP9": {
+        "number": 12,
+        "name": "GP9",
+        "description": "GPIO9 / UART1 RX / I2C0 SCL / SPI1 CSn / PWM4 B",
+        "connectorId": "connector11",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "UART1_RX", "I2C0_SCL", "SPI1_CSn", "PWM4_B"],
+        "pwmCapable": true,
+        "pwmChannel": "4B"
+      },
+      "GND_13": {
+        "number": 13,
+        "name": "GND",
+        "description": "Ground",
+        "connectorId": "connector12",
+        "electricalType": "ground"
+      },
+      "GP10": {
+        "number": 14,
+        "name": "GP10",
+        "description": "GPIO10 / I2C1 SDA / SPI1 SCK / PWM5 A",
+        "connectorId": "connector13",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C1_SDA", "SPI1_SCK", "PWM5_A"],
+        "pwmCapable": true,
+        "pwmChannel": "5A"
+      },
+      "GP11": {
+        "number": 15,
+        "name": "GP11",
+        "description": "GPIO11 / I2C1 SCL / SPI1 TX / PWM5 B",
+        "connectorId": "connector14",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C1_SCL", "SPI1_TX", "PWM5_B"],
+        "pwmCapable": true,
+        "pwmChannel": "5B"
+      },
+      "GP12": {
+        "number": 16,
+        "name": "GP12",
+        "description": "GPIO12 / UART0 TX / I2C0 SDA / SPI1 RX / PWM6 A",
+        "connectorId": "connector15",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "UART0_TX", "I2C0_SDA", "SPI1_RX", "PWM6_A"],
+        "pwmCapable": true,
+        "pwmChannel": "6A"
+      },
+      "GP13": {
+        "number": 17,
+        "name": "GP13",
+        "description": "GPIO13 / UART0 RX / I2C0 SCL / SPI1 CSn / PWM6 B",
+        "connectorId": "connector16",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "UART0_RX", "I2C0_SCL", "SPI1_CSn", "PWM6_B"],
+        "pwmCapable": true,
+        "pwmChannel": "6B"
+      },
+      "GND_18": {
+        "number": 18,
+        "name": "GND",
+        "description": "Ground",
+        "connectorId": "connector17",
+        "electricalType": "ground"
+      },
+      "GP14": {
+        "number": 19,
+        "name": "GP14",
+        "description": "GPIO14 / I2C1 SDA / SPI1 SCK / PWM7 A",
+        "connectorId": "connector18",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C1_SDA", "SPI1_SCK", "PWM7_A"],
+        "pwmCapable": true,
+        "pwmChannel": "7A"
+      },
+      "GP15": {
+        "number": 20,
+        "name": "GP15",
+        "description": "GPIO15 / I2C1 SCL / SPI1 TX / PWM7 B",
+        "connectorId": "connector19",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C1_SCL", "SPI1_TX", "PWM7_B"],
+        "pwmCapable": true,
+        "pwmChannel": "7B"
+      },
+      "GP16": {
+        "number": 21,
+        "name": "GP16",
+        "description": "GPIO16 / SPI0 RX / I2C0 SDA / UART0 TX / PWM0 A",
+        "connectorId": "connector20",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "SPI0_RX", "I2C0_SDA", "UART0_TX", "PWM0_A"],
+        "pwmCapable": true,
+        "pwmChannel": "0A"
+      },
+      "GP17": {
+        "number": 22,
+        "name": "GP17",
+        "description": "GPIO17 / SPI0 CSn / I2C0 SCL / UART0 RX / PWM0 B",
+        "connectorId": "connector21",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "SPI0_CSn", "I2C0_SCL", "UART0_RX", "PWM0_B"],
+        "pwmCapable": true,
+        "pwmChannel": "0B"
+      },
+      "GND_23": {
+        "number": 23,
+        "name": "GND",
+        "description": "Ground",
+        "connectorId": "connector22",
+        "electricalType": "ground"
+      },
+      "GP18": {
+        "number": 24,
+        "name": "GP18",
+        "description": "GPIO18 / SPI0 SCK / I2C1 SDA / PWM1 A",
+        "connectorId": "connector23",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "SPI0_SCK", "I2C1_SDA", "PWM1_A"],
+        "pwmCapable": true,
+        "pwmChannel": "1A"
+      },
+      "GP19": {
+        "number": 25,
+        "name": "GP19",
+        "description": "GPIO19 / SPIO TX / I2C1 SCL / PWM1 B",
+        "connectorId": "connector24",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "SPIO_TX", "I2C1_SCL", "PWM1_B"],
+        "pwmCapable": true,
+        "pwmChannel": "1B"
+      },
+      "GP20": {
+        "number": 26,
+        "name": "GP20",
+        "description": "GPIO20 / I2C SDA / PWM2 A",
+        "connectorId": "connector25",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C_SDA", "PWM2_A"],
+        "pwmCapable": true,
+        "pwmChannel": "2A"
+      },
+      "GP21": {
+        "number": 27,
+        "name": "GP21",
+        "description": "GPIO21 / I2C0 SCL / PWM2 B",
+        "connectorId": "connector26",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "I2C0_SCL", "PWM2_B"],
+        "pwmCapable": true,
+        "pwmChannel": "2B"
+      },
+      "GND_28": {
+        "number": 28,
+        "name": "GND",
+        "description": "Ground",
+        "connectorId": "connector27",
+        "electricalType": "ground"
+      },
+      "GP22": {
+        "number": 29,
+        "name": "GP22",
+        "description": "GPIO22 / PWM3 A",
+        "connectorId": "connector28",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "PWM3_A"],
+        "pwmCapable": true,
+        "pwmChannel": "3A"
+      },
+      "RUN": {
+        "number": 30,
+        "name": "RUN",
+        "description": "RUN - Reset pin (active low)",
+        "connectorId": "connector29",
+        "electricalType": "input"
+      },
+      "GP26_ADC0": {
+        "number": 31,
+        "name": "GP26/ADC0",
+        "description": "GPIO26 / ADC0 / I2C1 SDA / PWM5 A",
+        "connectorId": "connector30",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "ADC0", "I2C1_SDA", "PWM5_A"],
+        "pwmCapable": true,
+        "pwmChannel": "5A",
+        "adcCapable": true,
+        "adcChannel": 0
+      },
+      "GP27_ADC1": {
+        "number": 32,
+        "name": "GP27/ADC1",
+        "description": "GPIO27 / ADC1 / I2C1 SCL / PWM5 B",
+        "connectorId": "connector31",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "ADC1", "I2C1_SCL", "PWM5_B"],
+        "pwmCapable": true,
+        "pwmChannel": "5B",
+        "adcCapable": true,
+        "adcChannel": 1
+      },
+      "AGND": {
+        "number": 33,
+        "name": "AGND",
+        "description": "GND/AGND - Analog ground",
+        "connectorId": "connector32",
+        "electricalType": "ground"
+      },
+      "GP28_ADC2": {
+        "number": 34,
+        "name": "GP28/ADC2",
+        "description": "GPIO28 / ADC2 / PWM6 A",
+        "connectorId": "connector33",
+        "electricalType": "gpio",
+        "functions": ["GPIO", "ADC2", "PWM6_A"],
+        "pwmCapable": true,
+        "pwmChannel": "6A",
+        "adcCapable": true,
+        "adcChannel": 2
+      },
+      "ADC_VREF": {
+        "number": 35,
+        "name": "ADC_VREF",
+        "description": "ADC_VREF - Analog voltage reference input",
+        "connectorId": "connector34",
+        "electricalType": "input"
+      },
+      "3V3_OUT": {
+        "number": 36,
+        "name": "3V3(OUT)",
+        "description": "3V3 Out - 3.3V power output (max 300mA)",
+        "connectorId": "connector35",
+        "electricalType": "power",
+        "voltage": 3.3,
+        "maxCurrent": 0.3
+      },
+      "3V3_EN": {
+        "number": 37,
+        "name": "3V3_EN",
+        "description": "3V3_EN - 3.3V regulator enable (pull low to disable)",
+        "connectorId": "connector36",
+        "electricalType": "input"
+      },
+      "GND_38": {
+        "number": 38,
+        "name": "GND",
+        "description": "Ground",
+        "connectorId": "connector37",
+        "electricalType": "ground"
+      },
+      "VSYS": {
+        "number": 39,
+        "name": "VSYS",
+        "description": "VSYS - System voltage input (1.8-5.5V)",
+        "connectorId": "connector38",
+        "electricalType": "power",
+        "voltageRange": [1.8, 5.5]
+      },
+      "VBUS": {
+        "number": 40,
+        "name": "VBUS",
+        "description": "VBUS - USB power input (5V)",
+        "connectorId": "connector39",
+        "electricalType": "power",
+        "voltage": 5
+      },
+      "SWCLK": {
+        "number": 41,
+        "name": "SWCLK",
+        "description": "DEBUG SWCLK - Serial Wire Debug Clock",
+        "connectorId": "connector40",
+        "electricalType": "io"
+      },
+      "GND_DEBUG": {
+        "number": 42,
+        "name": "GND",
+        "description": "DEBUG GND - Debug ground",
+        "connectorId": "connector41",
+        "electricalType": "ground"
+      },
+      "SWDIO": {
+        "number": 43,
+        "name": "SWDIO",
+        "description": "DEBUG SWDIO - Serial Wire Debug Data",
+        "connectorId": "connector42",
+        "electricalType": "io"
+      }
+    },
+    "properties": {
+      "processor": "RP2040",
+      "cores": 2,
+      "architecture": "ARM Cortex-M0+",
+      "clockSpeed": 133,
+      "clockSpeedUnit": "MHz",
+      "flash": 2,
+      "flashUnit": "MB",
+      "sram": 264,
+      "sramUnit": "KB",
+      "gpioCount": 26,
+      "pwmChannels": 16,
+      "pwmNote": "16 PWM channels (8 slices × 2 channels). All GPIO pins can do PWM but share the 16 channels.",
+      "adcChannels": 3,
+      "adcResolution": 12,
+      "adcPins": ["GP26", "GP27", "GP28"],
+      "uartPorts": 2,
+      "spiPorts": 2,
+      "i2cPorts": 2,
+      "voltage": 3.3,
+      "voltageUnit": "V"
+    },
+    "physical": {
+      "type": "tht",
+      "package": "DIP-40",
+      "dimensions": {
+        "width": 21,
+        "height": 51,
+        "depth": 1.0,
+        "unit": "mm"
+      },
+      "pinSpacing": 2.54,
+      "pinSpacingUnit": "mm"
+    },
+    "rendering": {
+      "breadboard": {
+        "svg": "breadboard/PicoX_5b0d7b3a0f8021a2300141963517266c_2_breadboard.svg",
+        "width": 85,
+        "height": 240,
+        "unit": "px",
+        "renderMode": "off-breadboard",
+        "anchor": "GP0"
+      },
+      "schematic": {
+        "svg": "schematic/PicoX_5b0d7b3a0f8021a2300141963517266c_2_schematic.svg"
+      },
+      "pcb": {
+        "svg": "pcb/PicoX_5b0d7b3a0f8021a2300141963517266c_2_pcb.svg"
+      }
+    },
+    "validation": {
+      "electricalType": "microcontroller",
+      "ioVoltage": 3.3,
+      "maxIoCurrent": 0.012,
+      "maxIoCurrentUnit": "A",
+      "totalMaxCurrent": 0.05,
+      "totalMaxCurrentUnit": "A",
+      "rules": {
+        "requiresPower": true,
+        "requiresGround": true,
+        "io3v3Only": true,
+        "pwmShared": true,
+        "maxPwmSimultaneous": 16
+      },
+      "warnings": [
+        "All GPIO pins are 3.3V - do not connect directly to 5V signals",
+        "Maximum current per GPIO pin is 12mA",
+        "Total current across all GPIO pins should not exceed 50mA",
+        "PWM channels are shared: 16 channels total across all GPIO pins",
+        "ADC pins (GP26-28) can function as GPIO or analog input, not both simultaneously",
+        "Requires ground connection on at least one GND pin",
+        "Power via VBUS (5V USB), VSYS (1.8-5.5V), or use 3V3(OUT) from another Pico"
+      ]
+    }
+  }
+}
+

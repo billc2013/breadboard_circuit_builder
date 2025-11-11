@@ -1,0 +1,41 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Blinking LED Circuit",
+      "description": "Single red LED connected to GPIO15 that can be programmed to blink on and off",
+      "created": "2025-01-08"
+    },
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "15E",
+          "cathode": "16E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "12E",
+          "pin1": "15D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP15",
+        "to": "12D",
+        "description": "Connect GPIO15 to resistor for LED control"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GND_23",
+        "to": "16D",
+        "description": "Connect ground to LED cathode"
+      }
+    ]
+  }
+}

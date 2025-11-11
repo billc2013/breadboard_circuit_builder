@@ -1,0 +1,55 @@
+{
+  "library": {
+    "name": "Breadboard Circuit Builder Component Library",
+    "version": "1.0.0",
+    "description": "Component definitions for robotics and basic electronics projects",
+    "updated": "2025-11-01",
+    "author": "Breadboard Circuit Builder Project",
+    
+    "categories": {
+      "basic": {
+        "name": "Basic Components",
+        "description": "LEDs, resistors, capacitors, switches, and other fundamental parts",
+        "components": ["led-red-5mm", "led-green-5mm", "led-blue-5mm", "resistor-220"]
+      },
+      "microcontrollers": {
+        "name": "Microcontrollers",
+        "description": "Microcontroller development boards",
+        "components": ["raspberry-pi-pico"]
+      }
+    },
+    
+    "index": {
+      "led-red-5mm": {
+        "metadata": "basic/led-red-5mm.json",
+        "geometry": "basic/led-5mm-geometry.js",
+        "adapter": "basic/led-5mm-adapter.js",
+        "adapterClass": "LED5mmAdapter"
+      },
+      "led-green-5mm": {
+        "metadata": "basic/led-green-5mm.json",
+        "geometry": "basic/led-5mm-geometry.js",
+        "adapter": "basic/led-5mm-adapter.js",
+        "adapterClass": "LED5mmAdapter"
+      },
+      "led-blue-5mm": {
+        "metadata": "basic/led-blue-5mm.json",
+        "geometry": "basic/led-5mm-geometry.js",
+        "adapter": "basic/led-5mm-adapter.js",
+        "adapterClass": "LED5mmAdapter"
+      },
+      "resistor-220": {
+        "metadata": "basic/resistor-220.json",
+        "geometry": "basic/resistor-220-geometry.js",
+        "adapter": "basic/resistor-220-adapter.js",
+        "adapterClass": "ResistorAdapter"
+      },
+      "raspberry-pi-pico": {
+        "metadata": "microcontrollers/pico.json",
+        "geometry": "microcontrollers/pico-geometry.js",
+        "adapter": "microcontrollers/pico-adapter.js",
+        "adapterClass": "PicoAdapter"
+      }
+    }
+  }
+}

@@ -1,0 +1,234 @@
+class BreadboardApp {
+    constructor() {
+        this.svg = document.getElementById('breadboard-svg');
+        this.holesLayer = document.getElementById('holes-layer');
+        this.wiresLayer = document.getElementById('wires-layer');
+        this.labelsLayer = document.getElementById('labels-layer');
+        this.picoPinsLayer = document.getElementById('pico-pins-layer');
+        this.infoPanel = document.getElementById('hover-info');
+        this.wireCount = document.getElementById('wire-count');
+        
+        this.holes = BREADBOARD_HOLES;
+        this.wires = [];
+        this.selectedHole = null;
+        this.tempWire = null;
+        this.showLabels = false;
+        
+        this.init();
+    }
+    
+    init() {
+        this.renderHoles();
+        this.attachEventListeners();
+        this.updateWireCount();
+    }
+    
+    renderHoles() {
+        this.holes.forEach(hole => {
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.classList.add('hole');
+            group.setAttribute('data-hole-id', hole.id);
+            
+            // Add type-specific class
+            if (hole.type === 'power') {
+                group.classList.add('power-rail');
+            } else if (hole.type === 'ground') {
+                group.classList.add('ground-rail');
+            }
+            
+            // Create circle
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', hole.x);
+            circle.setAttribute('cy', hole.y);
+            circle.setAttribute('r', BREADBOARD_CONFIG.grid.hole_radius);
+            group.appendChild(circle);
+            
+            // Create label (initially hidden)
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.classList.add('label');
+            label.setAttribute('x', hole.x);
+            label.setAttribute('y', hole.y - 2);
+            label.setAttribute('text-anchor', 'middle');
+            label.textContent = hole.id;
+            label.style.display = 'none';
+            this.labelsLayer.appendChild(label);
+            
+            // Store reference
+            group._holeData = hole;
+            group._label = label;
+            
+            this.holesLayer.appendChild(group);
+        });
+    }
+    
+    attachEventListeners() {
+        // Hole interactions
+        this.holesLayer.addEventListener('mouseenter', (e) => {
+            if (e.target.closest('.hole')) {
+                this.handleHoleHover(e.target.closest('.hole'));
+            }
+        }, true);
+        
+        this.holesLayer.addEventListener('click', (e) => {
+            if (e.target.closest('.hole')) {
+                this.handleHoleClick(e.target.closest('.hole'));
+            }
+        });
+        
+        // Mouse move for temporary wire
+        this.svg.addEventListener('mousemove', (e) => {
+            if (this.selectedHole) {
+                this.updateTempWire(e);
+            }
+        });
+        
+        // Clear selection on background click
+        this.svg.addEventListener('click', (e) => {
+            if (e.target === this.svg) {
+                this.clearSelection();
+            }
+        });
+        
+        // Control buttons
+        document.getElementById('clear-wires').addEventListener('click', () => {
+            this.clearAllWires();
+        });
+        
+        document.getElementById('toggle-labels').addEventListener('click', () => {
+            this.toggleLabels();
+        });
+    }
+    
+    handleHoleHover(holeElement) {
+        const hole = holeElement._holeData;
+        const typeInfo = hole.type === 'main' ? 'Main Grid' : 
+                        hole.type === 'power' ? 'Power Rail (+)' : 'Ground Rail (-)';
+        this.infoPanel.textContent = 
+            `Hole: ${hole.id} | Type: ${typeInfo} | Position: (${hole.x.toFixed(2)}, ${hole.y.toFixed(2)}) | Bus: ${hole.bus}`;
+    }
+    
+    handleHoleClick(holeElement) {
+        const hole = holeElement._holeData;
+        
+        if (!this.selectedHole) {
+            // First click - select starting hole
+            this.selectedHole = hole;
+            holeElement.classList.add('selected');
+            this.infoPanel.textContent = `Selected: ${hole.id} - Click another hole to connect`;
+        } else {
+            // Second click - create wire
+            if (this.selectedHole.id !== hole.id) {
+                this.createWire(this.selectedHole, hole);
+            }
+            this.clearSelection();
+        }
+    }
+    
+    updateTempWire(e) {
+        if (!this.selectedHole) return;
+        
+        const pt = this.svg.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const svgP = pt.matrixTransform(this.svg.getScreenCTM().inverse());
+        
+        if (!this.tempWire) {
+            this.tempWire = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            this.tempWire.classList.add('wire-temp');
+            this.wiresLayer.appendChild(this.tempWire);
+        }
+        
+        this.tempWire.setAttribute('x1', this.selectedHole.x);
+        this.tempWire.setAttribute('y1', this.selectedHole.y);
+        this.tempWire.setAttribute('x2', svgP.x);
+        this.tempWire.setAttribute('y2', svgP.y);
+    }
+    
+    createWire(startHole, endHole) {
+        const wire = {
+            id: `wire-${this.wires.length + 1}`,
+            from: startHole.id,
+            to: endHole.id,
+            fromCoords: { x: startHole.x, y: startHole.y },
+            toCoords: { x: endHole.x, y: endHole.y }
+        };
+        
+        this.wires.push(wire);
+        this.renderWire(wire);
+        this.updateWireCount();
+        
+        // Mark holes as connected
+        const fromElement = this.holesLayer.querySelector(`[data-hole-id="${startHole.id}"]`);
+        const toElement = this.holesLayer.querySelector(`[data-hole-id="${endHole.id}"]`);
+        fromElement.classList.add('connected');
+        toElement.classList.add('connected');
+        
+        console.log('Wire created:', wire);
+    }
+    
+    renderWire(wire) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.classList.add('wire');
+        line.setAttribute('x1', wire.fromCoords.x);
+        line.setAttribute('y1', wire.fromCoords.y);
+        line.setAttribute('x2', wire.toCoords.x);
+        line.setAttribute('y2', wire.toCoords.y);
+        line.setAttribute('data-wire-id', wire.id);
+        this.wiresLayer.appendChild(line);
+    }
+    
+    clearSelection() {
+        if (this.selectedHole) {
+            const element = this.holesLayer.querySelector(`[data-hole-id="${this.selectedHole.id}"]`);
+            element.classList.remove('selected');
+            this.selectedHole = null;
+        }
+        
+        if (this.tempWire) {
+            this.tempWire.remove();
+            this.tempWire = null;
+        }
+        
+        this.infoPanel.textContent = 'Hover over holes to see coordinates';
+    }
+    
+    clearAllWires() {
+        this.wires = [];
+        this.wiresLayer.innerHTML = '';
+        
+        // Remove connected class from all holes
+        document.querySelectorAll('.hole.connected').forEach(hole => {
+            hole.classList.remove('connected');
+        });
+        
+        this.updateWireCount();
+        console.log('All wires cleared');
+    }
+    
+    toggleLabels() {
+        this.showLabels = !this.showLabels;
+        document.querySelectorAll('.label').forEach(label => {
+            label.style.display = this.showLabels ? 'block' : 'none';
+        });
+    }
+    
+    updateWireCount() {
+        this.wireCount.textContent = `Wires: ${this.wires.length}`;
+    }
+    
+    // Export circuit data as JSON
+    exportCircuit() {
+        return {
+            breadboard: BREADBOARD_CONFIG,
+            wires: this.wires,
+            timestamp: new Date().toISOString()
+        };
+    }
+}
+
+// Initialize app when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    window.breadboardApp = new BreadboardApp();
+    console.log('Breadboard app initialized');
+    console.log('Total holes:', BREADBOARD_HOLES.length);
+});

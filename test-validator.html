@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Circuit Validator Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #4ec9b0;
+            border-bottom: 2px solid #4ec9b0;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #dcdcaa;
+            margin-top: 30px;
+        }
+        .upload-section {
+            background: #252526;
+            border: 2px dashed #4ec9b0;
+            border-radius: 5px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .test-section {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .status {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .pass { color: #4ec9b0; }
+        .fail { color: #f48771; }
+        .warning { color: #dcdcaa; }
+        pre {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            padding: 15px;
+            overflow-x: auto;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            max-height: 500px;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            font-family: 'Courier New', monospace;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #555;
+        }
+        .btn-secondary:hover {
+            background: #666;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-label {
+            background: #0e639c;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: inline-block;
+            margin: 10px;
+        }
+        .file-label:hover {
+            background: #1177bb;
+        }
+        .file-info {
+            margin: 15px 0;
+            color: #4ec9b0;
+            font-size: 14px;
+        }
+        .error-item {
+            background: #3e1e1e;
+            border-left: 3px solid #f48771;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+        .warning-item {
+            background: #3e3e1e;
+            border-left: 3px solid #dcdcaa;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+        .success-item {
+            background: #1e3e1e;
+            border-left: 3px solid #4ec9b0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            padding: 15px;
+            border-radius: 3px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+        }
+        #drop-zone {
+            border: 2px dashed #666;
+            border-radius: 5px;
+            padding: 40px;
+            margin: 20px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #drop-zone:hover, #drop-zone.drag-over {
+            border-color: #4ec9b0;
+            background: #2a2a2a;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Circuit Validator Test Suite</h1>
+    
+    <div class="upload-section">
+        <h2>📁 Load Circuit JSON File</h2>
+        
+        <div id="drop-zone">
+            <p style="font-size: 18px; margin: 10px 0;">
+                Drag & Drop JSON file here<br>
+                <span style="font-size: 14px; color: #888;">or</span>
+            </p>
+            <label for="file-input" class="file-label">
+                📂 Choose File
+            </label>
+        </div>
+        
+        <input type="file" id="file-input" accept=".json,application/json">
+        
+        <div id="file-info" class="file-info"></div>
+        
+        <div style="margin-top: 20px;">
+            <button onclick="validateLoadedCircuit()" id="validate-btn" disabled>
+                🔍 Validate Circuit
+            </button>
+            <button onclick="clearResults()" class="btn-secondary">
+                🗑️ Clear Results
+            </button>
+        </div>
+        
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #3e3e42;">
+            <p style="color: #888; font-size: 14px;">Quick Test Files:</p>
+            <button onclick="loadTestFile('valid')" class="btn-secondary">
+                ✅ Load Valid Test
+            </button>
+            <button onclick="loadTestFile('invalid')" class="btn-secondary">
+                ❌ Load Invalid Test
+            </button>
+        </div>
+    </div>
+
+    <div id="results-section" class="test-section" style="display:none;">
+        <h2 id="results-title">Validation Results</h2>
+        
+        <div id="status-display"></div>
+        
+        <div class="stats" id="stats-display"></div>
+        
+        <div id="errors-display"></div>
+        
+        <div id="warnings-display"></div>
+        
+        <details open>
+            <summary style="cursor: pointer; font-size: 18px; margin: 20px 0; color: #dcdcaa;">
+                📋 Full Report
+            </summary>
+            <pre id="full-report"></pre>
+        </details>
+    </div>
+
+    <script src="breadboard-data.js"></script>
+    <script src="circuit-validator.js"></script>
+    <script>
+        let validator;
+        let loadedCircuit = null;
+        let loadedFileName = '';
+
+        // Initialize validator
+        async function initValidator() {
+            if (!validator) {
+                validator = new CircuitValidator(BREADBOARD_HOLES);
+                await validator.init();
+                console.log('Validator initialized');
+            }
+            return validator;
+        }
+
+        // File input handler
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+
+        // Drag and drop handlers
+        const dropZone = document.getElementById('drop-zone');
+
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        dropZone.addEventListener('click', function() {
+            document.getElementById('file-input').click();
+        });
+
+        // Handle file loading
+        function handleFile(file) {
+            if (!file.name.endsWith('.json')) {
+                alert('Please select a JSON file');
+                return;
+            }
+
+            loadedFileName = file.name;
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    loadedCircuit = JSON.parse(e.target.result);
+                    
+                    document.getElementById('file-info').innerHTML = `
+                        <div class="success-item">
+                            ✅ Loaded: <strong>${loadedFileName}</strong><br>
+                            Circuit: ${loadedCircuit.circuit?.metadata?.name || 'Unknown'}<br>
+                            Components: ${loadedCircuit.circuit?.components?.length || 0}, 
+                            Wires: ${loadedCircuit.circuit?.wires?.length || 0}
+                        </div>
+                    `;
+                    
+                    document.getElementById('validate-btn').disabled = false;
+                } catch (error) {
+                    document.getElementById('file-info').innerHTML = `
+                        <div class="error-item">
+                            ❌ Error parsing JSON: ${error.message}
+                        </div>
+                    `;
+                    loadedCircuit = null;
+                    document.getElementById('validate-btn').disabled = true;
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Validate loaded circuit
+        async function validateLoadedCircuit() {
+            if (!loadedCircuit) {
+                alert('No circuit loaded');
+                return;
+            }
+
+            document.getElementById('validate-btn').disabled = true;
+            document.getElementById('validate-btn').textContent = '⏳ Validating...';
+
+            try {
+                const v = await initValidator();
+                const result = await v.validate(loadedCircuit);
+                displayResults(result, loadedFileName);
+            } catch (error) {
+                document.getElementById('file-info').innerHTML += `
+                    <div class="error-item">
+                        ❌ Validation error: ${error.message}
+                    </div>
+                `;
+            } finally {
+                document.getElementById('validate-btn').disabled = false;
+                document.getElementById('validate-btn').textContent = '🔍 Validate Circuit';
+            }
+        }
+
+        // Display validation results
+        function displayResults(result, filename) {
+            const resultsSection = document.getElementById('results-section');
+            resultsSection.style.display = 'block';
+
+            // Title
+            document.getElementById('results-title').textContent = 
+                `Validation Results: ${filename}`;
+
+            // Status
+            const statusDiv = document.getElementById('status-display');
+            if (result.valid) {
+                statusDiv.innerHTML = `
+                    <div class="status pass">✅ VALID CIRCUIT</div>
+                    <p>Circuit passed all validation checks!</p>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <div class="status fail">❌ INVALID CIRCUIT</div>
+                    <p>Circuit has errors that must be fixed.</p>
+                `;
+            }
+
+            // Stats
+            const statsDiv = document.getElementById('stats-display');
+            statsDiv.innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-label">Components</div>
+                    <div class="stat-number" style="color: #4ec9b0;">
+                        ${loadedCircuit.circuit.components.length}
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Wires</div>
+                    <div class="stat-number" style="color: #569cd6;">
+                        ${loadedCircuit.circuit.wires.length}
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Errors</div>
+                    <div class="stat-number" style="color: ${result.errors.length > 0 ? '#f48771' : '#4ec9b0'};">
+                        ${result.errors.length}
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Warnings</div>
+                    <div class="stat-number" style="color: ${result.warnings.length > 0 ? '#dcdcaa' : '#4ec9b0'};">
+                        ${result.warnings.length}
+                    </div>
+                </div>
+            `;
+
+            // Errors
+            const errorsDiv = document.getElementById('errors-display');
+            if (result.errors.length > 0) {
+                let errorsHTML = '<h3 style="color: #f48771;">🚫 Errors Found:</h3>';
+                result.errors.forEach((err, i) => {
+                    errorsHTML += `
+                        <div class="error-item">
+                            <strong>${i + 1}. [${err.type}]</strong> 
+                            <span style="color: #888;">${err.location}</span><br>
+                            <div style="margin-top: 5px;">${err.message}</div>
+                            ${err.bus || err.pins ? `
+                                <details style="margin-top: 5px;">
+                                    <summary style="cursor: pointer; color: #888; font-size: 12px;">
+                                        Show details
+                                    </summary>
+                                    <pre style="font-size: 11px; margin: 5px 0;">${JSON.stringify({
+                                        bus: err.bus, 
+                                        pins: err.pins,
+                                        ledBuses: err.ledBuses,
+                                        resistorBuses: err.resistorBuses
+                                    }, null, 2)}</pre>
+                                </details>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+                errorsDiv.innerHTML = errorsHTML;
+            } else {
+                errorsDiv.innerHTML = '<div class="success-item">✅ No errors found!</div>';
+            }
+
+            // Warnings
+            const warningsDiv = document.getElementById('warnings-display');
+            if (result.warnings.length > 0) {
+                let warningsHTML = '<h3 style="color: #dcdcaa;">⚠️ Warnings:</h3>';
+                result.warnings.forEach((warn, i) => {
+                    warningsHTML += `
+                        <div class="warning-item">
+                            <strong>${i + 1}. [${warn.type}]</strong> 
+                            <span style="color: #888;">${warn.location}</span><br>
+                            <div style="margin-top: 5px;">${warn.message}</div>
+                        </div>
+                    `;
+                });
+                warningsDiv.innerHTML = warningsHTML;
+            } else {
+                warningsDiv.innerHTML = '<div class="success-item">✅ No warnings</div>';
+            }
+
+            // Full report
+            const report = validator.generateReport(result);
+            document.getElementById('full-report').textContent = report;
+
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Clear results
+        function clearResults() {
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('file-info').innerHTML = '';
+            loadedCircuit = null;
+            loadedFileName = '';
+            document.getElementById('validate-btn').disabled = true;
+            document.getElementById('file-input').value = '';
+        }
+
+        // Load test files
+        async function loadTestFile(type) {
+            const filename = type === 'valid' 
+                ? 'circuits/test-valid-led-circuit.json'
+                : 'circuits/test-invalid-led-circuit.json';
+
+            try {
+                const response = await fetch(filename);
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${filename}`);
+                }
+                loadedCircuit = await response.json();
+                loadedFileName = filename.split('/').pop();
+
+                document.getElementById('file-info').innerHTML = `
+                    <div class="success-item">
+                        ✅ Loaded: <strong>${loadedFileName}</strong><br>
+                        Circuit: ${loadedCircuit.circuit?.metadata?.name || 'Unknown'}<br>
+                        Components: ${loadedCircuit.circuit?.components?.length || 0}, 
+                        Wires: ${loadedCircuit.circuit?.wires?.length || 0}
+                    </div>
+                `;
+                
+                document.getElementById('validate-btn').disabled = false;
+            } catch (error) {
+                document.getElementById('file-info').innerHTML = `
+                    <div class="error-item">
+                        ❌ Error loading test file: ${error.message}<br>
+                        Make sure the file exists at: ${filename}
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize on load
+        initValidator();
+    </script>
+</body>
+</html>

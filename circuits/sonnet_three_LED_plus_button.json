@@ -1,0 +1,141 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "3 Red LED Button Circuit",
+      "description": "Pushbutton controls three red LEDs in parallel. When button is pressed, all LEDs light up.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "btn1",
+        "type": "button-tactile-6mm",
+        "placement": {
+          "leg0": "5E",
+          "leg1": "7E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "7D",
+          "pin1": "12D"
+        },
+        "description": "Pull-down resistor for button"
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "15E",
+          "anode": "16E"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "16D",
+          "pin1": "20D"
+        },
+        "description": "Current limiting resistor for LED1"
+      },
+      {
+        "id": "led2",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "22E",
+          "anode": "23E"
+        }
+      },
+      {
+        "id": "r3",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "23D",
+          "pin1": "27D"
+        },
+        "description": "Current limiting resistor for LED2"
+      },
+      {
+        "id": "led3",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "22J",
+          "anode": "23J"
+        }
+      },
+      {
+        "id": "r4",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "23I",
+          "pin1": "27I"
+        },
+        "description": "Current limiting resistor for LED3"
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "5D",
+        "description": "Connect 3.3V to button"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP16",
+        "to": "7C",
+        "description": "Connect GPIO16 to button/pull-down junction"
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "12C",
+        "description": "Connect ground to pull-down resistor"
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GP17",
+        "to": "20C",
+        "description": "GPIO17 controls LED1"
+      },
+      {
+        "id": "w5",
+        "from": "15D",
+        "to": "15Z",
+        "description": "LED1 cathode to ground rail"
+      },
+      {
+        "id": "w6",
+        "from": "pico1.GP18",
+        "to": "27C",
+        "description": "GPIO18 controls LED2"
+      },
+      {
+        "id": "w7",
+        "from": "22D",
+        "to": "22Z",
+        "description": "LED2 cathode to ground rail"
+      },
+      {
+        "id": "w8",
+        "from": "pico1.GP19",
+        "to": "27H",
+        "description": "GPIO19 controls LED3"
+      },
+      {
+        "id": "w9",
+        "from": "22I",
+        "to": "22X",
+        "description": "LED3 cathode to ground rail"
+      },
+      {
+        "id": "w10",
+        "from": "pico1.GND_28",
+        "to": "22Y",
+        "description": "Connect Pico ground to bottom ground rail"
+      }
+    ]
+  }
+}

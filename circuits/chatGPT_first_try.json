@@ -1,0 +1,48 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Blinking LED Pattern",
+      "description": "Single red LED connected to Raspberry Pi Pico GPIO2 with 220Ω resistor for PWM blinking pattern",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "pico1",
+        "type": "raspberry-pi-pico",
+        "placement": {
+          "position": { "x": 20, "y": 20 }
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "20E",
+          "anode": "20F"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "15F",
+          "pin1": "20F"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP2",
+        "to": "15J",
+        "description": "GPIO2 to resistor for LED control"
+      },
+      {
+        "id": "w2",
+        "from": "20E",
+        "to": "pico1.GND_8",
+        "description": "LED cathode to Pico ground"
+      }
+    ]
+  }
+}

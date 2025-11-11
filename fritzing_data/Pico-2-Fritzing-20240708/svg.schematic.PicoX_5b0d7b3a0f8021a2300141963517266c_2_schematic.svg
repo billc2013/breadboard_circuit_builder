@@ -1,0 +1,957 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" baseProfile="tiny" data-name="Layer 1" gorn="0" height="58.3mm" id="Layer_1" version="1.2" viewBox="0 0 72 165.3" width="25.4mm" >
+    <g gorn="0.0" id="svg2" >
+        <g gorn="0.0.0" id="schematic" >
+            <rect fill="none" gorn="0.0.0.0" height="150.9" id="rect7" stroke="#000" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" width="57.5" x="7.3"  y="7.2"/>
+            <g gorn="0.0.0.1" id="label" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(23.7 25.7)" >
+                        <g >
+                            <g fill="#000" font-family="Droid Sans" font-size="4.2" isolation="isolate" >
+                                <text x="0"  y="0">Raspberry Pi</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.2" id="label0" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.4 145)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP14</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.3" id="text15" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(2.8 142.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">19</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.4" id="label1" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.1 152.1)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP15</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.5" id="text22" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(2.5 149.4)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">20</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.6" id="text83" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(15.7 12.1)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">SW CLK</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.7" id="text51" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(17.6 5.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">41</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.8" id="text87" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(29.3 12.2)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">SW GND</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.9" id="text53" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(31.3 5.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">42</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.10" id="text79" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(54.4 152.1)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP16</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.11" id="text63" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 149.4)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">21</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.12" id="text81" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(54.2 144.9)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP17</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.13" id="text65" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 142.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">22</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.14" id="text44" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.4 130.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP13</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.15" id="text46" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(2.8 128)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">17</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.16" id="text48" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(32.3 155.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GND</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.17" id="text60" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.4 116.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP11</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.18" id="text62" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(2.8 113.6)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">15</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.19" id="text64" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.1 123.5)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP12</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.20" id="text66" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(2.5 120.8)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">16</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.21" id="text80" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.1 109.1)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP10</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.22" id="text82" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(2.5 106.4)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">14</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.23" id="text94" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.1 94.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP9</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.24" id="text96" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(2.5 91.9)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">12</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.25" id="text148" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.4 80.4)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP7</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.26" id="text150" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(2.8 77.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">10</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.27" id="text152" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.1 87.6)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP8</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.28" id="text154" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(2.5 84.9)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">11</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.29" id="text168" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.1 73.2)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP6</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.30" id="text170" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(3.9 70.5)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">9</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.31" id="text180" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.4 51.6)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP4</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.32" id="text182" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(4.2 48.9)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">6</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.33" id="text184" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.1 58.8)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP5</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.34" id="text186" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(3.9 56.1)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">7</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.35" id="text196" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.4 37.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP2</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.36" id="text198" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(4.2 34.5)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">4</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.37" id="text200" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.1 44.4)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP3</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.38" id="text202" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(3.9 41.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">5</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.39" id="text214" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(23.4 161.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">3,8,13,18</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.40" id="text220" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.4 22.9)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP1</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.41" id="text222" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(4.2 20.2)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">2</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.42" id="text228" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(9.1 15.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP0</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.43" id="text230" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(3.9 13)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">1</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.44" id="text236" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(44.1 12.2)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">SW DIO</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.45" id="text238" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(45.5 5.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">43</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.46" id="text248" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(54.2 130.6)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP18</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.47" id="text250" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 127.9)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">24</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.48" id="text260" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(54.4 123.4)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP19</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.49" id="text262" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 120.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">25</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.50" id="text264" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(54.2 116.2)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP20</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.51" id="text266" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 113.5)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">26</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.52" id="text276" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(54.4 109)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP21</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.53" id="text278" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 106.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">27</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.54" id="text292" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(54.4 94.6)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP22</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.55" id="text294" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 91.9)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">29</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.56" id="text296" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(55.5 87.5)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">RUN</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.57" id="text298" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 84.8)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">30</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.58" id="text308" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(48.8 80.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP26_A0</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.59" id="text310" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 77.6)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">31</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.60" id="text312" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(48.7 73.1)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP27_A1</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.61" id="text314" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 70.4)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">32</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.62" id="text324" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(53.2 65.9)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">AGND</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.63" id="text326" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 63.2)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">33</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.64" id="text328" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(48.7 58.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">GP28_A2</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.65" id="text330" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 56)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">34</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.66" id="text340" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(46.9 51.5)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">ADC_VREF</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.67" id="text342" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 48.8)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">35</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.68" id="text344" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(56.7 44.3)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">3V3</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.69" id="text346" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 41.6)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">36</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.70" id="text356" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(50.9 37.1)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">3V3_EN</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.71" id="text358" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 34.4)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">37</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.72" id="text372" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(55 22.8)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">VSYS</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.73" id="text374" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 20.1)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">39</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.74" id="text376" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(54.1 15.6)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="3.5" isolation="isolate" >
+                                <text x="0"  y="0">VBUS</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.75" id="text378" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(66.7 12.9)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">40</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g gorn="0.0.0.76" id="text388" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(32 32.9)" >
+                        <g >
+                            <g fill="#000" font-family="Droid Sans" font-size="4.2" isolation="isolate" >
+                                <text x="0"  y="0">Pico</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <line fill="none" gorn="0.0.0.77" id="connector0pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="14.4" y2="14.4"/>
+            <rect fill="none" gorn="0.0.0.78" height=".7" id="connector0terminal" stroke-width="0" width=".7" x="0"  y="14.1"/>
+            <line fill="none" gorn="0.0.0.79" id="connector1pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="21.7" y2="21.7"/>
+            <rect fill="none" gorn="0.0.0.80" height=".7" id="connector1terminal" stroke-width="0" width=".7" x="0"  y="21.3"/>
+            <line fill="none" gorn="0.0.0.81" id="connector2pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="36" x2="36"  y1="165" y2="158.4"/>
+            <rect fill="none" gorn="0.0.0.82" height=".7" id="connector2terminal" stroke-width="0" width=".7" x="35.6"  y="164.6"/>
+            <line fill="none" gorn="0.0.0.83" id="connector3pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="36" y2="36"/>
+            <rect fill="none" gorn="0.0.0.84" height=".7" id="connector3terminal" stroke-width="0" width=".7" x="0"  y="35.6"/>
+            <line fill="none" gorn="0.0.0.85" id="connector4pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="43.2" y2="43.2"/>
+            <rect fill="none" gorn="0.0.0.86" height=".7" id="connector4terminal" stroke-width="0" width=".7" x="0"  y="42.8"/>
+            <line fill="none" gorn="0.0.0.87" id="connector5pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="50.4" y2="50.4"/>
+            <rect fill="none" gorn="0.0.0.88" height=".7" id="connector5terminal" stroke-width="0" width=".7" x="0"  y="50"/>
+            <line fill="none" gorn="0.0.0.89" id="connector6pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="57.6" y2="57.6"/>
+            <rect fill="none" gorn="0.0.0.90" height=".7" id="connector6terminal" stroke-width="0" width=".7" x="0"  y="57.2"/>
+            <line fill="none" gorn="0.0.0.91" id="connector7pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="36" x2="36"  y1="165" y2="158.4"/>
+            <rect fill="none" gorn="0.0.0.92" height=".7" id="connector7terminal" stroke-width="0" width=".7" x="35.6"  y="164.6"/>
+            <line fill="none" gorn="0.0.0.93" id="connector8pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="72" y2="72"/>
+            <rect fill="none" gorn="0.0.0.94" height=".7" id="connector8terminal" stroke-width="0" width=".7" x="0"  y="71.6"/>
+            <line fill="none" gorn="0.0.0.95" id="connector9pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="79.1" y2="79.1"/>
+            <rect fill="none" gorn="0.0.0.96" height=".7" id="connector9terminal" stroke-width="0" width=".7" x="0"  y="78.8"/>
+            <line fill="none" gorn="0.0.0.97" id="connector10pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="86.3" y2="86.3"/>
+            <rect fill="none" gorn="0.0.0.98" height=".7" id="connector10terminal" stroke-width="0" width=".7" x="0"  y="86"/>
+            <line fill="none" gorn="0.0.0.99" id="connector11pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="93.4" y2="93.4"/>
+            <rect fill="none" gorn="0.0.0.100" height=".7" id="connector11terminal" stroke-width="0" width=".7" x="0"  y="93.1"/>
+            <line fill="none" gorn="0.0.0.101" id="connector12pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="36" x2="36"  y1="165" y2="158.4"/>
+            <rect fill="none" gorn="0.0.0.102" height=".7" id="connector12terminal" stroke-width="0" width=".7" x="35.6"  y="164.6"/>
+            <line fill="none" gorn="0.0.0.103" id="connector13pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="107.9" y2="107.9"/>
+            <rect fill="none" gorn="0.0.0.104" height=".7" id="connector13terminal" stroke-width="0" width=".7" x="0"  y="107.5"/>
+            <line fill="none" gorn="0.0.0.105" id="connector14pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="115" y2="115"/>
+            <rect fill="none" gorn="0.0.0.106" height=".7" id="connector14terminal" stroke-width="0" width=".7" x="0"  y="114.7"/>
+            <line fill="none" gorn="0.0.0.107" id="connector15pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="122.2" y2="122.2"/>
+            <rect fill="none" gorn="0.0.0.108" height=".7" id="connector15terminal" stroke-width="0" width=".7" x="0"  y="121.9"/>
+            <line fill="none" gorn="0.0.0.109" id="connector16pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="129.4" y2="129.4"/>
+            <rect fill="none" gorn="0.0.0.110" height=".7" id="connector16terminal" stroke-width="0" width=".7" x="0"  y="129.1"/>
+            <line fill="none" gorn="0.0.0.111" id="connector17pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="36" x2="36"  y1="165" y2="158.4"/>
+            <rect fill="none" gorn="0.0.0.112" height=".7" id="connector17terminal" stroke-width="0" width=".7" x="35.6"  y="164.6"/>
+            <line fill="none" gorn="0.0.0.113" id="connector18pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="143.7" y2="143.7"/>
+            <rect fill="none" gorn="0.0.0.114" height=".7" id="connector18terminal" stroke-width="0" width=".7" x="0"  y="143.4"/>
+            <line fill="none" gorn="0.0.0.115" id="connector19pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1=".5" x2="6.9"  y1="150.9" y2="150.9"/>
+            <rect fill="none" gorn="0.0.0.116" height=".7" id="connector19terminal" stroke-width="0" width=".7" x="0"  y="150.5"/>
+            <line fill="none" gorn="0.0.0.117" id="connector20pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="150.9" y2="150.9"/>
+            <rect fill="none" gorn="0.0.0.118" height=".7" id="connector20terminal" stroke-width="0" width=".7" x="71.2"  y="150.5"/>
+            <line fill="none" gorn="0.0.0.119" id="connector21pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="143.7" y2="143.7"/>
+            <rect fill="none" gorn="0.0.0.120" height=".7" id="connector21terminal" stroke-width="0" width=".7" x="71.2"  y="143.5"/>
+            <line fill="none" gorn="0.0.0.121" id="connector22pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="36" x2="36"  y1="158.4" y2="165"/>
+            <rect fill="none" gorn="0.0.0.122" height=".7" id="connector22terminal" stroke-width="0" width=".7" x="35.6"  y="164.6"/>
+            <line fill="none" gorn="0.0.0.123" id="connector23pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="129.4" y2="129.4"/>
+            <rect fill="none" gorn="0.0.0.124" height=".7" id="connector23terminal" stroke-width="0" width=".7" x="71.2"  y="129.1"/>
+            <line fill="none" gorn="0.0.0.125" id="connector24pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="122.2" y2="122.2"/>
+            <rect fill="none" gorn="0.0.0.126" height=".7" id="connector24terminal" stroke-width="0" width=".7" x="71.2"  y="121.8"/>
+            <line fill="none" gorn="0.0.0.127" id="connector25pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="115" y2="115"/>
+            <rect fill="none" gorn="0.0.0.128" height=".7" id="connector25terminal" stroke-width="0" width=".7" x="71.2"  y="114.7"/>
+            <line fill="none" gorn="0.0.0.129" id="connector26pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="107.8" y2="107.8"/>
+            <rect fill="none" gorn="0.0.0.130" height=".7" id="connector26terminal" stroke-width="0" width=".7" x="71.2"  y="107.4"/>
+            <line fill="none" gorn="0.0.0.131" id="connector27pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="36" x2="36"  y1="158.4" y2="165"/>
+            <rect fill="none" gorn="0.0.0.132" height=".7" id="connector27terminal" stroke-width="0" width=".7" x="35.6"  y="164.6"/>
+            <line fill="none" gorn="0.0.0.133" id="connector28pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="93.4" y2="93.4"/>
+            <rect fill="none" gorn="0.0.0.134" height=".7" id="connector28terminal" stroke-width="0" width=".7" x="71.2"  y="93"/>
+            <line fill="none" gorn="0.0.0.135" id="connector29pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="86.3" y2="86.3"/>
+            <rect fill="none" gorn="0.0.0.136" height=".7" id="connector29terminal" stroke-width="0" width=".7" x="71.2"  y="86"/>
+            <line fill="none" gorn="0.0.0.137" id="connector30pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="79.1" y2="79.1"/>
+            <rect fill="none" gorn="0.0.0.138" height=".7" id="connector30terminal" stroke-width="0" width=".7" x="71.2"  y="78.7"/>
+            <line fill="none" gorn="0.0.0.139" id="connector31pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="71.9" y2="71.9"/>
+            <rect fill="none" gorn="0.0.0.140" height=".7" id="connector31terminal" stroke-width="0" width=".7" x="71.2"  y="71.6"/>
+            <line fill="none" gorn="0.0.0.141" id="connector32pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="64.7" y2="64.7"/>
+            <rect fill="none" gorn="0.0.0.142" height=".7" id="connector32terminal" stroke-width="0" width=".7" x="71.2"  y="64.3"/>
+            <line fill="none" gorn="0.0.0.143" id="connector33pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="57.5" y2="57.5"/>
+            <rect fill="none" gorn="0.0.0.144" height=".7" id="connector33terminal" stroke-width="0" width=".7" x="71.2"  y="57.2"/>
+            <line fill="none" gorn="0.0.0.145" id="connector34pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="50.3" y2="50.3"/>
+            <rect fill="none" gorn="0.0.0.146" height=".7" id="connector34terminal" stroke-width="0" width=".7" x="71.2"  y="49.9"/>
+            <line fill="none" gorn="0.0.0.147" id="connector35pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="43.1" y2="43.1"/>
+            <rect fill="none" gorn="0.0.0.148" height=".7" id="connector35terminal" stroke-width="0" width=".7" x="71.2"  y="42.8"/>
+            <line fill="none" gorn="0.0.0.149" id="connector36pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="35.9" y2="35.9"/>
+            <rect fill="none" gorn="0.0.0.150" height=".7" id="connector36terminal" stroke-width="0" width=".7" x="71.2"  y="35.5"/>
+            <line fill="none" gorn="0.0.0.151" id="connector37pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="36" x2="36"  y1="165" y2="158.4"/>
+            <rect fill="none" gorn="0.0.0.152" height=".7" id="connector37terminal" stroke-width="0" width=".7" x="35.6"  y="164.6"/>
+            <line fill="none" gorn="0.0.0.153" id="connector38pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="21.6" y2="21.6"/>
+            <rect fill="none" gorn="0.0.0.154" height=".7" id="connector38terminal" stroke-width="0" width=".7" x="71.2"  y="21.2"/>
+            <line fill="none" gorn="0.0.0.155" id="connector39pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="65" x2="71.5"  y1="14.4" y2="14.4"/>
+            <rect fill="none" gorn="0.0.0.156" height=".7" id="connector39terminal" stroke-width="0" width=".7" x="71.2"  y="14.1"/>
+            <line fill="none" gorn="0.0.0.157" id="connector40pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="21.6" x2="21.6"  y1=".7" y2="7.2"/>
+            <rect fill="none" gorn="0.0.0.158" height=".7" id="connector40terminal" stroke-width="0" width=".7" x="21.3"  y="0"/>
+            <line fill="none" gorn="0.0.0.159" id="connector41pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="35.9" x2="35.9"  y1=".7" y2="7.2"/>
+            <rect fill="none" gorn="0.0.0.160" height=".7" id="connector41terminal" stroke-width="0" width=".7" x="35.6"  y="0"/>
+            <line fill="none" gorn="0.0.0.161" id="connector42pin" stroke="#555" stroke-linecap="round" stroke-miterlimit="10" stroke-width=".7" x1="50.2" x2="50.2"  y1=".7" y2="7.2"/>
+            <rect fill="none" gorn="0.0.0.162" height=".7" id="connector42terminal" stroke-width="0" width=".7" x="49.9"  y="0"/>
+            <g gorn="0.0.0.163" id="text361" isolation="isolate" >
+                <g isolation="isolate" >
+                    <g transform="translate(37.6 161.7)" >
+                        <g >
+                            <g fill="#555" font-family="Droid Sans" font-size="2.5" isolation="isolate" >
+                                <text x="0"  y="0">23,28,38</text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+    <referenceFile >rpi_pico-tht_1_schematic.svg
+  </referenceFile>
+    <metadata id="metadata41" >
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+            <cc:Work xmlns:cc="http://creativecommons.org/ns#">
+                <dc:format xmlns:dc="http://purl.org/dc/elements/1.1/">image/svg+xml
+        </dc:format>
+                <dc:type xmlns:dc="http://purl.org/dc/elements/1.1/"/>
+                <dc:title xmlns:dc="http://purl.org/dc/elements/1.1/"/>
+            </cc:Work>
+        </rdf:RDF>
+        <sfw >
+            <slices />
+            <sliceSourceBounds bottomLeftOrigin="true" height="165.31" width="71.88" x="0.06"  y="-0.05"/>
+        </sfw>
+    </metadata>
+</svg>

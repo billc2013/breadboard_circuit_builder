@@ -1,0 +1,83 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Valid LED Test Circuit",
+      "description": "Correctly wired LED circuit - resistor in series with LED, GPIO control, proper ground",
+      "created": "2025-01-15T12:00:00Z",
+      "author": "test",
+      "difficulty": "beginner"
+    },
+    
+    "components": [
+      {
+        "id": "pico1",
+        "type": "raspberry-pi-pico",
+        "properties": {
+          "voltage": 3.3
+        },
+        "placement": {
+          "GP0": "10F",
+          "GND_3": "10E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "properties": {
+          "resistance": 220
+        },
+        "placement": {
+          "pin0": "15F",
+          "pin1": "18F"
+        },
+        "comment": "Resistor horizontal on top section: 15F to 18F (different buses)"
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "properties": {
+          "color": "red"
+        },
+        "placement": {
+          "anode": "18F",
+          "cathode": "18E"
+        },
+        "comment": "LED vertical: anode on top (18F), cathode on bottom (18E)"
+      }
+    ],
+    
+    "wires": [
+      {
+        "id": "wire1",
+        "from": "pico1.GP0",
+        "to": "15H",
+        "properties": {
+          "color": "yellow",
+          "signal_type": "pwm",
+          "function": "signal"
+        },
+        "comment": "Pico GP0 (bus10-top) to resistor area (bus15-top)"
+      },
+      {
+        "id": "wire2",
+        "from": "18A",
+        "to": "3X",
+        "properties": {
+          "color": "black",
+          "function": "ground"
+        },
+        "comment": "LED cathode side (bus18-bottom) to ground rail"
+      },
+      {
+        "id": "wire3",
+        "from": "pico1.GND_3",
+        "to": "5X",
+        "properties": {
+          "color": "black",
+          "function": "ground"
+        },
+        "comment": "Pico ground to ground rail"
+      }
+    ]
+  }
+}

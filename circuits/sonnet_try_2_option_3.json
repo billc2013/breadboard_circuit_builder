@@ -1,0 +1,41 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "LED Slow Blink - Option 3",
+      "description": "Compact LED blink circuit using GPIO22 with minimal wire runs.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "8E",
+          "cathode": "9E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "5E",
+          "pin1": "8D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP22",
+        "to": "5D",
+        "description": "GPIO22 to resistor for LED control signal"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GND_3",
+        "to": "9D",
+        "description": "Ground connection to LED cathode"
+      }
+    ]
+  }
+}

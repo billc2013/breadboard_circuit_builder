@@ -1,0 +1,529 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a1a;
+    color: #ffffff;
+    padding: 20px;
+}
+
+#app {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    margin-bottom: 30px;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: #dcdcaa;
+    margin-top: 30px;
+}
+
+#info-panel {
+    background: #2a2a2a;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #00ff00;
+}
+
+#breadboard-container {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+#breadboard-svg {
+    display: block;
+    background: #d4d4d4;
+    border-radius: 5px;
+}
+
+
+/* Breadboard hole styles - now semi-transparent overlays */
+.hole {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hole circle {
+    fill: rgba(255, 255, 255, 0.01); /* Nearly invisible */
+    stroke: rgba(85, 85, 85, 0.1);
+    stroke-width: 0.3;
+}
+
+.hole:hover circle {
+    fill: rgba(255, 107, 0, 0.5); /* Semi-transparent orange */
+    stroke: #ff8800;
+    stroke-width: 0.6;
+}
+
+.hole.selected circle {
+    fill: rgba(0, 255, 0, 0.6);
+    stroke: #00ff00;
+    stroke-width: 0.8;
+}
+
+.hole.connected circle {
+    fill: rgba(0, 136, 255, 0.4);
+}
+
+/* Power rail styles - keep subtle */
+.hole.power-rail circle {
+    fill: rgba(139, 0, 0, 0.1);
+}
+
+.hole.ground-rail circle {
+    fill: rgba(0, 68, 0, 0.1);
+}
+
+.hole.power-rail:hover circle {
+    fill: rgba(255, 0, 0, 0.5);
+}
+
+.hole.ground-rail:hover circle {
+    fill: rgba(0, 255, 0, 0.5);
+}
+
+/* Wire styles */
+.wire {
+    stroke: #ff0000;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+.wire-temp {
+    stroke: #ffaa00;
+    stroke-width: 1.5;
+    stroke-dasharray: 3, 3;
+    fill: none;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+/* Occupied hole - blocked */
+.hole.occupied circle {
+    fill: #fcee21;
+    stroke: #f48771;
+    cursor: not-allowed;
+}
+
+.hole.occupied:hover circle {
+    fill: #f48771;
+    stroke: #fcee21;
+}
+
+/* Alternative holes on same bus - available */
+.hole.bus-neighbor circle {
+    fill: #4ec9b0;
+    stroke: #006837;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.hole.bus-neighbor:hover circle {
+    fill: #006837;
+    stroke: #4ec9b0;
+    stroke-width: 1.5;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Label styles */
+.label {
+    font-size: 4px;
+    font-family: Arial, sans-serif;
+    fill: #666;
+    pointer-events: none;
+    user-select: none;
+}
+
+
+/* Controls */
+#controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+button {
+    background: #0066cc;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #0088ff;
+}
+
+button:active {
+    background: #004499;
+}
+
+#wire-count {
+    background: #2a2a2a;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+}
+
+/* Validator Panel Styles */
+#validator-panel {
+    position: fixed;
+    top: 0;
+    right: -500px;
+    width: 500px;
+    height: 100vh;
+    background: #252526;
+    border-left: 2px solid #4ec9b0;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    color: #d4d4d4;
+}
+
+#validator-panel.open {
+    right: 0;
+}
+
+#validator-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+
+#validator-toggle:hover {
+    background: #1177bb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+#validator-toggle.panel-open {
+    right: 520px;
+}
+
+.validator-header {
+    background: #1e1e1e;
+    padding: 20px;
+    border-bottom: 1px solid #3e3e42;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.validator-header h2 {
+    margin: 0 0 10px 0;
+    color: #4ec9b0;
+    font-size: 20px;
+}
+
+.validator-content {
+    padding: 20px;
+}
+
+.upload-zone {
+    border: 2px dashed #666;
+    border-radius: 5px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+
+.upload-zone:hover, .upload-zone.drag-over {
+    border-color: #4ec9b0;
+    background: #2a2a2a;
+}
+
+.upload-zone p {
+    margin: 10px 0;
+    color: #888;
+}
+
+.file-label {
+    background: #0e639c;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-block;
+    margin: 10px 0;
+}
+
+.file-label:hover {
+    background: #1177bb;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.validator-btn {
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 5px;
+    width: calc(50% - 10px);
+}
+
+.validator-btn:hover {
+    background: #1177bb;
+}
+
+.validator-btn:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
+.validator-btn.secondary {
+    background: #555;
+}
+
+.validator-btn.secondary:hover {
+    background: #666;
+}
+
+.file-info {
+    background: #1e3e1e;
+    border-left: 3px solid #4ec9b0;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.results-section {
+    margin-top: 20px;
+}
+
+.status {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 3px;
+    text-align: center;
+}
+
+.status.pass {
+    background: #1e3e1e;
+    color: #4ec9b0;
+    border: 1px solid #4ec9b0;
+}
+
+.status.fail {
+    background: #3e1e1e;
+    color: #f48771;
+    border: 1px solid #f48771;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.stat-box {
+    background: #1e1e1e;
+    border: 1px solid #3e3e42;
+    padding: 12px;
+    border-radius: 3px;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.error-item, .warning-item {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.error-item {
+    background: #3e1e1e;
+    border-left: 3px solid #f48771;
+}
+
+.warning-item {
+    background: #3e3e1e;
+    border-left: 3px solid #dcdcaa;
+}
+
+.error-item strong, .warning-item strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+details {
+    margin: 10px 0;
+}
+
+summary {
+    cursor: pointer;
+    padding: 10px;
+    background: #1e1e1e;
+    border-radius: 3px;
+    user-select: none;
+}
+
+summary:hover {
+    background: #2a2a2a;
+}
+
+pre.report {
+    background: #1e1e1e;
+    border: 1px solid #3e3e42;
+    padding: 10px;
+    overflow-x: auto;
+    border-radius: 3px;
+    font-size: 11px;
+    max-height: 300px;
+}
+
+.close-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    color: #888;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+.close-panel:hover {
+    color: #f48771;
+}
+
+h3 {
+    color: #dcdcaa;
+    margin: 20px 0 10px 0;
+    font-size: 16px;
+}
+
+.quick-tests {
+    display: flex;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.quick-tests button {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+}
+
+/* Pico Pin Styles */
+.pin {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pin rect {
+    fill: #9a916c;  /* Gold color for pins */
+    stroke: #30312e;
+    stroke-width: 0.3;
+    transition: all 0.2s ease;
+}
+
+.pin:hover rect {
+    fill: #ecf6fd;
+    stroke: #fcee21;
+    stroke-width: 0.5;
+}
+
+.pin.selected rect {
+    fill: #fcee21 !important;
+    stroke: #fcee21;
+    stroke-width: 1;
+}
+
+.pin.connected rect {
+    fill: #4ec9b0;
+    stroke: #006837;
+}
+
+/* Pin type specific colors */
+.pin.pin-gpio rect {
+    fill: #569cd6;  /* Blue for GPIO */
+}
+
+.pin.pin-ground rect {
+    fill: #363a44;  /* Dark for ground */
+}
+
+.pin.pin-power rect {
+    fill: #f48771;  /* Red for power */
+}
+
+.pin.pin-input rect {
+    fill: #dcdcaa;  /* Yellow for input */
+}
+
+/* PWM capable indicator */
+.pin.pwm-capable rect {
+    stroke: #3c3;
+    stroke-width: 0.5;
+}
+
+.pin.pwm-capable:hover rect {
+    stroke: #3c3;
+    stroke-width: 1;
+}

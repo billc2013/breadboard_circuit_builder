@@ -1,0 +1,41 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "LED Slow Blink",
+      "description": "Simple LED blink circuit - the 'Hello World' of hardware. LED blinks on GPIO15 with 220Ω current-limiting resistor.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "15E",
+          "cathode": "16E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "12E",
+          "pin1": "15D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP15",
+        "to": "12D",
+        "description": "GPIO15 to resistor for LED control signal"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GND_23",
+        "to": "16D",
+        "description": "Ground connection to LED cathode"
+      }
+    ]
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Traffic Light LEDs",
+      "description": "Red, green, and blue LEDs with individual resistors - demonstrates dynamic color rendering",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "pico1",
+        "type": "raspberry-pi-pico",
+        "placement": {
+          "position": { "x": 20, "y": 20 }
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "8E",
+          "anode": "8F"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "5F",
+          "pin1": "8F"
+        }
+      },
+      {
+        "id": "led2",
+        "type": "led-green-5mm",
+        "placement": {
+          "cathode": "15E",
+          "anode": "15F"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "12F",
+          "pin1": "15F"
+        }
+      },
+      {
+        "id": "led3",
+        "type": "led-blue-5mm",
+        "placement": {
+          "cathode": "22E",
+          "anode": "22F"
+        }
+      },
+      {
+        "id": "r3",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "19F",
+          "pin1": "22F"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP0",
+        "to": "5J",
+        "description": "GPIO0 (PWM) to red LED resistor"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP1",
+        "to": "12J",
+        "description": "GPIO1 (PWM) to green LED resistor"
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GP2",
+        "to": "19J",
+        "description": "GPIO2 (PWM) to blue LED resistor"
+      },
+      {
+        "id": "w4",
+        "from": "8E",
+        "to": "pico1.GND_3",
+        "description": "Red LED cathode to ground"
+      },
+      {
+        "id": "w5",
+        "from": "15E",
+        "to": "pico1.GND_3",
+        "description": "Green LED cathode to ground"
+      },
+      {
+        "id": "w6",
+        "from": "22E",
+        "to": "pico1.GND_8",
+        "description": "Blue LED cathode to ground"
+      }
+    ]
+  }
+}

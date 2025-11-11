@@ -1,0 +1,96 @@
+{
+  "component": {
+    "metadata": {
+      "id": "led-red-5mm",
+      "name": "Red LED - 5mm",
+      "description": "A generic red LED (~1.8V forward voltage, 633nm wavelength)",
+      "author": "Brendan Howell",
+      "tags": ["LED", "Red LED", "indicator", "fritzing core"],
+      "version": "4",
+      "created": "2008-07-25",
+      "fritzingVersion": "0.1.beta.1396",
+      "category": "basic"
+    },
+    "pins": {
+      "cathode": {
+        "number": 1,
+        "name": "cathode",
+        "description": "cathode pin (negative, shorter leg, flat side of lens)",
+        "connectorId": "connector0",
+        "electricalType": "ground"
+      },
+      "anode": {
+        "number": 2,
+        "name": "anode",
+        "description": "anode pin (positive, longer leg)",
+        "connectorId": "connector1",
+        "electricalType": "input"
+      }
+    },
+    "properties": {
+      "package": "5 mm [THT]",
+      "color": "Red (633nm)",
+      "current": "0.030A",
+      "maxCurrent": 0.030,
+      "maxCurrentUnit": "A",
+      "forwardVoltage": 1.8,
+      "forwardVoltageUnit": "V",
+      "wavelength": 633,
+      "wavelengthUnit": "nm",
+      "leg": "yes"
+    },
+    "physical": {
+      "type": "tht",
+      "package": "5 mm [THT]"
+    },
+    "rendering": {
+      "breadboard": {
+        "svg": "components_svg/LED-5mm-red-leg.svg",
+        "width": 18,
+        "height": 40,
+        "unit": "px",
+        "anchor": "center",
+        "pinOffsets": {
+          "anode": {"x": -4.5, "y": 0},
+          "cathode": {"x": 4.5, "y": 0}
+        },
+        "renderMode": "on-breadboard",
+        "orientation": {
+          "default": "horizontal",
+          "allowed": ["horizontal", "vertical"]
+        }
+      },
+      "schematic": {
+        "svg": "schematic/led.svg"
+      },
+      "pcb": {
+        "svg": "pcb/5mm_LED.svg"
+      }
+    },
+    "validation": {
+      "electricalType": "led",
+      "polarity": "polarized",
+      "forwardVoltage": 1.8,
+      "maxCurrent": 0.030,
+      "typicalCurrent": 0.010,
+      "rules": {
+        "requiresCurrentLimiting": true,
+        "recommendedResistor": {
+          "min": 150,
+          "max": 470,
+          "unit": "ohm",
+          "calculation": "(Vsupply - 1.8V) / 0.010A for typical operation"
+        },
+        "anodeMustBeHigherVoltage": true,
+        "mustHaveGroundConnection": true
+      },
+      "warnings": [
+        "LED requires current-limiting resistor in series",
+        "Anode voltage must be higher than cathode voltage",
+        "Maximum continuous current is 30mA",
+        "Typical operating current is 10mA for good brightness and longevity",
+        "Connect anode to signal/power, cathode to ground"
+      ]
+    }
+  }
+}

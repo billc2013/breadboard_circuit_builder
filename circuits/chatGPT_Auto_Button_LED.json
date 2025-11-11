@@ -1,0 +1,75 @@
+{
+"circuit": {
+"metadata": {
+"name": "Pico Button + LED (GPIO16 input, GPIO17 output)",
+"description": "Pushbutton with 10kΩ pulldown on GP16 and LED on GP17 with 220Ω current limiting. Uses no rails.",
+"created": "2025-11-02"
+},
+"components": [
+{
+"id": "button1",
+"type": "button-tactile-6mm",
+"placement": {
+"leg0": "4E",
+"leg1": "5E"
+}
+},
+{
+"id": "r_pull",
+"type": "resistor-10k",
+"placement": {
+"pin0": "5D",
+"pin1": "10D"
+}
+},
+{
+"id": "r_led",
+"type": "resistor-220",
+"placement": {
+"pin0": "15D",
+"pin1": "19D"
+}
+},
+{
+"id": "led1",
+"type": "led-red-5mm",
+"placement": {
+"anode": "19E",
+"cathode": "20E"
+}
+}
+],
+"wires": [
+{
+"id": "w_3v3_to_button",
+"from": "pico1.3V3_OUT",
+"to": "4D",
+"description": "Provides HIGH to one side of the button (4D shares bus with 4E)."
+},
+{
+"id": "w_btn_to_gpio16",
+"from": "pico1.GP16",
+"to": "5A",
+"description": "Reads button state on the 5-column bus (shared with 5E and 5D)."
+},
+{
+"id": "w_pulldown_to_gnd",
+"from": "pico1.GND_23",
+"to": "10C",
+"description": "Grounds the far end of the 10kΩ pulldown (10C shares bus with 10D)."
+},
+{
+"id": "w_gpio17_to_resistor",
+"from": "pico1.GP17",
+"to": "15C",
+"description": "Drives LED through 220Ω series resistor (15C shares bus with 15D)."
+},
+{
+"id": "w_led_cathode_to_gnd",
+"from": "pico1.GND_18",
+"to": "20C",
+"description": "Ground return for LED cathode (20C shares bus with 20E)."
+}
+]
+}
+}

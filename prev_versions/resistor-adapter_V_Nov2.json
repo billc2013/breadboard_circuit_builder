@@ -1,0 +1,165 @@
+// resistor-220-adapter.js
+// Adapter for rendering 220Ω Resistor on breadboard
+// This orchestrates the geometry calculations and SVG rendering
+
+/**
+ * Adapter for 220Ω Resistor component
+ * Implements the standard component adapter interface
+ */
+class ResistorAdapter {
+    constructor() {
+        this.componentType = 'resistor-220';
+    }
+    
+    /**
+     * Validate component placement
+     * @param {Object} placement - { pin0: "15F", pin1: "20F" }
+     * @param {Array} breadboardHoles - Available breadboard holes
+     * @returns {Object} {valid: boolean, error?: string, warning?: string}
+     */
+    validate(placement, breadboardHoles) {
+        return validateResistorPlacement(placement, breadboardHoles);
+    }
+    
+    /**
+     * Calculate rendering position from placement
+     * @param {Object} placement - { pin0: "15F", pin1: "20F" }
+     * @param {Array} breadboardHoles - Available breadboard holes
+     * @returns {Object} Position data for rendering
+     */
+    calculatePosition(placement, breadboardHoles) {
+        return calculateResistorPosition(placement, breadboardHoles);
+    }
+    
+    /**
+     * Get list of holes required by this component
+     * @param {Object} placement - { pin0: "15F", pin1: "20F" }
+     * @returns {Array<string>} Array of hole IDs that will be occupied
+     */
+    getRequiredHoles(placement) {
+        return [placement.pin0, placement.pin1];
+    }
+    
+    /**
+     * Render the resistor component on the breadboard
+     * @param {string} componentId - Unique component ID (e.g., "r1")
+     * @param {Object} position - Calculated position data from calculatePosition()
+     * @param {Object} metadata - Component metadata from JSON file
+     */
+    async render(componentId, position, metadata) {
+        const componentsLayer = document.getElementById('components-layer');
+        
+        if (!componentsLayer) {
+            throw new Error('Components layer not found in DOM');
+        }
+        
+        // Load resistor SVG
+        const svgPath = RESISTOR_220_CONFIG.svg.file;
+        const response = await fetch(svgPath);
+        if (!response.ok) {
+            throw new Error(`Failed to load resistor SVG: ${svgPath}`);
+        }
+        const svgText = await response.text();
+        
+        // Parse SVG
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+        const svgElement = svgDoc.querySelector('svg');
+        
+        if (!svgElement) {
+            throw new Error('Failed to parse resistor SVG');
+        }
+        
+        // Extract breadboard view
+        const breadboardGroup = svgElement.querySelector('#breadboard');
+        
+        if (!breadboardGroup) {
+            throw new Error('No breadboard group found in resistor SVG');
+        }
+        
+        // Create wrapper group for this resistor instance
+        const resistorGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        resistorGroup.classList.add('component', 'resistor');
+        resistorGroup.setAttribute('data-component-id', componentId);
+        resistorGroup.setAttribute('data-component-type', this.componentType);
+        
+        // Clone breadboard content
+        const clonedContent = breadboardGroup.cloneNode(true);
+        
+        // Calculate dynamic scale based on actual hole spacing
+        // Resistor body stretches/compresses to match breadboard holes
+        const scale = calculateResistorScale(position.actualSpacing);
+        
+        // Get SVG connector positions
+        const { pin0, pin1 } = RESISTOR_220_CONFIG.svg.connectors;
+        
+        // Calculate translation to position resistor
+        // Goal: Pin centers align with breadboard hole centers
+        let translateX, translateY, rotation;
+        
+        if (position.orientation === 'horizontal') {
+            // Horizontal placement (typical)
+            translateX = position.pin0Coords.x - (pin0.x * scale);
+            translateY = position.pin0Coords.y - (pin0.y * scale);
+            rotation = 0;
+        } else {
+            // Vertical placement
+            // Rotate around center point
+            translateX = position.centerX;
+            translateY = position.centerY;
+            rotation = 90;
+        }
+        
+        // Apply transform
+        // Note: For vertical, we rotate around the center, so translate calculation differs
+        if (position.orientation === 'horizontal') {
+            resistorGroup.setAttribute('transform', 
+                `translate(${translateX}, ${translateY}) scale(${scale})`
+            );
+        } else {
+            // For vertical: translate to center, rotate, then adjust for pin positions
+            const adjustX = -((pin0.x + pin1.x) / 2) * scale;
+            const adjustY = -((pin0.y + pin1.y) / 2) * scale;
+            resistorGroup.setAttribute('transform', 
+                `translate(${translateX}, ${translateY}) rotate(${rotation}) translate(${adjustX}, ${adjustY}) scale(${scale})`
+            );
+        }
+        
+        // Append cloned content
+        resistorGroup.appendChild(clonedContent);
+        
+        // Add to components layer
+        componentsLayer.appendChild(resistorGroup);
+        
+        // Add component label (show resistance value)
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', position.centerX);
+        label.setAttribute('y', position.centerY - 8);
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('font-size', '8');
+        label.setAttribute('fill', '#333');
+        label.setAttribute('font-weight', 'bold');
+        label.textContent = '220Ω';
+        label.classList.add('component-label');
+        componentsLayer.appendChild(label);
+        
+        // Store metadata on resistor group
+        resistorGroup._componentData = {
+            position,
+            metadata,
+            config: RESISTOR_220_CONFIG,
+            scale  // Store calculated scale for debugging
+        };
+        
+        // Mark holes as occupied
+        markHoleOccupied(position.pin0HoleId, 'component', componentId);
+        markHoleOccupied(position.pin1HoleId, 'component', componentId);
+        
+        console.log(`✓ Resistor rendered: ${componentId} at ${position.pin0HoleId}/${position.pin1HoleId} (scale: ${scale.toFixed(2)})`);
+    }
+}
+
+// Register adapter globally
+window.ResistorAdapter = ResistorAdapter;
+
+console.log('ResistorAdapter loaded');

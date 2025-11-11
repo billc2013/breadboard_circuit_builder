@@ -1,0 +1,41 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "LED Slow Blink - Option 2",
+      "description": "LED blink circuit using GPIO10 with components on right side of breadboard.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-blue-5mm",
+        "placement": {
+          "anode": "24E",
+          "cathode": "25E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "21E",
+          "pin1": "24D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP10",
+        "to": "21D",
+        "description": "GPIO10 to resistor for LED control signal"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GND_18",
+        "to": "25D",
+        "description": "Ground connection to LED cathode"
+      }
+    ]
+  }
+}

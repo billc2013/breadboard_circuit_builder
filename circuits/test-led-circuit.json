@@ -1,0 +1,48 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Simple LED Test Circuit",
+      "description": "PWM-controlled LED with current-limiting resistor",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "pico1",
+        "type": "raspberry-pi-pico",
+        "placement": {
+          "position": { "x": 20, "y": 20 }
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "6J",
+          "anode": "7J"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "1H",
+          "pin1": "6H"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP0",
+        "to": "1J",
+        "description": "GPIO0 to resistor"
+      },
+      {
+        "id": "w2",
+        "from": "7H",
+        "to": "pico1.GND_3",
+        "description": "LED anode to ground"
+      }
+    ]
+  }
+}

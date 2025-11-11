@@ -1,0 +1,41 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Blinking LED Circuit",
+      "description": "An LED connected to a GPIO pin through a 220Ω resistor for a blinking pattern using Raspberry Pi Pico.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "20E",
+          "cathode": "21E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "15E",
+          "pin1": "20E"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP15",
+        "to": "15D",
+        "description": "GPIO15 output controls LED through resistor."
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GND_23",
+        "to": "21D",
+        "description": "Connect LED cathode to ground."
+      }
+    ]
+  }
+}

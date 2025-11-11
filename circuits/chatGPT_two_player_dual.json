@@ -1,0 +1,165 @@
+{
+"circuit": {
+"metadata": {
+"name": "Pico Two-Player Reaction Duel",
+"description": "Press START (blue LED will arm). After a random delay, blue turns off—first player to press wins. Player A lights RED (GP18), Player B lights GREEN (GP19). Two buttons with 10kΩ pulldowns; each LED has a 220Ω series resistor.",
+"created": "2025-11-02"
+},
+"components": [
+{
+"id": "buttonA",
+"type": "button-tactile-6mm",
+"placement": {
+"leg0": "3E",
+"leg1": "4E"
+}
+},
+{
+"id": "r_pull_A",
+"type": "resistor-10k",
+"placement": {
+"pin0": "4D",
+"pin1": "9D"
+}
+},
+{
+"id": "buttonB",
+"type": "button-tactile-6mm",
+"placement": {
+"leg0": "12E",
+"leg1": "13E"
+}
+},
+{
+"id": "r_pull_B",
+"type": "resistor-10k",
+"placement": {
+"pin0": "13D",
+"pin1": "18D"
+}
+},
+{
+"id": "r_ready",
+"type": "resistor-220",
+"placement": {
+"pin0": "16D",
+"pin1": "20D"
+}
+},
+{
+"id": "led_ready",
+"type": "led-blue-5mm",
+"placement": {
+"anode": "20E",
+"cathode": "21E"
+}
+},
+{
+"id": "r_Awin",
+"type": "resistor-220",
+"placement": {
+"pin0": "6B",
+"pin1": "10B"
+}
+},
+{
+"id": "led_Awin",
+"type": "led-red-5mm",
+"placement": {
+"anode": "10A",
+"cathode": "11A"
+}
+},
+{
+"id": "r_Bwin",
+"type": "resistor-220",
+"placement": {
+"pin0": "24D",
+"pin1": "28D"
+}
+},
+{
+"id": "led_Bwin",
+"type": "led-green-5mm",
+"placement": {
+"anode": "28E",
+"cathode": "29E"
+}
+}
+],
+"wires": [
+{
+"id": "w_3v3_to_buttonA",
+"from": "pico1.3V3_OUT",
+"to": "3D",
+"description": "Provides HIGH to one side of Player A button (3D shares bus with 3E)."
+},
+{
+"id": "w_btnA_to_gpio16",
+"from": "pico1.GP16",
+"to": "4A",
+"description": "Player A input node (4A shares bus with 4E and 4D)."
+},
+{
+"id": "w_pullA_to_gnd",
+"from": "pico1.GND_23",
+"to": "9C",
+"description": "Ground for A's 10kΩ pulldown (9C shares bus with 9D)."
+},
+{
+"id": "w_3v3_to_buttonB",
+"from": "pico1.3V3_OUT",
+"to": "12D",
+"description": "Provides HIGH to one side of Player B button (12D shares bus with 12E)."
+},
+{
+"id": "w_btnB_to_gpio20",
+"from": "pico1.GP20",
+"to": "13A",
+"description": "Player B input node (13A shares bus with 13E and 13D)."
+},
+{
+"id": "w_pullB_to_gnd",
+"from": "pico1.GND_28",
+"to": "18C",
+"description": "Ground for B's 10kΩ pulldown (18C shares bus with 18D)."
+},
+{
+"id": "w_gpio17_to_ready_res",
+"from": "pico1.GP17",
+"to": "16C",
+"description": "Drives READY (blue) LED through 220Ω resistor (16C shares bus with 16D)."
+},
+{
+"id": "w_ready_cathode_to_gnd",
+"from": "pico1.GND_18",
+"to": "21C",
+"description": "Ground for blue LED cathode (21C shares bus with 21E)."
+},
+{
+"id": "w_gpio18_to_Awin_res",
+"from": "pico1.GP18",
+"to": "6C",
+"description": "Drives RED A-win LED via 220Ω resistor (6C shares bus with 6B)."
+},
+{
+"id": "w_Awin_cathode_to_gnd",
+"from": "pico1.GND_3",
+"to": "11C",
+"description": "Ground for red LED cathode (11C shares bus with 11A)."
+},
+{
+"id": "w_gpio19_to_Bwin_res",
+"from": "pico1.GP19",
+"to": "24C",
+"description": "Drives GREEN B-win LED via 220Ω resistor (24C shares bus with 24D)."
+},
+{
+"id": "w_Bwin_cathode_to_gnd",
+"from": "pico1.GND_38",
+"to": "29C",
+"description": "Ground for green LED cathode (29C shares bus with 29E)."
+}
+]
+}
+}

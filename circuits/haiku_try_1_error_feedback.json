@@ -1,0 +1,47 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Blinking LED Circuit",
+      "description": "Red LED connected to GPIO0 with current-limiting resistor for a basic blinking light project",
+      "created": "2025-01-01"
+    },
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "15J",
+          "cathode": "16J"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "12J",
+          "pin1": "15J"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP0",
+        "to": "12J",
+        "description": "GPIO0 output to current-limiting resistor"
+      },
+      {
+        "id": "w2",
+        "from": "16J",
+        "to": "20Z",
+        "description": "LED cathode to ground rail"
+      },
+      {
+        "id": "w3",
+        "from": "20Z",
+        "to": "pico1.GND_3",
+        "description": "Ground rail to Pico ground"
+      }
+    ]
+  }
+}

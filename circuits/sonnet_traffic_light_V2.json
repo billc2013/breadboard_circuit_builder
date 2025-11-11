@@ -1,0 +1,103 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Traffic Light Circuit",
+      "description": "Three LED traffic light (red, yellow, green) controlled by Raspberry Pi Pico with current-limiting resistors",
+      "created": "2025-01-10"
+    },
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "5E",
+          "cathode": "6E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "5D",
+          "pin1": "10D"
+        }
+      },
+      {
+        "id": "led2",
+        "type": "led-green-5mm",
+        "placement": {
+          "anode": "15E",
+          "cathode": "16E"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "15D",
+          "pin1": "20D"
+        }
+      },
+      {
+        "id": "led3",
+        "type": "led-blue-5mm",
+        "placement": {
+          "anode": "25E",
+          "cathode": "26E"
+        }
+      },
+      {
+        "id": "r3",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "25D",
+          "pin1": "30D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP15",
+        "to": "10A",
+        "description": "Connect GPIO15 to red LED resistor"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP14",
+        "to": "20A",
+        "description": "Connect GPIO14 to yellow LED resistor"
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GP13",
+        "to": "30A",
+        "description": "Connect GPIO13 to green LED resistor"
+      },
+      {
+        "id": "w4",
+        "from": "6D",
+        "to": "6Z",
+        "description": "Connect red LED cathode to ground rail"
+      },
+      {
+        "id": "w5",
+        "from": "16D",
+        "to": "16Z",
+        "description": "Connect yellow LED cathode to ground rail"
+      },
+      {
+        "id": "w6",
+        "from": "26D",
+        "to": "25Z",
+        "description": "Connect green LED cathode to ground rail"
+      },
+      {
+        "id": "w7",
+        "from": "pico1.GND_23",
+        "to": "1Z",
+        "description": "Connect Pico ground to breadboard ground rail"
+      }
+    ]
+  }
+}

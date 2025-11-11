@@ -1,0 +1,235 @@
+// led-5mm-geometry.js
+// Generic geometry for ALL 5mm LEDs (red, green, blue, yellow, etc.)
+// Color is specified in metadata JSON, not in geometry
+
+const LED_RED_5MM_CONFIG = {
+    component_type: 'led-red-5mm',
+    component_file: 'components/basic/led-red-5mm.json',
+    
+    // SVG rendering info (extracted from Fritzing breadboard view)
+    svg: {
+        file: 'components_svg/LED-5mm-red-leg.svg',
+        viewBox: '0 0 21.467 40.565',
+        width: 21.467,   // mm
+        height: 40.565,  // mm
+        
+        // Connector positions (from Fritzing SVG)
+        // These are where the legs connect in the original SVG
+        connectors: {
+            cathode: {
+                id: 'connector0leg',
+                x: 6.287,      // Left leg (negative, flat side)
+                y: 40.565      // Bottom of LED body
+            },
+            anode: {
+                id: 'connector1leg', 
+                x: 16.29,      // Right leg (positive, round side)
+                y: 40.565      // Bottom of LED body
+            }
+        },
+        
+        // Body center point (for positioning calculations)
+        body: {
+            centerX: 11.29,     // Horizontal center between legs: (6.287 + 16.29) / 2
+            centerY: 20.28,     // Vertical center: 40.565 / 2
+            baseY: 40.565       // Bottom of LED body (where legs start)
+        }
+    },
+    
+    // Pin spacing on breadboard (standard 0.1" spacing)
+    pin_spacing: {
+        horizontal: 8.982,  // One breadboard hole (2.54mm = 0.1" converted to viewport units)
+        vertical: 8.982
+    },
+    
+    // Visual rendering settings
+    rendering: {
+        scale: 0.8,              // Scale factor for screen display
+        insertionOffset: -8,     // Push LED up into breadboard (negative = up)
+        stubLength: 11,          // Length of stub legs from hole to LED body
+        
+        // Stub styling
+        cathodeStub: {
+            color: '#6C6C6C',    // Darker grey for cathode (polarity indicator)
+            width: 1.5
+        },
+        anodeStub: {
+            color: '#8C8C8C',    // Lighter grey for anode
+            width: 1.5
+        }
+    },
+    
+    // Default orientation
+    default_orientation: 'horizontal',  // LED typically horizontal across gap (E to F)
+    
+    // Polarity information
+    polarity: {
+        type: 'polarized',
+        cathode: {
+            marker: 'flat-side',  // Flat side of lens indicates cathode
+            description: 'Negative terminal (shorter leg, connects to ground)',
+            svgConnector: 'connector0'
+        },
+        anode: {
+            marker: 'round-side',  // Round side of lens
+            description: 'Positive terminal (longer leg, connects to signal)',
+            svgConnector: 'connector1'
+        }
+    }
+};
+
+/**
+ * Calculate LED rendering position based on hole placement
+ * @param {Object} placement - { cathode: "14E", anode: "15E" }
+ * @param {Array} breadboardHoles - Array of breadboard hole objects
+ * @returns {Object} Position data for rendering
+ *   {
+ *     centerX, centerY,           // Center point of LED body
+ *     orientation, rotation,       // How LED is oriented
+ *     cathodeCoords, anodeCoords, // Actual hole positions
+ *     cathodeHoleId, anodeHoleId, // Hole IDs for occupation tracking
+ *     componentType               // For identification
+ *   }
+ */
+function calculateLEDPosition(placement, breadboardHoles) {
+    // Validate placement has required fields
+    if (!placement.cathode || !placement.anode) {
+        console.error('LED placement requires both cathode and anode holes');
+        return null;
+    }
+    
+    // Look up hole coordinates
+    const cathodeHole = breadboardHoles.find(h => h.id === placement.cathode);
+    const anodeHole = breadboardHoles.find(h => h.id === placement.anode);
+    
+    if (!cathodeHole || !anodeHole) {
+        console.error('LED holes not found:', placement);
+        return null;
+    }
+    
+    // Calculate center point between the two holes
+    const centerX = (cathodeHole.x + anodeHole.x) / 2;
+    const centerY = (cathodeHole.y + anodeHole.y) / 2;
+    
+    // Determine orientation based on hole positions
+    const deltaX = Math.abs(anodeHole.x - cathodeHole.x);
+    const deltaY = Math.abs(anodeHole.y - cathodeHole.y);
+    
+    let orientation, rotation;
+    if (deltaX > deltaY) {
+        // Horizontal placement (common: across breadboard gap)
+        orientation = 'horizontal';
+        rotation = cathodeHole.x < anodeHole.x ? 0 : 180;  // Cathode left = 0°
+    } else {
+        // Vertical placement (less common)
+        orientation = 'vertical';
+        rotation = cathodeHole.y < anodeHole.y ? 90 : 270;  // Cathode top = 90°
+    }
+    
+    return {
+        centerX,
+        centerY,
+        orientation,
+        rotation,
+        cathodeCoords: { x: cathodeHole.x, y: cathodeHole.y },
+        anodeCoords: { x: anodeHole.x, y: anodeHole.y },
+        cathodeHoleId: placement.cathode,
+        anodeHoleId: placement.anode,
+        componentType: LED_RED_5MM_CONFIG.component_type
+    };
+}
+
+/**
+ * Validate LED placement
+ * @param {Object} placement - { cathode: "14E", anode: "15E" }
+ * @param {Array} breadboardHoles - Array of breadboard hole objects
+ * @returns {Object} { valid: boolean, error?: string, warning?: string }
+ */
+function validateLEDPlacement(placement, breadboardHoles) {
+    // Check required fields exist
+    if (!placement.cathode || !placement.anode) {
+        return { 
+            valid: false, 
+            error: 'LED requires both cathode and anode placement' 
+        };
+    }
+    
+    // Check holes exist
+    const cathodeHole = breadboardHoles.find(h => h.id === placement.cathode);
+    const anodeHole = breadboardHoles.find(h => h.id === placement.anode);
+    
+    if (!cathodeHole) {
+        return { 
+            valid: false, 
+            error: `Cathode hole "${placement.cathode}" not found` 
+        };
+    }
+    if (!anodeHole) {
+        return { 
+            valid: false, 
+            error: `Anode hole "${placement.anode}" not found` 
+        };
+    }
+    
+    // Check if holes are adjacent (standard LED leg spacing)
+    const deltaX = Math.abs(anodeHole.x - cathodeHole.x);
+    const deltaY = Math.abs(anodeHole.y - cathodeHole.y);
+    const spacing = LED_RED_5MM_CONFIG.pin_spacing.horizontal;
+    
+    const isAdjacent = (deltaX < spacing + 1 && deltaY < 1) ||  // Horizontal adjacent
+                       (deltaY < spacing + 1 && deltaX < 1);    // Vertical adjacent
+    
+    if (!isAdjacent) {
+        const distance = Math.sqrt(deltaX*deltaX + deltaY*deltaY).toFixed(2);
+        return { 
+            valid: false, 
+            error: `LED pins must be in adjacent holes (spacing: ${spacing}mm). Current distance: ${distance}mm` 
+        };
+    }
+    
+    // Check if cathode and anode are on same bus (would create short circuit)
+    if (cathodeHole.bus === anodeHole.bus) {
+        return {
+            valid: false,
+            error: `LED pins on same bus "${cathodeHole.bus}" - this creates a short circuit`
+        };
+    }
+    
+    // Check typical placement (across breadboard gap)
+    const cathodeRow = placement.cathode.match(/[A-Z]+$/)[0];
+    const anodeRow = placement.anode.match(/[A-Z]+$/)[0];
+    
+    const topRows = ['J', 'I', 'H', 'G', 'F'];
+    const bottomRows = ['E', 'D', 'C', 'B', 'A'];
+    
+    const cathodeOnTop = topRows.includes(cathodeRow);
+    const anodeOnTop = topRows.includes(anodeRow);
+    const cathodeOnBottom = bottomRows.includes(cathodeRow);
+    const anodeOnBottom = bottomRows.includes(anodeRow);
+    
+    // Typical: cathode and anode span the gap
+    if ((cathodeOnTop && anodeOnBottom) || (cathodeOnBottom && anodeOnTop)) {
+        return { valid: true };  // Perfect placement
+    }
+    
+    // Both on same side - unusual but valid
+    if ((cathodeOnTop && anodeOnTop) || (cathodeOnBottom && anodeOnBottom)) {
+        return { 
+            valid: true, 
+            warning: 'LED pins on same side of gap (unusual but valid)' 
+        };
+    }
+    
+    return { valid: true };
+}
+
+console.log('LED geometry helper loaded');
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        LED_RED_5MM_CONFIG,
+        calculateLEDPosition,
+        validateLEDPlacement
+    };
+}

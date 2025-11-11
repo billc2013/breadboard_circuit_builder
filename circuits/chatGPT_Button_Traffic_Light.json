@@ -1,0 +1,131 @@
+{
+"circuit": {
+"metadata": {
+"name": "Pico Traffic Light with Start Button",
+"description": "Button on GP16 starts a traffic light sequence with red, yellow, and green LEDs on GP17, GP18, and GP19. Includes 10kΩ pulldown resistor on button and 220Ω resistors for each LED.",
+"created": "2025-11-02"
+},
+"components": [
+{
+"id": "button1",
+"type": "button-tactile-6mm",
+"placement": {
+"leg0": "4E",
+"leg1": "5E"
+}
+},
+{
+"id": "r_pull",
+"type": "resistor-10k",
+"placement": {
+"pin0": "5D",
+"pin1": "10D"
+}
+},
+{
+"id": "r_red",
+"type": "resistor-220",
+"placement": {
+"pin0": "15D",
+"pin1": "19D"
+}
+},
+{
+"id": "led_red",
+"type": "led-red-5mm",
+"placement": {
+"anode": "19E",
+"cathode": "20E"
+}
+},
+{
+"id": "r_yellow",
+"type": "resistor-220",
+"placement": {
+"pin0": "10B",
+"pin1": "14B"
+}
+},
+{
+"id": "led_yellow",
+"type": "led-green-5mm",
+"placement": {
+"anode": "14A",
+"cathode": "15A"
+}
+},
+{
+"id": "r_green",
+"type": "resistor-220",
+"placement": {
+"pin0": "20B",
+"pin1": "24B"
+}
+},
+{
+"id": "led_green",
+"type": "led-green-5mm",
+"placement": {
+"anode": "24A",
+"cathode": "25A"
+}
+}
+],
+"wires": [
+{
+"id": "w_3v3_to_button",
+"from": "pico1.3V3_OUT",
+"to": "4D",
+"description": "Provides HIGH to one side of the button."
+},
+{
+"id": "w_btn_to_gpio16",
+"from": "pico1.GP16",
+"to": "5A",
+"description": "Reads button state on GP16 input bus."
+},
+{
+"id": "w_pulldown_to_gnd",
+"from": "pico1.GND_23",
+"to": "10C",
+"description": "Ground connection for button pulldown resistor."
+},
+{
+"id": "w_gpio17_to_red_res",
+"from": "pico1.GP17",
+"to": "15C",
+"description": "Red LED signal path from GPIO17 to resistor."
+},
+{
+"id": "w_gpio18_to_yellow_res",
+"from": "pico1.GP18",
+"to": "10C",
+"description": "Yellow LED signal path from GPIO18 to resistor."
+},
+{
+"id": "w_gpio19_to_green_res",
+"from": "pico1.GP19",
+"to": "20C",
+"description": "Green LED signal path from GPIO19 to resistor."
+},
+{
+"id": "w_led_red_cathode_to_gnd",
+"from": "pico1.GND_18",
+"to": "20C",
+"description": "Ground connection for red LED cathode."
+},
+{
+"id": "w_led_yellow_cathode_to_gnd",
+"from": "pico1.GND_23",
+"to": "15C",
+"description": "Ground connection for yellow LED cathode."
+},
+{
+"id": "w_led_green_cathode_to_gnd",
+"from": "pico1.GND_28",
+"to": "25C",
+"description": "Ground connection for green LED cathode."
+}
+]
+}
+}

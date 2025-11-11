@@ -1,0 +1,176 @@
+// led-red-5mm-adapter.js
+// Adapter for rendering Red LED 5mm on breadboard
+// This orchestrates the geometry calculations and SVG rendering
+
+/**
+ * Adapter for LED Red 5mm component
+ * Implements the standard component adapter interface
+ */
+class LEDRedAdapter {
+    constructor() {
+        this.componentType = 'led-red-5mm';
+    }
+    
+    /**
+     * Validate component placement
+     * @param {Object} placement - { cathode: "14E", anode: "15E" }
+     * @param {Array} breadboardHoles - Available breadboard holes
+     * @returns {Object} {valid: boolean, error?: string, warning?: string}
+     */
+    validate(placement, breadboardHoles) {
+        return validateLEDPlacement(placement, breadboardHoles);
+    }
+    
+    /**
+     * Calculate rendering position from placement
+     * @param {Object} placement - { cathode: "14E", anode: "15E" }
+     * @param {Array} breadboardHoles - Available breadboard holes
+     * @returns {Object} Position data for rendering
+     */
+    calculatePosition(placement, breadboardHoles) {
+        return calculateLEDPosition(placement, breadboardHoles);
+    }
+    
+    /**
+     * Get list of holes required by this component
+     * @param {Object} placement - { cathode: "14E", anode: "15E" }
+     * @returns {Array<string>} Array of hole IDs that will be occupied
+     */
+    getRequiredHoles(placement) {
+        return [placement.cathode, placement.anode];
+    }
+    
+    /**
+     * Render the LED component on the breadboard
+     * @param {string} componentId - Unique component ID (e.g., "led1")
+     * @param {Object} position - Calculated position data from calculatePosition()
+     * @param {Object} metadata - Component metadata from JSON file
+     */
+    async render(componentId, position, metadata) {
+        const componentsLayer = document.getElementById('components-layer');
+        
+        if (!componentsLayer) {
+            throw new Error('Components layer not found in DOM');
+        }
+        
+        // Load LED SVG
+        const svgPath = LED_RED_5MM_CONFIG.svg.file;
+        const response = await fetch(svgPath);
+        if (!response.ok) {
+            throw new Error(`Failed to load LED SVG: ${svgPath}`);
+        }
+        const svgText = await response.text();
+        
+        // Parse SVG
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+        const svgElement = svgDoc.querySelector('svg');
+        
+        if (!svgElement) {
+            throw new Error('Failed to parse LED SVG');
+        }
+        
+        // Extract breadboard view
+        const breadboardGroup = svgElement.querySelector('#breadboard');
+        
+        if (!breadboardGroup) {
+            throw new Error('No breadboard group found in LED SVG');
+        }
+        
+        // Create wrapper group for this LED instance
+        const ledGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        ledGroup.classList.add('component', 'led');
+        ledGroup.setAttribute('data-component-id', componentId);
+        ledGroup.setAttribute('data-component-type', this.componentType);
+        
+        // Clone breadboard content
+        const clonedContent = breadboardGroup.cloneNode(true);
+        
+        // REMOVE THE LONG LEGS - they extend way too far for screen display
+        const connector0leg = clonedContent.querySelector('#connector0leg');
+        const connector1leg = clonedContent.querySelector('#connector1leg');
+        
+        if (connector0leg) connector0leg.remove();
+        if (connector1leg) connector1leg.remove();
+        
+        // Get rendering settings
+        const { scale, insertionOffset } = LED_RED_5MM_CONFIG.rendering;
+        const { centerX, baseY } = LED_RED_5MM_CONFIG.svg.body;
+        
+        // Calculate transform to position LED
+        // Goal: LED body centered between holes, appearing "inserted" into breadboard
+        const translateX = position.centerX - (centerX * scale);
+        const translateY = position.centerY - (baseY * scale) + insertionOffset;
+        
+        // Apply transform
+        ledGroup.setAttribute('transform', 
+            `translate(${translateX}, ${translateY}) scale(${scale})`
+        );
+        
+        // Append cloned content (without long legs)
+        ledGroup.appendChild(clonedContent);
+        
+        // Add SHORT stub legs from holes up to LED body
+        // These show the connection points clearly without visual clutter
+        const { cathodeStub, anodeStub, stubLength } = LED_RED_5MM_CONFIG.rendering;
+        
+        // Cathode stub (darker grey for polarity indication)
+        const cathodeStubLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        cathodeStubLine.setAttribute('x1', position.cathodeCoords.x);
+        cathodeStubLine.setAttribute('y1', position.cathodeCoords.y);
+        cathodeStubLine.setAttribute('x2', position.cathodeCoords.x);
+        cathodeStubLine.setAttribute('y2', position.cathodeCoords.y + insertionOffset);
+        cathodeStubLine.setAttribute('stroke', cathodeStub.color);
+        cathodeStubLine.setAttribute('stroke-width', cathodeStub.width);
+        cathodeStubLine.setAttribute('stroke-linecap', 'round');
+        cathodeStubLine.classList.add('led-stub', 'cathode-stub');
+        
+        // Anode stub (lighter grey)
+        const anodeStubLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        anodeStubLine.setAttribute('x1', position.anodeCoords.x);
+        anodeStubLine.setAttribute('y1', position.anodeCoords.y);
+        anodeStubLine.setAttribute('x2', position.anodeCoords.x);
+        anodeStubLine.setAttribute('y2', position.anodeCoords.y + insertionOffset);
+        anodeStubLine.setAttribute('stroke', anodeStub.color);
+        anodeStubLine.setAttribute('stroke-width', anodeStub.width);
+        anodeStubLine.setAttribute('stroke-linecap', 'round');
+        anodeStubLine.classList.add('led-stub', 'anode-stub');
+        
+        // Add stubs BEFORE LED body (so they appear behind)
+        componentsLayer.appendChild(cathodeStubLine);
+        componentsLayer.appendChild(anodeStubLine);
+        
+        // Add LED body on top
+        componentsLayer.appendChild(ledGroup);
+        
+        // Add component label
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', position.centerX);
+        label.setAttribute('y', position.centerY - 15);
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('font-size', '8');
+        label.setAttribute('fill', '#333');
+        label.setAttribute('font-weight', 'bold');
+        label.textContent = componentId.toUpperCase();
+        label.classList.add('component-label');
+        componentsLayer.appendChild(label);
+        
+        // Store metadata on LED group
+        ledGroup._componentData = {
+            position,
+            metadata,
+            config: LED_RED_5MM_CONFIG
+        };
+        
+        // Mark holes as occupied
+        markHoleOccupied(position.cathodeHoleId, 'component', componentId);
+        markHoleOccupied(position.anodeHoleId, 'component', componentId);
+        
+        console.log(`✓ LED rendered: ${componentId} at ${position.cathodeHoleId}/${position.anodeHoleId}`);
+    }
+}
+
+// Register adapter globally
+window.LEDRedAdapter = LEDRedAdapter;
+
+console.log('LEDRedAdapter loaded');

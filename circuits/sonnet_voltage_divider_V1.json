@@ -1,0 +1,47 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "LED Voltage Divider Sensor",
+      "description": "Voltage divider circuit using LED as variable resistor for light sensing experiments",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "10J",
+          "pin1": "15J"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "15H",
+          "anode": "16H"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "10I",
+        "description": "3.3V supply to top of voltage divider"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP26_ADC0",
+        "to": "15I",
+        "description": "ADC input reads voltage at divider midpoint"
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "16I",
+        "description": "Ground connection to LED cathode"
+      }
+    ]
+  }
+}

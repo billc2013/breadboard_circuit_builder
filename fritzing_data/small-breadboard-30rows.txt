@@ -1,0 +1,3016 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module moduleId="SmallBreadboardModuleID" fritzingVersion="0.12.34">
+ <version>1</version>
+ <author>Educational Robotics</author>
+ <title>Small Breadboard (30 rows)</title>
+ <date>2025-10-29</date>
+ <label>Breadboard</label>
+ <tags>
+  <tag>breadboard</tag>
+  <tag>small</tag>
+  <tag>mini</tag>
+ </tags>
+ <properties>
+  <property name="family">Breadboard</property>
+  <property name="size">small</property>
+  <property name="rows">30</property>
+ </properties>
+ <taxonomy>prototyping.breadboard.breadboard.smallbreadboard</taxonomy>
+ <description>A small 30-row breadboard for easily prototyping circuits with microcontrollers</description>
+ <views>
+  <iconView>
+   <layers image="small-breadboard-icon.svg">
+    <layer layerId="icon"/>
+   </layers>
+  </iconView>
+  <breadboardView>
+   <layers image="small-breadboard.svg">
+    <layer layerId="breadboardbreadboard"/>
+   </layers>
+  </breadboardView>
+  <schematicView>
+   <layers image="small-breadboard.svg">
+    <layer layerId="breadboardbreadboard"/>
+   </layers>
+  </schematicView>
+  <pcbView>
+   <layers image="small-breadboard.svg">
+    <layer layerId="breadboardbreadboard"/>
+   </layers>
+  </pcbView>
+ </views>
+ <connectors ignoreTerminalPoints="true">
+  <!-- Power Rails -->
+  <connector id="power_pos_1" name="+" type="female">
+   <description>positive power rail</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="power_pos_1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  
+  <connector id="power_neg_1" name="-" type="female">
+   <description>negative power rail</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="power_neg_1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  
+  <!-- Main breadboard holes -->
+  <!-- Row 1 -->
+  <connector id="A1" name="A1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B1" name="B1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C1" name="C1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D1" name="D1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E1" name="E1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F1" name="F1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G1" name="G1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H1" name="H1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I1" name="I1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I1"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J1" name="J1" type="female">
+   <description>breadboard socket row 1</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J1"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 2 -->
+  <connector id="A2" name="A2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A2"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B2" name="B2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B2"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C2" name="C2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C2"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D2" name="D2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D2"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E2" name="E2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E2"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F2" name="F2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F2"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G2" name="G2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G2"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H2" name="H2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H2"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I2" name="I2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I2"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J2" name="J2" type="female">
+   <description>breadboard socket row 2</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J2"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 3 -->
+  <connector id="A3" name="A3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A3"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B3" name="B3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B3"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C3" name="C3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C3"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D3" name="D3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D3"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E3" name="E3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E3"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F3" name="F3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F3"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G3" name="G3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G3"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H3" name="H3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H3"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I3" name="I3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I3"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J3" name="J3" type="female">
+   <description>breadboard socket row 3</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J3"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 4 -->
+  <connector id="A4" name="A4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A4"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B4" name="B4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B4"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C4" name="C4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C4"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D4" name="D4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D4"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E4" name="E4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E4"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F4" name="F4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F4"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G4" name="G4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G4"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H4" name="H4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H4"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I4" name="I4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I4"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J4" name="J4" type="female">
+   <description>breadboard socket row 4</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J4"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 5 -->
+  <connector id="A5" name="A5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A5"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B5" name="B5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B5"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C5" name="C5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C5"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D5" name="D5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D5"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E5" name="E5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E5"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F5" name="F5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F5"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G5" name="G5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G5"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H5" name="H5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H5"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I5" name="I5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I5"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J5" name="J5" type="female">
+   <description>breadboard socket row 5</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J5"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 6 -->
+  <connector id="A6" name="A6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A6"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B6" name="B6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B6"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C6" name="C6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C6"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D6" name="D6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D6"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E6" name="E6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E6"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F6" name="F6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F6"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G6" name="G6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G6"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H6" name="H6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H6"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I6" name="I6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I6"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J6" name="J6" type="female">
+   <description>breadboard socket row 6</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J6"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 7 -->
+  <connector id="A7" name="A7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A7"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B7" name="B7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B7"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C7" name="C7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C7"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D7" name="D7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D7"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E7" name="E7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E7"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F7" name="F7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F7"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G7" name="G7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G7"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H7" name="H7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H7"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I7" name="I7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I7"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J7" name="J7" type="female">
+   <description>breadboard socket row 7</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J7"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 8 -->
+  <connector id="A8" name="A8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A8"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B8" name="B8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B8"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C8" name="C8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C8"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D8" name="D8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D8"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E8" name="E8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E8"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F8" name="F8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F8"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G8" name="G8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G8"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H8" name="H8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H8"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I8" name="I8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I8"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J8" name="J8" type="female">
+   <description>breadboard socket row 8</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J8"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 9 -->
+  <connector id="A9" name="A9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A9"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B9" name="B9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B9"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C9" name="C9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C9"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D9" name="D9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D9"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E9" name="E9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E9"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F9" name="F9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F9"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G9" name="G9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G9"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H9" name="H9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H9"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I9" name="I9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I9"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J9" name="J9" type="female">
+   <description>breadboard socket row 9</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J9"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 10 -->
+  <connector id="A10" name="A10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A10"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B10" name="B10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B10"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C10" name="C10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C10"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D10" name="D10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D10"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E10" name="E10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E10"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F10" name="F10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F10"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G10" name="G10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G10"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H10" name="H10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H10"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I10" name="I10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I10"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J10" name="J10" type="female">
+   <description>breadboard socket row 10</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J10"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 11 -->
+  <connector id="A11" name="A11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A11"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B11" name="B11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B11"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C11" name="C11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C11"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D11" name="D11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D11"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E11" name="E11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E11"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F11" name="F11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F11"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G11" name="G11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G11"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H11" name="H11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H11"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I11" name="I11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I11"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J11" name="J11" type="female">
+   <description>breadboard socket row 11</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J11"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 12 -->
+  <connector id="A12" name="A12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A12"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B12" name="B12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B12"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C12" name="C12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C12"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D12" name="D12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D12"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E12" name="E12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E12"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F12" name="F12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F12"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G12" name="G12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G12"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H12" name="H12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H12"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I12" name="I12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I12"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J12" name="J12" type="female">
+   <description>breadboard socket row 12</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J12"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 13 -->
+  <connector id="A13" name="A13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A13"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B13" name="B13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B13"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C13" name="C13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C13"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D13" name="D13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D13"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E13" name="E13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E13"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F13" name="F13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F13"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G13" name="G13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G13"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H13" name="H13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H13"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I13" name="I13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I13"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J13" name="J13" type="female">
+   <description>breadboard socket row 13</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J13"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 14 -->
+  <connector id="A14" name="A14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A14"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B14" name="B14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B14"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C14" name="C14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C14"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D14" name="D14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D14"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E14" name="E14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E14"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F14" name="F14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F14"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G14" name="G14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G14"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H14" name="H14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H14"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I14" name="I14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I14"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J14" name="J14" type="female">
+   <description>breadboard socket row 14</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J14"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 15 -->
+  <connector id="A15" name="A15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A15"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B15" name="B15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B15"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C15" name="C15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C15"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D15" name="D15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D15"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E15" name="E15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E15"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F15" name="F15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F15"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G15" name="G15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G15"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H15" name="H15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H15"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I15" name="I15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I15"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J15" name="J15" type="female">
+   <description>breadboard socket row 15</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J15"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 16 -->
+  <connector id="A16" name="A16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A16"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B16" name="B16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B16"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C16" name="C16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C16"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D16" name="D16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D16"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E16" name="E16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E16"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F16" name="F16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F16"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G16" name="G16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G16"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H16" name="H16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H16"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I16" name="I16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I16"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J16" name="J16" type="female">
+   <description>breadboard socket row 16</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J16"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 17 -->
+  <connector id="A17" name="A17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A17"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B17" name="B17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B17"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C17" name="C17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C17"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D17" name="D17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D17"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E17" name="E17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E17"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F17" name="F17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F17"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G17" name="G17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G17"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H17" name="H17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H17"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I17" name="I17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I17"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J17" name="J17" type="female">
+   <description>breadboard socket row 17</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J17"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 18 -->
+  <connector id="A18" name="A18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A18"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B18" name="B18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B18"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C18" name="C18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C18"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D18" name="D18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D18"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E18" name="E18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E18"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F18" name="F18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F18"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G18" name="G18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G18"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H18" name="H18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H18"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I18" name="I18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I18"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J18" name="J18" type="female">
+   <description>breadboard socket row 18</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J18"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 19 -->
+  <connector id="A19" name="A19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A19"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B19" name="B19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B19"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C19" name="C19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C19"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D19" name="D19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D19"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E19" name="E19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E19"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F19" name="F19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F19"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G19" name="G19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G19"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H19" name="H19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H19"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I19" name="I19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I19"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J19" name="J19" type="female">
+   <description>breadboard socket row 19</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J19"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 20 -->
+  <connector id="A20" name="A20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A20"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B20" name="B20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B20"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C20" name="C20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C20"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D20" name="D20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D20"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E20" name="E20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E20"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F20" name="F20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F20"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G20" name="G20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G20"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H20" name="H20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H20"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I20" name="I20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I20"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J20" name="J20" type="female">
+   <description>breadboard socket row 20</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J20"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 21 -->
+  <connector id="A21" name="A21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A21"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B21" name="B21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B21"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C21" name="C21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C21"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D21" name="D21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D21"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E21" name="E21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E21"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F21" name="F21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F21"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G21" name="G21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G21"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H21" name="H21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H21"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I21" name="I21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I21"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J21" name="J21" type="female">
+   <description>breadboard socket row 21</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J21"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 22 -->
+  <connector id="A22" name="A22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A22"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B22" name="B22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B22"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C22" name="C22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C22"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D22" name="D22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D22"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E22" name="E22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E22"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F22" name="F22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F22"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G22" name="G22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G22"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H22" name="H22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H22"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I22" name="I22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I22"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J22" name="J22" type="female">
+   <description>breadboard socket row 22</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J22"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 23 -->
+  <connector id="A23" name="A23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A23"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B23" name="B23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B23"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C23" name="C23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C23"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D23" name="D23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D23"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E23" name="E23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E23"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F23" name="F23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F23"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G23" name="G23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G23"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H23" name="H23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H23"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I23" name="I23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I23"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J23" name="J23" type="female">
+   <description>breadboard socket row 23</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J23"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 24 -->
+  <connector id="A24" name="A24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A24"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B24" name="B24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B24"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C24" name="C24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C24"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D24" name="D24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D24"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E24" name="E24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E24"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F24" name="F24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F24"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G24" name="G24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G24"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H24" name="H24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H24"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I24" name="I24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I24"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J24" name="J24" type="female">
+   <description>breadboard socket row 24</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J24"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 25 -->
+  <connector id="A25" name="A25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A25"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B25" name="B25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B25"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C25" name="C25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C25"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D25" name="D25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D25"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E25" name="E25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E25"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F25" name="F25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F25"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G25" name="G25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G25"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H25" name="H25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H25"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I25" name="I25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I25"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J25" name="J25" type="female">
+   <description>breadboard socket row 25</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J25"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 26 -->
+  <connector id="A26" name="A26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A26"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B26" name="B26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B26"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C26" name="C26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C26"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D26" name="D26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D26"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E26" name="E26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E26"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F26" name="F26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F26"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G26" name="G26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G26"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H26" name="H26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H26"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I26" name="I26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I26"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J26" name="J26" type="female">
+   <description>breadboard socket row 26</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J26"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 27 -->
+  <connector id="A27" name="A27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A27"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B27" name="B27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B27"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C27" name="C27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C27"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D27" name="D27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D27"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E27" name="E27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E27"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F27" name="F27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F27"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G27" name="G27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G27"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H27" name="H27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H27"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I27" name="I27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I27"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J27" name="J27" type="female">
+   <description>breadboard socket row 27</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J27"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 28 -->
+  <connector id="A28" name="A28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A28"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B28" name="B28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B28"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C28" name="C28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C28"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D28" name="D28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D28"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E28" name="E28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E28"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F28" name="F28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F28"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G28" name="G28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G28"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H28" name="H28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H28"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I28" name="I28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I28"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J28" name="J28" type="female">
+   <description>breadboard socket row 28</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J28"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 29 -->
+  <connector id="A29" name="A29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A29"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B29" name="B29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B29"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C29" name="C29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C29"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D29" name="D29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D29"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E29" name="E29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E29"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F29" name="F29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F29"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G29" name="G29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G29"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H29" name="H29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H29"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I29" name="I29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I29"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J29" name="J29" type="female">
+   <description>breadboard socket row 29</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J29"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+  <!-- Row 30 -->
+  <connector id="A30" name="A30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="A30"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="B30" name="B30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="B30"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="C30" name="C30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="C30"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="D30" name="D30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="D30"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="E30" name="E30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="E30"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="F30" name="F30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="F30"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="G30" name="G30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="G30"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="H30" name="H30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="H30"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="I30" name="I30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="I30"/>
+    </breadboardView>
+   </views>
+  </connector>
+  <connector id="J30" name="J30" type="female">
+   <description>breadboard socket row 30</description>
+   <views>
+    <breadboardView>
+     <p layer="breadboardbreadboard" svgId="J30"/>
+    </breadboardView>
+   </views>
+  </connector>
+
+ </connectors>
+ <buses>
+  <!-- Power rails -->
+  <bus id="power_positive">
+   <nodeMember connectorId="power_pos_1"/>
+  </bus>
+  
+  <bus id="power_negative">
+   <nodeMember connectorId="power_neg_1"/>
+  </bus>
+  
+  <!-- Row buses (internal connections) -->
+  <bus id="row1_left">
+   <nodeMember connectorId="A1"/>
+   <nodeMember connectorId="B1"/>
+   <nodeMember connectorId="C1"/>
+   <nodeMember connectorId="D1"/>
+   <nodeMember connectorId="E1"/>
+  </bus>
+
+  <bus id="row1_right">
+   <nodeMember connectorId="F1"/>
+   <nodeMember connectorId="G1"/>
+   <nodeMember connectorId="H1"/>
+   <nodeMember connectorId="I1"/>
+   <nodeMember connectorId="J1"/>
+  </bus>
+
+  <bus id="row2_left">
+   <nodeMember connectorId="A2"/>
+   <nodeMember connectorId="B2"/>
+   <nodeMember connectorId="C2"/>
+   <nodeMember connectorId="D2"/>
+   <nodeMember connectorId="E2"/>
+  </bus>
+
+  <bus id="row2_right">
+   <nodeMember connectorId="F2"/>
+   <nodeMember connectorId="G2"/>
+   <nodeMember connectorId="H2"/>
+   <nodeMember connectorId="I2"/>
+   <nodeMember connectorId="J2"/>
+  </bus>
+
+  <bus id="row3_left">
+   <nodeMember connectorId="A3"/>
+   <nodeMember connectorId="B3"/>
+   <nodeMember connectorId="C3"/>
+   <nodeMember connectorId="D3"/>
+   <nodeMember connectorId="E3"/>
+  </bus>
+
+  <bus id="row3_right">
+   <nodeMember connectorId="F3"/>
+   <nodeMember connectorId="G3"/>
+   <nodeMember connectorId="H3"/>
+   <nodeMember connectorId="I3"/>
+   <nodeMember connectorId="J3"/>
+  </bus>
+
+  <bus id="row4_left">
+   <nodeMember connectorId="A4"/>
+   <nodeMember connectorId="B4"/>
+   <nodeMember connectorId="C4"/>
+   <nodeMember connectorId="D4"/>
+   <nodeMember connectorId="E4"/>
+  </bus>
+
+  <bus id="row4_right">
+   <nodeMember connectorId="F4"/>
+   <nodeMember connectorId="G4"/>
+   <nodeMember connectorId="H4"/>
+   <nodeMember connectorId="I4"/>
+   <nodeMember connectorId="J4"/>
+  </bus>
+
+  <bus id="row5_left">
+   <nodeMember connectorId="A5"/>
+   <nodeMember connectorId="B5"/>
+   <nodeMember connectorId="C5"/>
+   <nodeMember connectorId="D5"/>
+   <nodeMember connectorId="E5"/>
+  </bus>
+
+  <bus id="row5_right">
+   <nodeMember connectorId="F5"/>
+   <nodeMember connectorId="G5"/>
+   <nodeMember connectorId="H5"/>
+   <nodeMember connectorId="I5"/>
+   <nodeMember connectorId="J5"/>
+  </bus>
+
+  <bus id="row6_left">
+   <nodeMember connectorId="A6"/>
+   <nodeMember connectorId="B6"/>
+   <nodeMember connectorId="C6"/>
+   <nodeMember connectorId="D6"/>
+   <nodeMember connectorId="E6"/>
+  </bus>
+
+  <bus id="row6_right">
+   <nodeMember connectorId="F6"/>
+   <nodeMember connectorId="G6"/>
+   <nodeMember connectorId="H6"/>
+   <nodeMember connectorId="I6"/>
+   <nodeMember connectorId="J6"/>
+  </bus>
+
+  <bus id="row7_left">
+   <nodeMember connectorId="A7"/>
+   <nodeMember connectorId="B7"/>
+   <nodeMember connectorId="C7"/>
+   <nodeMember connectorId="D7"/>
+   <nodeMember connectorId="E7"/>
+  </bus>
+
+  <bus id="row7_right">
+   <nodeMember connectorId="F7"/>
+   <nodeMember connectorId="G7"/>
+   <nodeMember connectorId="H7"/>
+   <nodeMember connectorId="I7"/>
+   <nodeMember connectorId="J7"/>
+  </bus>
+
+  <bus id="row8_left">
+   <nodeMember connectorId="A8"/>
+   <nodeMember connectorId="B8"/>
+   <nodeMember connectorId="C8"/>
+   <nodeMember connectorId="D8"/>
+   <nodeMember connectorId="E8"/>
+  </bus>
+
+  <bus id="row8_right">
+   <nodeMember connectorId="F8"/>
+   <nodeMember connectorId="G8"/>
+   <nodeMember connectorId="H8"/>
+   <nodeMember connectorId="I8"/>
+   <nodeMember connectorId="J8"/>
+  </bus>
+
+  <bus id="row9_left">
+   <nodeMember connectorId="A9"/>
+   <nodeMember connectorId="B9"/>
+   <nodeMember connectorId="C9"/>
+   <nodeMember connectorId="D9"/>
+   <nodeMember connectorId="E9"/>
+  </bus>
+
+  <bus id="row9_right">
+   <nodeMember connectorId="F9"/>
+   <nodeMember connectorId="G9"/>
+   <nodeMember connectorId="H9"/>
+   <nodeMember connectorId="I9"/>
+   <nodeMember connectorId="J9"/>
+  </bus>
+
+  <bus id="row10_left">
+   <nodeMember connectorId="A10"/>
+   <nodeMember connectorId="B10"/>
+   <nodeMember connectorId="C10"/>
+   <nodeMember connectorId="D10"/>
+   <nodeMember connectorId="E10"/>
+  </bus>
+
+  <bus id="row10_right">
+   <nodeMember connectorId="F10"/>
+   <nodeMember connectorId="G10"/>
+   <nodeMember connectorId="H10"/>
+   <nodeMember connectorId="I10"/>
+   <nodeMember connectorId="J10"/>
+  </bus>
+
+  <bus id="row11_left">
+   <nodeMember connectorId="A11"/>
+   <nodeMember connectorId="B11"/>
+   <nodeMember connectorId="C11"/>
+   <nodeMember connectorId="D11"/>
+   <nodeMember connectorId="E11"/>
+  </bus>
+
+  <bus id="row11_right">
+   <nodeMember connectorId="F11"/>
+   <nodeMember connectorId="G11"/>
+   <nodeMember connectorId="H11"/>
+   <nodeMember connectorId="I11"/>
+   <nodeMember connectorId="J11"/>
+  </bus>
+
+  <bus id="row12_left">
+   <nodeMember connectorId="A12"/>
+   <nodeMember connectorId="B12"/>
+   <nodeMember connectorId="C12"/>
+   <nodeMember connectorId="D12"/>
+   <nodeMember connectorId="E12"/>
+  </bus>
+
+  <bus id="row12_right">
+   <nodeMember connectorId="F12"/>
+   <nodeMember connectorId="G12"/>
+   <nodeMember connectorId="H12"/>
+   <nodeMember connectorId="I12"/>
+   <nodeMember connectorId="J12"/>
+  </bus>
+
+  <bus id="row13_left">
+   <nodeMember connectorId="A13"/>
+   <nodeMember connectorId="B13"/>
+   <nodeMember connectorId="C13"/>
+   <nodeMember connectorId="D13"/>
+   <nodeMember connectorId="E13"/>
+  </bus>
+
+  <bus id="row13_right">
+   <nodeMember connectorId="F13"/>
+   <nodeMember connectorId="G13"/>
+   <nodeMember connectorId="H13"/>
+   <nodeMember connectorId="I13"/>
+   <nodeMember connectorId="J13"/>
+  </bus>
+
+  <bus id="row14_left">
+   <nodeMember connectorId="A14"/>
+   <nodeMember connectorId="B14"/>
+   <nodeMember connectorId="C14"/>
+   <nodeMember connectorId="D14"/>
+   <nodeMember connectorId="E14"/>
+  </bus>
+
+  <bus id="row14_right">
+   <nodeMember connectorId="F14"/>
+   <nodeMember connectorId="G14"/>
+   <nodeMember connectorId="H14"/>
+   <nodeMember connectorId="I14"/>
+   <nodeMember connectorId="J14"/>
+  </bus>
+
+  <bus id="row15_left">
+   <nodeMember connectorId="A15"/>
+   <nodeMember connectorId="B15"/>
+   <nodeMember connectorId="C15"/>
+   <nodeMember connectorId="D15"/>
+   <nodeMember connectorId="E15"/>
+  </bus>
+
+  <bus id="row15_right">
+   <nodeMember connectorId="F15"/>
+   <nodeMember connectorId="G15"/>
+   <nodeMember connectorId="H15"/>
+   <nodeMember connectorId="I15"/>
+   <nodeMember connectorId="J15"/>
+  </bus>
+
+  <bus id="row16_left">
+   <nodeMember connectorId="A16"/>
+   <nodeMember connectorId="B16"/>
+   <nodeMember connectorId="C16"/>
+   <nodeMember connectorId="D16"/>
+   <nodeMember connectorId="E16"/>
+  </bus>
+
+  <bus id="row16_right">
+   <nodeMember connectorId="F16"/>
+   <nodeMember connectorId="G16"/>
+   <nodeMember connectorId="H16"/>
+   <nodeMember connectorId="I16"/>
+   <nodeMember connectorId="J16"/>
+  </bus>
+
+  <bus id="row17_left">
+   <nodeMember connectorId="A17"/>
+   <nodeMember connectorId="B17"/>
+   <nodeMember connectorId="C17"/>
+   <nodeMember connectorId="D17"/>
+   <nodeMember connectorId="E17"/>
+  </bus>
+
+  <bus id="row17_right">
+   <nodeMember connectorId="F17"/>
+   <nodeMember connectorId="G17"/>
+   <nodeMember connectorId="H17"/>
+   <nodeMember connectorId="I17"/>
+   <nodeMember connectorId="J17"/>
+  </bus>
+
+  <bus id="row18_left">
+   <nodeMember connectorId="A18"/>
+   <nodeMember connectorId="B18"/>
+   <nodeMember connectorId="C18"/>
+   <nodeMember connectorId="D18"/>
+   <nodeMember connectorId="E18"/>
+  </bus>
+
+  <bus id="row18_right">
+   <nodeMember connectorId="F18"/>
+   <nodeMember connectorId="G18"/>
+   <nodeMember connectorId="H18"/>
+   <nodeMember connectorId="I18"/>
+   <nodeMember connectorId="J18"/>
+  </bus>
+
+  <bus id="row19_left">
+   <nodeMember connectorId="A19"/>
+   <nodeMember connectorId="B19"/>
+   <nodeMember connectorId="C19"/>
+   <nodeMember connectorId="D19"/>
+   <nodeMember connectorId="E19"/>
+  </bus>
+
+  <bus id="row19_right">
+   <nodeMember connectorId="F19"/>
+   <nodeMember connectorId="G19"/>
+   <nodeMember connectorId="H19"/>
+   <nodeMember connectorId="I19"/>
+   <nodeMember connectorId="J19"/>
+  </bus>
+
+  <bus id="row20_left">
+   <nodeMember connectorId="A20"/>
+   <nodeMember connectorId="B20"/>
+   <nodeMember connectorId="C20"/>
+   <nodeMember connectorId="D20"/>
+   <nodeMember connectorId="E20"/>
+  </bus>
+
+  <bus id="row20_right">
+   <nodeMember connectorId="F20"/>
+   <nodeMember connectorId="G20"/>
+   <nodeMember connectorId="H20"/>
+   <nodeMember connectorId="I20"/>
+   <nodeMember connectorId="J20"/>
+  </bus>
+
+  <bus id="row21_left">
+   <nodeMember connectorId="A21"/>
+   <nodeMember connectorId="B21"/>
+   <nodeMember connectorId="C21"/>
+   <nodeMember connectorId="D21"/>
+   <nodeMember connectorId="E21"/>
+  </bus>
+
+  <bus id="row21_right">
+   <nodeMember connectorId="F21"/>
+   <nodeMember connectorId="G21"/>
+   <nodeMember connectorId="H21"/>
+   <nodeMember connectorId="I21"/>
+   <nodeMember connectorId="J21"/>
+  </bus>
+
+  <bus id="row22_left">
+   <nodeMember connectorId="A22"/>
+   <nodeMember connectorId="B22"/>
+   <nodeMember connectorId="C22"/>
+   <nodeMember connectorId="D22"/>
+   <nodeMember connectorId="E22"/>
+  </bus>
+
+  <bus id="row22_right">
+   <nodeMember connectorId="F22"/>
+   <nodeMember connectorId="G22"/>
+   <nodeMember connectorId="H22"/>
+   <nodeMember connectorId="I22"/>
+   <nodeMember connectorId="J22"/>
+  </bus>
+
+  <bus id="row23_left">
+   <nodeMember connectorId="A23"/>
+   <nodeMember connectorId="B23"/>
+   <nodeMember connectorId="C23"/>
+   <nodeMember connectorId="D23"/>
+   <nodeMember connectorId="E23"/>
+  </bus>
+
+  <bus id="row23_right">
+   <nodeMember connectorId="F23"/>
+   <nodeMember connectorId="G23"/>
+   <nodeMember connectorId="H23"/>
+   <nodeMember connectorId="I23"/>
+   <nodeMember connectorId="J23"/>
+  </bus>
+
+  <bus id="row24_left">
+   <nodeMember connectorId="A24"/>
+   <nodeMember connectorId="B24"/>
+   <nodeMember connectorId="C24"/>
+   <nodeMember connectorId="D24"/>
+   <nodeMember connectorId="E24"/>
+  </bus>
+
+  <bus id="row24_right">
+   <nodeMember connectorId="F24"/>
+   <nodeMember connectorId="G24"/>
+   <nodeMember connectorId="H24"/>
+   <nodeMember connectorId="I24"/>
+   <nodeMember connectorId="J24"/>
+  </bus>
+
+  <bus id="row25_left">
+   <nodeMember connectorId="A25"/>
+   <nodeMember connectorId="B25"/>
+   <nodeMember connectorId="C25"/>
+   <nodeMember connectorId="D25"/>
+   <nodeMember connectorId="E25"/>
+  </bus>
+
+  <bus id="row25_right">
+   <nodeMember connectorId="F25"/>
+   <nodeMember connectorId="G25"/>
+   <nodeMember connectorId="H25"/>
+   <nodeMember connectorId="I25"/>
+   <nodeMember connectorId="J25"/>
+  </bus>
+
+  <bus id="row26_left">
+   <nodeMember connectorId="A26"/>
+   <nodeMember connectorId="B26"/>
+   <nodeMember connectorId="C26"/>
+   <nodeMember connectorId="D26"/>
+   <nodeMember connectorId="E26"/>
+  </bus>
+
+  <bus id="row26_right">
+   <nodeMember connectorId="F26"/>
+   <nodeMember connectorId="G26"/>
+   <nodeMember connectorId="H26"/>
+   <nodeMember connectorId="I26"/>
+   <nodeMember connectorId="J26"/>
+  </bus>
+
+  <bus id="row27_left">
+   <nodeMember connectorId="A27"/>
+   <nodeMember connectorId="B27"/>
+   <nodeMember connectorId="C27"/>
+   <nodeMember connectorId="D27"/>
+   <nodeMember connectorId="E27"/>
+  </bus>
+
+  <bus id="row27_right">
+   <nodeMember connectorId="F27"/>
+   <nodeMember connectorId="G27"/>
+   <nodeMember connectorId="H27"/>
+   <nodeMember connectorId="I27"/>
+   <nodeMember connectorId="J27"/>
+  </bus>
+
+  <bus id="row28_left">
+   <nodeMember connectorId="A28"/>
+   <nodeMember connectorId="B28"/>
+   <nodeMember connectorId="C28"/>
+   <nodeMember connectorId="D28"/>
+   <nodeMember connectorId="E28"/>
+  </bus>
+
+  <bus id="row28_right">
+   <nodeMember connectorId="F28"/>
+   <nodeMember connectorId="G28"/>
+   <nodeMember connectorId="H28"/>
+   <nodeMember connectorId="I28"/>
+   <nodeMember connectorId="J28"/>
+  </bus>
+
+  <bus id="row29_left">
+   <nodeMember connectorId="A29"/>
+   <nodeMember connectorId="B29"/>
+   <nodeMember connectorId="C29"/>
+   <nodeMember connectorId="D29"/>
+   <nodeMember connectorId="E29"/>
+  </bus>
+
+  <bus id="row29_right">
+   <nodeMember connectorId="F29"/>
+   <nodeMember connectorId="G29"/>
+   <nodeMember connectorId="H29"/>
+   <nodeMember connectorId="I29"/>
+   <nodeMember connectorId="J29"/>
+  </bus>
+
+  <bus id="row30_left">
+   <nodeMember connectorId="A30"/>
+   <nodeMember connectorId="B30"/>
+   <nodeMember connectorId="C30"/>
+   <nodeMember connectorId="D30"/>
+   <nodeMember connectorId="E30"/>
+  </bus>
+
+  <bus id="row30_right">
+   <nodeMember connectorId="F30"/>
+   <nodeMember connectorId="G30"/>
+   <nodeMember connectorId="H30"/>
+   <nodeMember connectorId="I30"/>
+   <nodeMember connectorId="J30"/>
+  </bus>
+
+ </buses>
+</module>

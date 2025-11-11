@@ -1,0 +1,256 @@
+// resistor-220-geometry.js
+// Geometry and positioning logic for 220Ω Resistor
+// This file handles ALL positioning math and validation
+
+const RESISTOR_220_CONFIG = {
+    component_type: 'resistor-220',
+    component_file: 'components/basic/resistor-220.json',
+    
+    // SVG rendering info (extracted from Fritzing breadboard view)
+    svg: {
+        file: 'components_svg/resistor_220.svg',
+        viewBox: '0 0 42.917 9.71',
+        width: 42.917,   // mm (0.42917 inches)
+        height: 9.71,    // mm (0.0971 inches)
+        
+        // Connector positions (from Fritzing SVG)
+        // These are the pin connection points in the original SVG
+        connectors: {
+            pin0: {
+                id: 'connector0leg',
+                x: 1.455,       // Left pin center
+                y: 5.045        // Vertical center
+            },
+            pin1: {
+                id: 'connector1leg',
+                x: 41.462,      // Right pin center
+                y: 5.045        // Vertical center
+            }
+        },
+        
+        // Body dimensions (the actual resistor body, not including leads)
+        body: {
+            startX: 8.563,      // Where body starts (after left lead)
+            endX: 34.303,       // Where body ends (before right lead)
+            width: 25.74,       // Body width: 34.303 - 8.563
+            height: 9.71,       // Full height
+            centerY: 4.855      // Vertical center of body
+        },
+        
+        // Pin spacing in SVG
+        pinSpacing: 40.007      // Distance between pin centers: 41.462 - 1.455
+    },
+    
+    // Pin spacing options on breadboard
+    pin_spacing: {
+        standard: 26.982,   // 3 holes (400 mil standard for 1/4W resistor)
+        min: 8.982,         // 1 hole (can bend leads tight)
+        max: 44.91,         // 5 holes (stretched out)
+        increment: 8.982    // One breadboard hole spacing
+    },
+    
+    // Visual rendering settings
+    rendering: {
+        // Scale is DYNAMIC based on actual hole spacing
+        // We stretch/compress the resistor to match the breadboard holes
+        dynamicScale: true,
+        
+        // Body scaling constraints
+        minScale: 0.4,      // Don't make body smaller than 40% (looks weird)
+        maxScale: 1.2,      // Don't make body larger than 120% (looks stretched)
+        
+        // Color band information (for 220Ω)
+        colorBands: {
+            band1: 'Red',       // 2
+            band2: 'Red',       // 2
+            multiplier: 'Brown', // ×10
+            tolerance: 'Gold'   // ±5%
+        }
+    },
+    
+    // Component properties
+    default_orientation: 'horizontal',  // Resistors typically horizontal
+    polarity: 'non-polarized',          // Can be flipped either way
+    
+    // Electrical specifications (from metadata)
+    electrical: {
+        resistance: 220,        // Ohms
+        tolerance: 0.05,        // ±5%
+        power: 0.25,           // Watts (1/4W)
+        package: 'THT'         // Through-hole
+    }
+};
+
+/**
+ * Calculate resistor rendering position based on hole placement
+ * @param {Object} placement - { pin0: "15F", pin1: "20F" }
+ * @param {Array} breadboardHoles - Array of breadboard hole objects
+ * @returns {Object} Position data for rendering
+ *   {
+ *     centerX, centerY,              // Center point of resistor body
+ *     orientation, rotation,          // How resistor is oriented
+ *     pin0Coords, pin1Coords,        // Actual hole positions
+ *     pin0HoleId, pin1HoleId,        // Hole IDs for occupation tracking
+ *     actualSpacing,                 // Distance between pins (for dynamic scaling)
+ *     componentType                  // For identification
+ *   }
+ */
+function calculateResistorPosition(placement, breadboardHoles) {
+    // Validate placement has required fields
+    if (!placement.pin0 || !placement.pin1) {
+        console.error('Resistor placement requires both pin0 and pin1 holes');
+        return null;
+    }
+    
+    // Look up hole coordinates
+    const pin0Hole = breadboardHoles.find(h => h.id === placement.pin0);
+    const pin1Hole = breadboardHoles.find(h => h.id === placement.pin1);
+    
+    if (!pin0Hole || !pin1Hole) {
+        console.error('Resistor holes not found:', placement);
+        return null;
+    }
+    
+    // Calculate center point between the two holes
+    const centerX = (pin0Hole.x + pin1Hole.x) / 2;
+    const centerY = (pin0Hole.y + pin1Hole.y) / 2;
+    
+    // Determine orientation based on hole positions
+    const deltaX = Math.abs(pin1Hole.x - pin0Hole.x);
+    const deltaY = Math.abs(pin1Hole.y - pin0Hole.y);
+    
+    let orientation, rotation;
+    if (deltaX > deltaY) {
+        // Horizontal placement (typical)
+        orientation = 'horizontal';
+        rotation = 0;
+    } else {
+        // Vertical placement
+        orientation = 'vertical';
+        rotation = 90;
+    }
+    
+    // Calculate actual pin spacing (for dynamic scaling)
+    const actualSpacing = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    return {
+        centerX,
+        centerY,
+        orientation,
+        rotation,
+        pin0Coords: { x: pin0Hole.x, y: pin0Hole.y },
+        pin1Coords: { x: pin1Hole.x, y: pin1Hole.y },
+        pin0HoleId: placement.pin0,
+        pin1HoleId: placement.pin1,
+        actualSpacing,
+        componentType: RESISTOR_220_CONFIG.component_type
+    };
+}
+
+/**
+ * Validate resistor placement
+ * @param {Object} placement - { pin0: "15F", pin1: "20F" }
+ * @param {Array} breadboardHoles - Array of breadboard hole objects
+ * @returns {Object} { valid: boolean, error?: string, warning?: string }
+ */
+function validateResistorPlacement(placement, breadboardHoles) {
+    // Check required fields exist
+    if (!placement.pin0 || !placement.pin1) {
+        return { 
+            valid: false, 
+            error: 'Resistor requires both pin0 and pin1 placement' 
+        };
+    }
+    
+    // Check holes exist
+    const pin0Hole = breadboardHoles.find(h => h.id === placement.pin0);
+    const pin1Hole = breadboardHoles.find(h => h.id === placement.pin1);
+    
+    if (!pin0Hole) {
+        return { 
+            valid: false, 
+            error: `Pin0 hole "${placement.pin0}" not found` 
+        };
+    }
+    if (!pin1Hole) {
+        return { 
+            valid: false, 
+            error: `Pin1 hole "${placement.pin1}" not found` 
+        };
+    }
+    
+    // CRITICAL: Check if pins are on same bus (SHORT CIRCUIT!)
+    // This is the most common error - both pins in the same bus = no resistance
+    if (pin0Hole.bus === pin1Hole.bus) {
+        return { 
+            valid: false, 
+            error: `Resistor pins on same bus "${pin0Hole.bus}" - this creates a short circuit with no resistance!` 
+        };
+    }
+    
+    // Calculate spacing between pins
+    const deltaX = Math.abs(pin1Hole.x - pin0Hole.x);
+    const deltaY = Math.abs(pin1Hole.y - pin0Hole.y);
+    const actualSpacing = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    // Check if spacing is within acceptable range
+    const { min, max, standard } = RESISTOR_220_CONFIG.pin_spacing;
+    
+    if (actualSpacing < min) {
+        return { 
+            valid: false, 
+            error: `Resistor pin spacing too small: ${actualSpacing.toFixed(2)}mm (min: ${min}mm)` 
+        };
+    }
+    
+    if (actualSpacing > max) {
+        return { 
+            valid: false, 
+            error: `Resistor pin spacing too large: ${actualSpacing.toFixed(2)}mm (max: ${max}mm). Leads cannot stretch this far.` 
+        };
+    }
+    
+    // Warn for non-standard spacing
+    // Standard is 3 holes (400 mil) - anything else will look slightly off
+    const spacingDifference = Math.abs(actualSpacing - standard);
+    if (spacingDifference > 1) {
+        const numHoles = Math.round(actualSpacing / RESISTOR_220_CONFIG.pin_spacing.increment);
+        return { 
+            valid: true, 
+            warning: `Non-standard resistor spacing: ${numHoles} holes (${actualSpacing.toFixed(2)}mm). Standard is 3 holes (${standard}mm).` 
+        };
+    }
+    
+    return { valid: true };
+}
+
+/**
+ * Calculate dynamic scale factor for resistor body
+ * Resistor body stretches/compresses to match actual hole spacing
+ * @param {number} actualSpacing - Distance between holes in mm
+ * @returns {number} Scale factor to apply to SVG
+ */
+function calculateResistorScale(actualSpacing) {
+    const svgPinSpacing = RESISTOR_220_CONFIG.svg.pinSpacing;  // 40.007mm in SVG
+    const { minScale, maxScale } = RESISTOR_220_CONFIG.rendering;
+    
+    // Calculate raw scale to match hole spacing
+    let scale = actualSpacing / svgPinSpacing;
+    
+    // Clamp to reasonable limits (prevent weird visuals)
+    scale = Math.max(minScale, Math.min(maxScale, scale));
+    
+    return scale;
+}
+
+console.log('Resistor geometry helper loaded');
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        RESISTOR_220_CONFIG,
+        calculateResistorPosition,
+        validateResistorPlacement,
+        calculateResistorScale
+    };
+}

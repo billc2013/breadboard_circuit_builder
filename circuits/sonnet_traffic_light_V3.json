@@ -1,0 +1,97 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Traffic Light Circuit",
+      "description": "Three-LED traffic light with red, green, and blue LEDs controlled by separate GPIO pins",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "5J",
+          "pin1": "8J"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "8H",
+          "anode": "9H"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "12J",
+          "pin1": "15J"
+        }
+      },
+      {
+        "id": "led2",
+        "type": "led-green-5mm",
+        "placement": {
+          "cathode": "15H",
+          "anode": "16H"
+        }
+      },
+      {
+        "id": "r3",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "19J",
+          "pin1": "22J"
+        }
+      },
+      {
+        "id": "led3",
+        "type": "led-blue-5mm",
+        "placement": {
+          "cathode": "22H",
+          "anode": "23H"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP15",
+        "to": "5I",
+        "description": "GPIO15 controls red LED"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP14",
+        "to": "12I",
+        "description": "GPIO14 controls green LED (yellow light)"
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GP13",
+        "to": "19I",
+        "description": "GPIO13 controls blue LED (can represent green)"
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GND_23",
+        "to": "9I",
+        "description": "Ground for red LED"
+      },
+      {
+        "id": "w5",
+        "from": "9G",
+        "to": "16I",
+        "description": "Shared ground for green LED"
+      },
+      {
+        "id": "w6",
+        "from": "16G",
+        "to": "23I",
+        "description": "Shared ground for blue LED"
+      }
+    ]
+  }
+}
