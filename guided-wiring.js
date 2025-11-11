@@ -161,6 +161,9 @@ class GuidedWiringManager {
      * Start guided wiring mode
      */
     start() {
+        console.log('DEBUG: start() called');
+        console.log('DEBUG: wireQueue.length:', this.wireQueue.length);
+
         if (this.wireQueue.length === 0) {
             console.warn('No wires loaded. Call loadWires() first.');
             return;
@@ -168,6 +171,8 @@ class GuidedWiringManager {
 
         this.isActive = true;
         this.currentWireIndex = 0;
+
+        console.log('DEBUG: About to call showCurrentWire()');
         this.showCurrentWire();
 
         console.log('\n▶️  Guided Wiring Started');
@@ -190,12 +195,17 @@ class GuidedWiringManager {
      * Show pulsing endpoints for current wire
      */
     showCurrentWire() {
+        console.log('DEBUG: showCurrentWire() called');
+        console.log('DEBUG: currentWireIndex:', this.currentWireIndex);
+        console.log('DEBUG: wireQueue.length:', this.wireQueue.length);
+
         if (this.currentWireIndex >= this.wireQueue.length) {
             this.onAllWiresComplete();
             return;
         }
 
         const wire = this.wireQueue[this.currentWireIndex];
+        console.log('DEBUG: current wire:', wire);
 
         console.log(`\n📍 Wire ${this.currentWireIndex + 1}/${this.wireQueue.length}`);
         console.log(`   From: ${wire.from}`);
@@ -205,6 +215,7 @@ class GuidedWiringManager {
         }
 
         // Start pulsing animation on both endpoints
+        console.log('DEBUG: About to call startPulsing()');
         this.startPulsing(wire.from, wire.to);
     }
 
@@ -214,24 +225,34 @@ class GuidedWiringManager {
      * @param {string} toId - To endpoint ID
      */
     startPulsing(fromId, toId) {
+        console.log('DEBUG: startPulsing() called');
+        console.log('DEBUG: fromId:', fromId);
+        console.log('DEBUG: toId:', toId);
+
         this.stopPulsing(); // Clear any existing pulses
 
         const fromElement = this.getConnectionElement(fromId);
         const toElement = this.getConnectionElement(toId);
 
+        console.log('DEBUG: fromElement:', fromElement);
+        console.log('DEBUG: toElement:', toElement);
+
         if (fromElement) {
             fromElement.classList.add('pulse-endpoint');
+            console.log('DEBUG: Added pulse-endpoint class to fromElement');
         } else {
             console.warn(`Could not find element for ${fromId}`);
         }
 
         if (toElement) {
             toElement.classList.add('pulse-endpoint');
+            console.log('DEBUG: Added pulse-endpoint class to toElement');
         } else {
             console.warn(`Could not find element for ${toId}`);
         }
 
         this.isPulsingActive = true;
+        console.log('DEBUG: Pulsing activated. isPulsingActive:', this.isPulsingActive);
     }
 
     /**

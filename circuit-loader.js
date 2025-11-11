@@ -233,9 +233,13 @@ class CircuitLoader {
         if (circuit.wires && circuit.wires.length > 0) {
             console.log('\n⚡ Initializing Guided Wiring Mode');
             console.log('-'.repeat(60));
+            console.log('DEBUG: this.app.guidedWiring exists?', !!this.app.guidedWiring);
+            console.log('DEBUG: circuit.wires:', circuit.wires);
 
             if (this.app.guidedWiring) {
+                console.log('DEBUG: Calling loadWires()...');
                 this.app.guidedWiring.loadWires(circuit.wires);
+                console.log('DEBUG: Calling start()...');
                 this.app.guidedWiring.start();
                 console.log(`✓ Guided wiring mode activated`);
                 console.log(`  ${circuit.wires.length} wires queued for placement`);
@@ -243,6 +247,9 @@ class CircuitLoader {
                 warnings.push('Guided wiring system not available - wires not loaded');
                 console.warn('⚠️  Guided wiring system not initialized');
             }
+        } else {
+            console.log('DEBUG: No wires in circuit, or wires array is empty');
+            console.log('DEBUG: circuit.wires:', circuit.wires);
         }
         
         // Summary

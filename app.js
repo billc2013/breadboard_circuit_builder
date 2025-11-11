@@ -43,6 +43,7 @@ async init() {
     this.circuitLoader = new CircuitLoader(this);
     await this.circuitLoader.init();
     this.guidedWiring = new GuidedWiringManager(this); // Initialize guided wiring
+    console.log('✓ GuidedWiringManager instantiated:', this.guidedWiring);
     this.renderHoles();
     this.renderPicoPins(); // NEW
     this.attachEventListeners();
