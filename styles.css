@@ -552,12 +552,14 @@ h3 {
 .hole.pulse-endpoint circle {
     fill: #4CAF50 !important;
     animation: pulse-endpoint 1.5s ease-in-out infinite;
+    transform-origin: center;  /* Scale from center, not top-left */
 }
 
 /* Apply pulsing to pin endpoints */
 .pin.pulse-endpoint rect {
     fill: #4CAF50 !important;
     animation: pulse-endpoint 1.5s ease-in-out infinite;
+    transform-origin: center;  /* Scale from center, not top-left */
 }
 
 /* Routing mode indicator */
