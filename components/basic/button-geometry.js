@@ -103,14 +103,14 @@ function calculateButtonPosition(placement, breadboardHoles) {
     
     const deltaX = Math.abs(leg1Hole.x - leg0Hole.x);
     const deltaY = Math.abs(leg1Hole.y - leg0Hole.y);
-    
+
     let orientation, rotation;
     if (deltaX > deltaY) {
         orientation = 'horizontal';
-        rotation = 90;  // Rotate button 90° for horizontal placement
+        rotation = 0;  // No rotation for horizontal placement (legs left-right)
     } else {
         orientation = 'vertical';
-        rotation = 0;
+        rotation = 90;  // Rotate 90° for vertical placement (legs up-down)
     }
     
     const actualSpacing = Math.sqrt(deltaX * deltaX + deltaY * deltaY);

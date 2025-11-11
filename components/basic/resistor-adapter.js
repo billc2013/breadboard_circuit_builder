@@ -22,6 +22,51 @@ class ResistorAdapter {
         return [placement.pin0, placement.pin1];
     }
     
+    /**
+     * Render color bands as overlays on the resistor body
+     * @param {SVGElement} resistorGroup - The resistor group element
+     * @param {Object} metadata - Component metadata
+     * @param {number} scale - Current scale factor
+     */
+    renderColorBands(resistorGroup, metadata, scale) {
+        const colorBandNames = getResistorColorBands(metadata);
+        const { positions, y, height, colors } = RESISTOR_CONFIG.colorBands;
+
+        // Create a group for color bands
+        const bandsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        bandsGroup.classList.add('color-bands');
+
+        // Render each color band
+        colorBandNames.forEach((colorName, index) => {
+            if (index >= positions.length) {
+                console.warn(`No position defined for band ${index + 1}`);
+                return;
+            }
+
+            const bandPos = positions[index];
+            const hexColor = colors[colorName] || colors['Black']; // Fallback to black
+
+            // Create rectangle for color band
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', bandPos.x);
+            rect.setAttribute('y', y);
+            rect.setAttribute('width', bandPos.width);
+            rect.setAttribute('height', height);
+            rect.setAttribute('fill', hexColor);
+
+            // Add stroke for visibility (especially for yellow/white bands)
+            if (colorName === 'Yellow' || colorName === 'White') {
+                rect.setAttribute('stroke', '#999');
+                rect.setAttribute('stroke-width', '0.2');
+            }
+
+            bandsGroup.appendChild(rect);
+        });
+
+        // Append bands to resistor group (on top of base SVG)
+        resistorGroup.appendChild(bandsGroup);
+    }
+
     async render(componentId, position, metadata) {
         const componentsLayer = document.getElementById('components-layer');
         
@@ -104,7 +149,10 @@ class ResistorAdapter {
         
         // Append cloned content
         resistorGroup.appendChild(clonedContent);
-        
+
+        // Render color bands (overlays on top of base SVG)
+        this.renderColorBands(resistorGroup, metadata, scale);
+
         // Add to components layer
         componentsLayer.appendChild(resistorGroup);
         

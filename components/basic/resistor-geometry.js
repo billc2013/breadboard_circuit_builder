@@ -56,7 +56,35 @@ const RESISTOR_CONFIG = {
     
     default_orientation: 'horizontal',
     polarity: 'non-polarized',
-    
+
+    // Color band rendering (positions in SVG coordinates)
+    colorBands: {
+        positions: [
+            { x: 11.5, width: 2.5 },  // Band 1 (first digit)
+            { x: 15.5, width: 2.5 },  // Band 2 (second digit)
+            { x: 19.5, width: 2.5 },  // Band 3 (multiplier)
+            { x: 28.0, width: 2.0 }   // Band 4 (tolerance)
+        ],
+        y: 2.5,        // Top of bands
+        height: 4.5,   // Height of bands (covers body)
+
+        // Color mapping (resistor color code standard)
+        colors: {
+            'Black': '#000000',
+            'Brown': '#8B4513',
+            'Red': '#FF0000',
+            'Orange': '#FF8C00',
+            'Yellow': '#FFFF00',
+            'Green': '#00FF00',
+            'Blue': '#0000FF',
+            'Violet': '#9400D3',
+            'Grey': '#808080',
+            'White': '#FFFFFF',
+            'Gold': '#FFD700',
+            'Silver': '#C0C0C0'
+        }
+    },
+
     // Common resistor values and their properties
     // Used for validation and label generation
     commonValues: {
@@ -243,14 +271,14 @@ function extractResistanceValue(metadata) {
 function getResistorLabel(metadata) {
     const valueKey = extractResistanceValue(metadata);
     const commonValue = RESISTOR_CONFIG.commonValues[valueKey];
-    
+
     if (commonValue) {
         return commonValue.label;
     }
-    
+
     // Fallback: format from raw resistance value
     const resistance = metadata?.properties?.resistance || 220;
-    
+
     if (resistance >= 1000000) {
         return `${(resistance / 1000000).toFixed(1)}MΩ`;
     } else if (resistance >= 1000) {
@@ -258,6 +286,24 @@ function getResistorLabel(metadata) {
     } else {
         return `${resistance}Ω`;
     }
+}
+
+/**
+ * Get color bands for a resistance value
+ * @param {Object} metadata - Component metadata
+ * @returns {Array} Array of color names ['Red', 'Red', 'Brown', 'Gold']
+ */
+function getResistorColorBands(metadata) {
+    const valueKey = extractResistanceValue(metadata);
+    const commonValue = RESISTOR_CONFIG.commonValues[valueKey];
+
+    if (commonValue && commonValue.colorBands) {
+        return commonValue.colorBands;
+    }
+
+    // Fallback to default (220Ω)
+    console.warn(`No color bands defined for ${valueKey}, using 220Ω default`);
+    return ['Red', 'Red', 'Brown', 'Gold'];
 }
 
 console.log('Resistor geometry helper loaded (generic for all values)');
@@ -270,6 +316,7 @@ if (typeof module !== 'undefined' && module.exports) {
         validateResistorPlacement,
         calculateResistorScale,
         extractResistanceValue,
-        getResistorLabel
+        getResistorLabel,
+        getResistorColorBands
     };
 }
