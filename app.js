@@ -442,14 +442,52 @@ getConnectionElement(pointId) {
 
     
     renderWire(wire) {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.classList.add('wire');
-        line.setAttribute('x1', wire.fromCoords.x);
-        line.setAttribute('y1', wire.fromCoords.y);
-        line.setAttribute('x2', wire.toCoords.x);
-        line.setAttribute('y2', wire.toCoords.y);
-        line.setAttribute('data-wire-id', wire.id);
-        this.wiresLayer.appendChild(line);
+        // Check if wire has waypoints
+        if (wire.waypoints && wire.waypoints.length > 0) {
+            // Create polyline for wire with waypoints
+            const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+            polyline.classList.add('wire');
+            polyline.setAttribute('data-wire-id', wire.id);
+
+            // Build points string: start -> waypoint1 -> waypoint2 -> ... -> end
+            let points = `${wire.fromCoords.x},${wire.fromCoords.y}`;
+
+            wire.waypoints.forEach(waypoint => {
+                points += ` ${waypoint.x},${waypoint.y}`;
+            });
+
+            points += ` ${wire.toCoords.x},${wire.toCoords.y}`;
+            polyline.setAttribute('points', points);
+
+            this.wiresLayer.appendChild(polyline);
+
+            // Render waypoint markers
+            this.renderWaypointMarkers(wire);
+        } else {
+            // Simple straight line (no waypoints)
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.classList.add('wire');
+            line.setAttribute('x1', wire.fromCoords.x);
+            line.setAttribute('y1', wire.fromCoords.y);
+            line.setAttribute('x2', wire.toCoords.x);
+            line.setAttribute('y2', wire.toCoords.y);
+            line.setAttribute('data-wire-id', wire.id);
+            this.wiresLayer.appendChild(line);
+        }
+    }
+
+    renderWaypointMarkers(wire) {
+        // Render small circles at each waypoint
+        wire.waypoints.forEach((waypoint, index) => {
+            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            marker.classList.add('waypoint-marker');
+            marker.setAttribute('cx', waypoint.x);
+            marker.setAttribute('cy', waypoint.y);
+            marker.setAttribute('r', '3');  // Small circle
+            marker.setAttribute('data-wire-id', wire.id);
+            marker.setAttribute('data-waypoint-index', index);
+            this.wiresLayer.appendChild(marker);
+        });
     }
     
     clearSelection() {

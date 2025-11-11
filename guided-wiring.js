@@ -24,6 +24,8 @@ class GuidedWiringManager {
         this.waypoints = [];           // Waypoints for current wire
         this.startPoint = null;        // First clicked endpoint
         this.isPulsingActive = false;  // Controls pulsing animation
+        this.previewPolyline = null;   // Preview polyline during wire building
+        this.previewMarkers = [];      // Preview waypoint markers
 
         this.initKeyboardHandlers();
         this.initAudioFeedback();
@@ -341,7 +343,56 @@ class GuidedWiringManager {
         this.waypoints.push(pointData);
         console.log(`  + Waypoint added at ${pointData.id || `(${pointData.x}, ${pointData.y})`}`);
 
-        // TODO: Draw preview line to this waypoint
+        // Update preview to show path so far
+        this.updatePreview();
+    }
+
+    /**
+     * Update preview visualization showing path from start through waypoints
+     */
+    updatePreview() {
+        if (!this.startPoint) return;
+
+        // Clear existing preview
+        this.clearPreview();
+
+        // Create preview polyline
+        this.previewPolyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        this.previewPolyline.classList.add('wire-temp', 'wire-preview');
+
+        // Build points string: start -> waypoint1 -> waypoint2 -> ...
+        let points = `${this.startPoint.x},${this.startPoint.y}`;
+
+        this.waypoints.forEach(waypoint => {
+            points += ` ${waypoint.x},${waypoint.y}`;
+        });
+
+        this.previewPolyline.setAttribute('points', points);
+        this.app.wiresLayer.appendChild(this.previewPolyline);
+
+        // Add preview markers for waypoints
+        this.waypoints.forEach((waypoint, index) => {
+            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            marker.classList.add('waypoint-marker', 'waypoint-preview');
+            marker.setAttribute('cx', waypoint.x);
+            marker.setAttribute('cy', waypoint.y);
+            marker.setAttribute('r', '3');
+            this.app.wiresLayer.appendChild(marker);
+            this.previewMarkers.push(marker);
+        });
+    }
+
+    /**
+     * Clear preview visualization
+     */
+    clearPreview() {
+        if (this.previewPolyline) {
+            this.previewPolyline.remove();
+            this.previewPolyline = null;
+        }
+
+        this.previewMarkers.forEach(marker => marker.remove());
+        this.previewMarkers = [];
     }
 
     /**
@@ -370,7 +421,8 @@ class GuidedWiringManager {
         // Audio feedback
         this.playSuccessSound();
 
-        // Clear state
+        // Clear preview and state
+        this.clearPreview();
         this.startPoint = null;
         this.waypoints = [];
 

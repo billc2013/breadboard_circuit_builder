@@ -117,6 +117,21 @@ h2 {
     pointer-events: none;
 }
 
+/* Waypoint markers */
+.waypoint-marker {
+    fill: #ff0000;
+    stroke: #ffffff;
+    stroke-width: 0.5;
+    pointer-events: none;
+}
+
+/* Preview waypoint markers (during wire building) */
+.waypoint-marker.waypoint-preview {
+    fill: #ffaa00;  /* Orange to match wire-temp */
+    stroke: #ffffff;
+    stroke-width: 0.5;
+}
+
 /* Occupied hole - blocked */
 .hole.occupied circle {
     fill: #fcee21;
