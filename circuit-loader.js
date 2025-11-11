@@ -229,19 +229,19 @@ class CircuitLoader {
             }
         }
         
-        // Render wires
+        // Start guided wiring mode (instead of auto-rendering)
         if (circuit.wires && circuit.wires.length > 0) {
-            console.log('\n⚡ Rendering Wires');
+            console.log('\n⚡ Initializing Guided Wiring Mode');
             console.log('-'.repeat(60));
-            
-            for (const wire of circuit.wires) {
-                try {
-                    this.renderWire(wire);
-                } catch (error) {
-                    const errorMsg = `Failed to render wire ${wire.id || 'unnamed'}: ${error.message}`;
-                    console.error(`❌ ${errorMsg}`);
-                    errors.push(errorMsg);
-                }
+
+            if (this.app.guidedWiring) {
+                this.app.guidedWiring.loadWires(circuit.wires);
+                this.app.guidedWiring.start();
+                console.log(`✓ Guided wiring mode activated`);
+                console.log(`  ${circuit.wires.length} wires queued for placement`);
+            } else {
+                warnings.push('Guided wiring system not available - wires not loaded');
+                console.warn('⚠️  Guided wiring system not initialized');
             }
         }
         

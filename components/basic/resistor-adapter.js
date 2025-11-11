@@ -23,48 +23,48 @@ class ResistorAdapter {
     }
     
     /**
-     * Render color bands as overlays on the resistor body
+     * Update resistor color bands by modifying the Fritzing SVG's existing band elements
      * @param {SVGElement} resistorGroup - The resistor group element
      * @param {Object} metadata - Component metadata
      * @param {number} scale - Current scale factor
      */
     renderColorBands(resistorGroup, metadata, scale) {
         const colorBandNames = getResistorColorBands(metadata);
-        const { positions, y, height, colors } = RESISTOR_CONFIG.colorBands;
+        const { colors } = RESISTOR_CONFIG.colorBands;
 
-        // Create a group for color bands
-        const bandsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        bandsGroup.classList.add('color-bands');
+        // Mapping of band index to Fritzing SVG element IDs
+        const bandElementIds = [
+            'band_1_st',           // First digit band
+            'band_2_nd',           // Second digit band
+            'band_rd_multiplier',  // Multiplier band
+            'gold_band'            // Tolerance band
+        ];
 
-        // Render each color band
+        // Update each band's fill color
         colorBandNames.forEach((colorName, index) => {
-            if (index >= positions.length) {
-                console.warn(`No position defined for band ${index + 1}`);
+            if (index >= bandElementIds.length) {
+                console.warn(`No SVG element for band ${index + 1}`);
                 return;
             }
 
-            const bandPos = positions[index];
+            const bandId = bandElementIds[index];
             const hexColor = colors[colorName] || colors['Black']; // Fallback to black
 
-            // Create rectangle for color band
-            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            rect.setAttribute('x', bandPos.x);
-            rect.setAttribute('y', y);
-            rect.setAttribute('width', bandPos.width);
-            rect.setAttribute('height', height);
-            rect.setAttribute('fill', hexColor);
+            // Find the band element in the cloned SVG content
+            const bandElement = resistorGroup.querySelector(`#${bandId}`);
 
-            // Add stroke for visibility (especially for yellow/white bands)
-            if (colorName === 'Yellow' || colorName === 'White') {
-                rect.setAttribute('stroke', '#999');
-                rect.setAttribute('stroke-width', '0.2');
+            if (bandElement) {
+                bandElement.setAttribute('fill', hexColor);
+
+                // Add subtle stroke for visibility on light colors
+                if (colorName === 'Yellow' || colorName === 'White') {
+                    bandElement.setAttribute('stroke', '#999');
+                    bandElement.setAttribute('stroke-width', '0.3');
+                }
+            } else {
+                console.warn(`Band element #${bandId} not found in SVG`);
             }
-
-            bandsGroup.appendChild(rect);
         });
-
-        // Append bands to resistor group (on top of base SVG)
-        resistorGroup.appendChild(bandsGroup);
     }
 
     async render(componentId, position, metadata) {

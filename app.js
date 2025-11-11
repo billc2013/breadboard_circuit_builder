@@ -28,10 +28,13 @@ class BreadboardApp {
         this.selectedPoint = null; // Renamed from selectedHole
         this.tempWire = null;
         this.showLabels = false;
-        
+
         // Component metadata (loaded async)
         this.picoMetadata = null; // NEW
-        
+
+        // Guided wiring system (initialized after DOM is ready)
+        this.guidedWiring = null;
+
         this.init();
     }
     
@@ -39,6 +42,7 @@ async init() {
     await this.loadComponentMetadata(); // NEW - Load pico.json
     this.circuitLoader = new CircuitLoader(this);
     await this.circuitLoader.init();
+    this.guidedWiring = new GuidedWiringManager(this); // Initialize guided wiring
     this.renderHoles();
     this.renderPicoPins(); // NEW
     this.attachEventListeners();
@@ -287,9 +291,17 @@ async init() {
     }
 
     handleConnectionPointClick(element, pointData) {
+        // Check if guided wiring mode is active
+        if (this.guidedWiring && this.guidedWiring.isActive) {
+            const handled = this.guidedWiring.handlePointClick(pointData);
+            if (handled) {
+                return; // Guided wiring handled the click
+            }
+        }
+
         if (!this.selectedPoint) {
             // First click - check if starting point is available
-            
+
             // Breadboard holes must be unoccupied
             if (!pointData.id.includes('.')) {  // It's a breadboard hole (not pico pin)
                 if (!isHoleAvailable(pointData.id)) {
@@ -381,13 +393,16 @@ async init() {
     }
 
     
-    createWire(startPoint, endPoint) {
+    createWire(startPoint, endPoint, options = {}) {
         const wire = {
-            id: `wire-${this.wires.length + 1}`,
+            id: options.id || `wire-${this.wires.length + 1}`,
             from: startPoint.id,
             to: endPoint.id,
             fromCoords: { x: startPoint.x, y: startPoint.y },
-            toCoords: { x: endPoint.x, y: endPoint.y }
+            toCoords: { x: endPoint.x, y: endPoint.y },
+            waypoints: options.waypoints || [],
+            routingMode: options.routingMode || 'straight',
+            description: options.description || null
         };
         
         this.wires.push(wire);
