@@ -70,13 +70,13 @@ const PHOTOCELL_CONFIG = {
  * Calculate photocell rendering position
  */
 function calculatePhotocellPosition(placement, breadboardHoles) {
-    if (!placement.pins || !placement.pins.pin0 || !placement.pins.pin1) {
+    if (!placement.pin0 || !placement.pin1) {
         console.error('Photocell placement requires both pin0 and pin1');
         return null;
     }
 
-    const pin0Hole = breadboardHoles.find(h => h.id === placement.pins.pin0);
-    const pin1Hole = breadboardHoles.find(h => h.id === placement.pins.pin1);
+    const pin0Hole = breadboardHoles.find(h => h.id === placement.pin0);
+    const pin1Hole = breadboardHoles.find(h => h.id === placement.pin1);
 
     if (!pin0Hole || !pin1Hole) {
         console.error('Photocell holes not found:', placement);

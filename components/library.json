@@ -9,7 +9,7 @@
       "basic": {
         "name": "Basic Components",
         "description": "LEDs, resistors, capacitors, switches, and other fundamental parts",
-        "components": ["led-red-5mm", "led-green-5mm", "led-blue-5mm", "led-yellow-5mm", "resistor-220", "resistor-10k", "photocell-ldr", "button-tactile-6mm"]
+        "components": ["led-red-5mm", "led-green-5mm", "led-blue-5mm", "led-yellow-5mm", "resistor-220", "resistor-10k", "photocell", "button-tactile-6mm"]
       },
       "microcontrollers": {
         "name": "Microcontrollers",
@@ -55,7 +55,7 @@
         "adapter": "basic/resistor-adapter.js",
         "adapterClass": "ResistorAdapter"
       },
-      "photocell-ldr": {
+      "photocell": {
         "metadata": "basic/photocell.json",
         "geometry": "basic/photocell-geometry.js",
         "adapter": "basic/photocell-adapter.js",
