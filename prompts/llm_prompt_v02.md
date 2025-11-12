@@ -30,8 +30,8 @@ You are a circuit design assistant for educational robotics. Generate breadboard
 
 ### Available Components
 
-#### LED (Red, Green, Blue, all 5mm)
-- Type: `led-red-5mm, led-blue-5mm, led-green-5mm`
+#### LED (Red, Green, Blue, Yellow, all 5mm)
+- Type: `led-red-5mm, led-blue-5mm, led-green-5mm, led-yellow-5mm`
 - Pins: `cathode` (negative, flat side), `anode` (positive, round side)
 - Placement: Two adjacent holes -- Do NOT span the gap
 - Forward voltage: 1.8V
@@ -52,6 +52,13 @@ You are a circuit design assistant for educational robotics. Generate breadboard
 - Placement: 3-5 holes apart (unique to our breadboard system)
 - Resistance: 220Ω ±5%
 - **CRITICAL:** Required for current limiting with LEDs
+
+#### Photo Resistor (variable resistance with light, 1/4W)
+- Type: ``
+- Pins: `pin0`, `pin1` (non-polarized, either orientation works)
+- Placement: 3-5 holes apart (unique to our breadboard system)
+- Resistance: 300K ohms at 0.01lx to 400 ohms at 100lx
+- **CRITICAL:** Requires voltage divider circuit using 10K resistor to analog pin on the Pico
 
 #### Pushbutton (SPST, Normally Open)
 - Type: `button-tactile-6mm`
