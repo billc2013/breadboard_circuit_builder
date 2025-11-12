@@ -123,8 +123,8 @@ function calculatePhotocellPosition(placement, breadboardHoles) {
         actualPinSpacing,
         pin0Coords: { x: pin0Hole.x, y: pin0Hole.y },
         pin1Coords: { x: pin1Hole.x, y: pin1Hole.y },
-        pin0HoleId: placement.pins.pin0,
-        pin1HoleId: placement.pins.pin1,
+        pin0HoleId: placement.pin0,
+        pin1HoleId: placement.pin1,
         componentType: PHOTOCELL_CONFIG.component_type
     };
 }
