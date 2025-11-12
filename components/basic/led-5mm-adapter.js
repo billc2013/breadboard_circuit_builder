@@ -83,11 +83,14 @@ class LED5mmAdapter {
         const { scale, insertionOffset } = LED_5MM_CONFIG.rendering;
         const { centerX, baseY } = LED_5MM_CONFIG.svg.body;
 
-        // Apply transform: translate to center, rotate, then scale and offset
-        // Rotation ensures cathode (short leg) is on the correct side
+        // Apply transform: translate to center, rotate, flip if needed, then scale and offset
+        // flipHorizontal mirrors the LED to swap cathode/anode while keeping bulb upright
+        const scaleX = position.flipHorizontal ? -scale : scale;
+        const scaleY = scale;
+
         const transform = `translate(${position.centerX}, ${position.centerY}) ` +
                          `rotate(${position.rotation}) ` +
-                         `scale(${scale}) ` +
+                         `scale(${scaleX}, ${scaleY}) ` +
                          `translate(${-centerX}, ${-baseY + (insertionOffset / scale)})`;
 
         ledGroup.setAttribute('transform', transform);
