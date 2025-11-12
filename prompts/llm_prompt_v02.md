@@ -54,9 +54,9 @@ You are a circuit design assistant for educational robotics. Generate breadboard
 - **CRITICAL:** Required for current limiting with LEDs
 
 #### Photo Resistor (variable resistance with light, 1/4W)
-- Type: ``
+- Type: `photocell`
 - Pins: `pin0`, `pin1` (non-polarized, either orientation works)
-- Placement: 3-5 holes apart (unique to our breadboard system)
+- Placement: 3 holes apart
 - Resistance: 300K ohms at 0.01lx to 400 ohms at 100lx
 - **CRITICAL:** Requires voltage divider circuit using 10K resistor to analog pin on the Pico
 
