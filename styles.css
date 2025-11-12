@@ -574,7 +574,7 @@ h3 {
 
 /* Apply pulsing to hole endpoints */
 .hole.pulse-endpoint circle {
-    fill: #4CAF50 !important;
+    fill: hsl(63, 96%, 49%) !important;
     animation: pulse-endpoint 1.5s ease-in-out infinite;
     transform-box: fill-box;      /* Use element's painted area for transforms */
     transform-origin: center;     /* Scale from center, not top-left */
@@ -582,7 +582,7 @@ h3 {
 
 /* Apply pulsing to pin endpoints */
 .pin.pulse-endpoint rect {
-    fill: #4CAF50 !important;
+    fill: hsl(63, 96%, 49%) !important;
     animation: pulse-endpoint 1.5s ease-in-out infinite;
     transform-box: fill-box;      /* Use element's painted area for transforms */
     transform-origin: center;     /* Scale from center, not top-left */
