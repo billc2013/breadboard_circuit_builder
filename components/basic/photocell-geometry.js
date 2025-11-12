@@ -133,26 +133,26 @@ function calculatePhotocellPosition(placement, breadboardHoles) {
  * Validate photocell placement
  */
 function validatePhotocellPlacement(placement, breadboardHoles) {
-    if (!placement.pins || !placement.pins.pin0 || !placement.pins.pin1) {
+    if (!placement.pin0 || !placement.pin1) {
         return {
             valid: false,
             error: 'Photocell requires both pin0 and pin1 placement'
         };
     }
 
-    const pin0Hole = breadboardHoles.find(h => h.id === placement.pins.pin0);
-    const pin1Hole = breadboardHoles.find(h => h.id === placement.pins.pin1);
+    const pin0Hole = breadboardHoles.find(h => h.id === placement.pin0);
+    const pin1Hole = breadboardHoles.find(h => h.id === placement.pin1);
 
     if (!pin0Hole) {
         return {
             valid: false,
-            error: `Pin0 hole "${placement.pins.pin0}" not found`
+            error: `Pin0 hole "${placement.pin0}" not found`
         };
     }
     if (!pin1Hole) {
         return {
             valid: false,
-            error: `Pin1 hole "${placement.pins.pin1}" not found`
+            error: `Pin1 hole "${placement.pin1}" not found`
         };
     }
 

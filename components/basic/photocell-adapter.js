@@ -18,7 +18,7 @@ class PhotocellAdapter {
     }
 
     getRequiredHoles(placement) {
-        return [placement.pins.pin0, placement.pins.pin1];
+        return [placement.pin0, placement.pin1];
     }
 
     async render(componentId, position, metadata) {
