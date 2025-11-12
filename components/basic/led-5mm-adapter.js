@@ -82,14 +82,15 @@ class LED5mmAdapter {
         // Calculate positioning
         const { scale, insertionOffset } = LED_5MM_CONFIG.rendering;
         const { centerX, baseY } = LED_5MM_CONFIG.svg.body;
-        
-        const translateX = position.centerX - (centerX * scale);
-        const translateY = position.centerY - (baseY * scale) + insertionOffset;
-        
-        // Apply transform
-        ledGroup.setAttribute('transform', 
-            `translate(${translateX}, ${translateY}) scale(${scale})`
-        );
+
+        // Apply transform: translate to center, rotate, then scale and offset
+        // Rotation ensures cathode (short leg) is on the correct side
+        const transform = `translate(${position.centerX}, ${position.centerY}) ` +
+                         `rotate(${position.rotation}) ` +
+                         `scale(${scale}) ` +
+                         `translate(${-centerX}, ${-baseY + (insertionOffset / scale)})`;
+
+        ledGroup.setAttribute('transform', transform);
         
         // Append cloned content
         ledGroup.appendChild(clonedContent);
