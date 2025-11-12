@@ -1,0 +1,81 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Automatic Night Light",
+      "description": "Yellow LED turns on automatically when dark using photocell sensor",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "photocell1",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "5J",
+          "pin1": "7J"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "8I",
+          "pin1": "13I"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "20F",
+          "pin1": "23F"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-yellow-5mm",
+        "placement": {
+          "cathode": "23E",
+          "anode": "24E"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "5I",
+        "description": "Power to photocell"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP26_A0",
+        "to": "8H",
+        "description": "Analog reading from voltage divider"
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "13H",
+        "description": "Ground for voltage divider"
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GP15",
+        "to": "20G",
+        "description": "GPIO15 controls LED"
+      },
+      {
+        "id": "w5",
+        "from": "pico1.GND_18",
+        "to": "23D",
+        "description": "Ground for LED cathode"
+      },
+      {
+        "id": "w6",
+        "from": "24D",
+        "to": "24F",
+        "description": "LED anode to resistor"
+      }
+    ]
+  }
+}
