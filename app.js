@@ -194,8 +194,28 @@ async init() {
             }
         });
         
-        // Clear selection on background click
+        // SVG click handler - handles guided wiring waypoints or background click
         this.svg.addEventListener('click', (e) => {
+            // Check if guided wiring is active and wire has been started
+            if (this.guidedWiring && this.guidedWiring.isActive && this.guidedWiring.startPoint) {
+                // Don't handle if clicking on a hole or pin (those have their own handlers)
+                if (!e.target.closest('.hole') && !e.target.closest('.pin')) {
+                    // Get SVG coordinates from click event
+                    const pt = this.svg.createSVGPoint();
+                    pt.x = e.clientX;
+                    pt.y = e.clientY;
+                    const svgP = pt.matrixTransform(this.svg.getScreenCTM().inverse());
+
+                    // Snap to waypoint grid
+                    const snapped = this.guidedWiring.snapToWaypointGrid(svgP.x, svgP.y);
+
+                    // Add waypoint at snapped position
+                    this.guidedWiring.addWaypoint(snapped);
+                    return;
+                }
+            }
+
+            // Original behavior - clear selection on background click
             if (e.target === this.svg) {
                 this.clearSelection();
             }

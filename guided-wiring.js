@@ -26,6 +26,15 @@ class GuidedWiringManager {
         this.isPulsingActive = false;  // Controls pulsing animation
         this.previewPolyline = null;   // Preview polyline during wire building
         this.previewMarkers = [];      // Preview waypoint markers
+        this.cursorMarker = null;      // Orange circle following cursor
+        this.livePreviewLine = null;   // Preview line from last point to cursor
+
+        // Alternate waypoint grid configuration
+        // Offset by half-spacing to sit "between" breadboard holes
+        this.waypointGrid = {
+            spacing: 8.982,              // Same as breadboard hole spacing
+            offset: 8.982 / 2            // Half spacing offset (~4.491 pixels)
+        };
 
         this.initKeyboardHandlers();
         this.initAudioFeedback();
@@ -61,6 +70,28 @@ class GuidedWiringManager {
             console.warn('Audio feedback not available:', e);
             this.audioContext = null;
         }
+    }
+
+    /**
+     * Play start sound when wire is initiated
+     */
+    playStartSound() {
+        if (!this.audioContext) return;
+
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+
+        // Single pleasant tone - E5
+        oscillator.frequency.setValueAtTime(659.25, this.audioContext.currentTime);
+
+        gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
+
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.15);
     }
 
     /**
@@ -310,8 +341,17 @@ class GuidedWiringManager {
             this.startPoint = pointData;
             console.log(`✓ Starting from ${pointData.id}`);
 
+            // Audio feedback - wire initiated
+            this.playStartSound();
+
+            // Visual feedback - brief flash on start point
+            this.showStartFeedback(pointData);
+
+            // Start live preview - show cursor and preview line
+            this.startLivePreview();
+
             // Show info panel
-            this.app.infoPanel.textContent = `Routing mode: ${this.routingMode.toUpperCase()} (Press M/S to change)`;
+            this.app.infoPanel.textContent = `Routing mode: ${this.routingMode.toUpperCase()} (Press M/S to change). Click to add waypoints.`;
 
             return true; // Handled
         } else {
@@ -396,6 +436,100 @@ class GuidedWiringManager {
     }
 
     /**
+     * Snap coordinates to the alternate waypoint grid
+     * Grid is offset by half-spacing to sit "between" breadboard holes
+     * @param {number} x - X coordinate
+     * @param {number} y - Y coordinate
+     * @returns {Object} Snapped coordinates {x, y}
+     */
+    snapToWaypointGrid(x, y) {
+        const { spacing, offset } = this.waypointGrid;
+
+        // Snap to grid points offset from breadboard holes
+        const snappedX = Math.round((x - offset) / spacing) * spacing + offset;
+        const snappedY = Math.round((y - offset) / spacing) * spacing + offset;
+
+        return { x: snappedX, y: snappedY };
+    }
+
+    /**
+     * Start live preview - shows preview line and cursor marker following mouse
+     */
+    startLivePreview() {
+        // Add mousemove listener
+        this.mousemoveHandler = (e) => this.updateLivePreview(e);
+        document.getElementById('breadboard-svg').addEventListener('mousemove', this.mousemoveHandler);
+    }
+
+    /**
+     * Update live preview on mouse move
+     * Shows preview line from last point to cursor + orange circle at cursor
+     */
+    updateLivePreview(e) {
+        if (!this.startPoint) return;
+
+        // Get SVG coordinates from mouse event
+        const svg = document.getElementById('breadboard-svg');
+        const pt = svg.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+        // Snap to waypoint grid
+        const snapped = this.snapToWaypointGrid(svgP.x, svgP.y);
+
+        // Get last point (either startPoint or last waypoint)
+        const lastPoint = this.waypoints.length > 0 ?
+                          this.waypoints[this.waypoints.length - 1] :
+                          this.startPoint;
+
+        // Update or create live preview line
+        if (!this.livePreviewLine) {
+            this.livePreviewLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            this.livePreviewLine.classList.add('wire-temp', 'wire-live-preview');
+            this.app.wiresLayer.appendChild(this.livePreviewLine);
+        }
+
+        this.livePreviewLine.setAttribute('x1', lastPoint.x);
+        this.livePreviewLine.setAttribute('y1', lastPoint.y);
+        this.livePreviewLine.setAttribute('x2', snapped.x);
+        this.livePreviewLine.setAttribute('y2', snapped.y);
+
+        // Update or create cursor marker
+        if (!this.cursorMarker) {
+            this.cursorMarker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            this.cursorMarker.classList.add('waypoint-marker', 'cursor-marker');
+            this.cursorMarker.setAttribute('r', '4');  // Slightly larger than waypoint markers
+            this.app.wiresLayer.appendChild(this.cursorMarker);
+        }
+
+        this.cursorMarker.setAttribute('cx', snapped.x);
+        this.cursorMarker.setAttribute('cy', snapped.y);
+    }
+
+    /**
+     * Stop live preview - removes preview line and cursor marker
+     */
+    stopLivePreview() {
+        // Remove mousemove listener
+        if (this.mousemoveHandler) {
+            document.getElementById('breadboard-svg').removeEventListener('mousemove', this.mousemoveHandler);
+            this.mousemoveHandler = null;
+        }
+
+        // Remove live preview elements
+        if (this.livePreviewLine) {
+            this.livePreviewLine.remove();
+            this.livePreviewLine = null;
+        }
+
+        if (this.cursorMarker) {
+            this.cursorMarker.remove();
+            this.cursorMarker = null;
+        }
+    }
+
+    /**
      * Complete the current wire
      * @param {Object} fromPoint - Starting point
      * @param {Object} toPoint - Ending point
@@ -423,6 +557,7 @@ class GuidedWiringManager {
 
         // Clear preview and state
         this.clearPreview();
+        this.stopLivePreview();  // Stop cursor tracking and live preview
         this.startPoint = null;
         this.waypoints = [];
 
@@ -440,6 +575,33 @@ class GuidedWiringManager {
                 this.onAllWiresComplete();
             }
         }, 1000);
+    }
+
+    /**
+     * Show visual feedback when wire is started
+     * @param {Object} point - Starting point
+     */
+    showStartFeedback(point) {
+        // Create temporary star/spark at starting point
+        const svg = document.getElementById('breadboard-svg');
+        const star = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        star.setAttribute('x', point.x);
+        star.setAttribute('y', point.y);
+        star.setAttribute('text-anchor', 'middle');
+        star.setAttribute('font-size', '20');
+        star.setAttribute('fill', '#ffaa00');  // Orange to match preview color
+        star.setAttribute('font-weight', 'bold');
+        star.textContent = '◆';  // Diamond/spark symbol
+        star.style.opacity = '1';
+
+        svg.appendChild(star);
+
+        // Fade out and remove
+        setTimeout(() => {
+            star.style.transition = 'opacity 0.3s';
+            star.style.opacity = '0';
+            setTimeout(() => star.remove(), 300);
+        }, 300);
     }
 
     /**

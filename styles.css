@@ -132,6 +132,15 @@ h2 {
     stroke-width: 0.5;
 }
 
+/* Cursor marker (follows mouse during wire building) */
+.waypoint-marker.cursor-marker {
+    fill: #ffaa00;  /* Orange to match wire-temp */
+    stroke: #ffffff;
+    stroke-width: 1;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
 /* Occupied hole - blocked */
 .hole.occupied circle {
     fill: #fcee21;
