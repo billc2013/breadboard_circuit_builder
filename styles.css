@@ -39,6 +39,29 @@ h2 {
     color: #00ff00;
 }
 
+#hover-info {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#wire-instruction {
+    display: none;  /* Hidden by default, shown during guided wiring */
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #444;
+    color: #ffaa00;  /* Orange for wire instructions */
+    line-height: 1.6;
+}
+
+#wire-instruction strong {
+    color: #4CAF50;  /* Green for wire number */
+}
+
+#wire-instruction .wire-desc {
+    color: #00ccff;  /* Cyan for description text */
+    font-style: italic;
+}
+
 #breadboard-container {
     background: #2a2a2a;
     padding: 20px;

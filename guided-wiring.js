@@ -247,6 +247,9 @@ class GuidedWiringManager {
             console.log(`   ${wire.description}`);
         }
 
+        // Update wire instruction display
+        this.updateWireInstruction(wire);
+
         // Start pulsing animation on both endpoints
         console.log('DEBUG: About to call startPulsing()');
         this.startPulsing(wire.from, wire.to);
@@ -642,6 +645,9 @@ class GuidedWiringManager {
 
         this.app.infoPanel.textContent = `All wires completed! Circuit ready. 🎉`;
 
+        // Clear wire instruction display
+        this.clearWireInstruction();
+
         // Play completion fanfare
         this.playCompletionFanfare();
     }
@@ -686,6 +692,43 @@ class GuidedWiringManager {
         const modeText = this.routingMode === 'manhattan' ?
                          '📐 Manhattan (90°)' : '📏 Straight';
         this.app.infoPanel.textContent = `Routing: ${modeText} (Press M/S to change)`;
+    }
+
+    /**
+     * Update wire instruction display
+     * Shows the current wire information and description in the info panel
+     * @param {Object} wire - Current wire to display
+     */
+    updateWireInstruction(wire) {
+        const wireInstructionDiv = document.getElementById('wire-instruction');
+
+        if (!wireInstructionDiv) {
+            console.warn('wire-instruction element not found in DOM');
+            return;
+        }
+
+        // Build instruction text
+        const wireNumber = `Wire ${this.currentWireIndex + 1}/${this.wireQueue.length}`;
+        const connection = `${wire.from} → ${wire.to}`;
+        const description = wire.description || 'Connect the pulsing endpoints';
+
+        // Update the display
+        wireInstructionDiv.innerHTML = `
+            <strong>${wireNumber}:</strong> ${connection}<br>
+            <span class="wire-desc">${description}</span>
+        `;
+        wireInstructionDiv.style.display = 'block';
+    }
+
+    /**
+     * Clear wire instruction display
+     */
+    clearWireInstruction() {
+        const wireInstructionDiv = document.getElementById('wire-instruction');
+        if (wireInstructionDiv) {
+            wireInstructionDiv.style.display = 'none';
+            wireInstructionDiv.innerHTML = '';
+        }
     }
 
     /**
