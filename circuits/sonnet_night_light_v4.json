@@ -1,0 +1,75 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Night Light with Photocell",
+      "description": "Yellow LED turns on when photocell detects darkness. Uses voltage divider to read light levels on analog pin.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "photocell1",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "8J",
+          "pin1": "11J"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "11H",
+          "pin1": "16H"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-yellow-5mm",
+        "placement": {
+          "cathode": "22E",
+          "anode": "23E"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "23D",
+          "pin1": "26D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "8H",
+        "description": "Power to photocell top"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP26_ADC0",
+        "to": "11G",
+        "description": "Analog input from voltage divider midpoint"
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "16G",
+        "description": "Ground for voltage divider"
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GP15",
+        "to": "26C",
+        "description": "GPIO to control LED via current-limiting resistor"
+      },
+      {
+        "id": "w5",
+        "from": "pico1.GND_18",
+        "to": "22D",
+        "description": "Ground for LED cathode"
+      }
+    ]
+  }
+}

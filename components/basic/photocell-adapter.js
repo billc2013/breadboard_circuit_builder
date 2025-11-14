@@ -104,34 +104,34 @@ class PhotocellAdapter {
         // Append cloned content
         photocellGroup.appendChild(clonedContent);
 
-        // Add stub legs to breadboard holes
-        const insertionOffset = -8;  // Same as LED
+        // // Add stub legs to breadboard holes
+        // const insertionOffset = -8;  // Same as LED
 
-        // Pin0 stub
-        const pin0StubLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        pin0StubLine.setAttribute('x1', position.pin0Coords.x);
-        pin0StubLine.setAttribute('y1', position.pin0Coords.y);
-        pin0StubLine.setAttribute('x2', position.pin0Coords.x);
-        pin0StubLine.setAttribute('y2', position.pin0Coords.y + insertionOffset);
-        pin0StubLine.setAttribute('stroke', '#8C8C8C');
-        pin0StubLine.setAttribute('stroke-width', '1.5');
-        pin0StubLine.setAttribute('stroke-linecap', 'round');
-        pin0StubLine.classList.add('photocell-stub', 'pin0-stub');
+        // // Pin0 stub
+        // const pin0StubLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        // pin0StubLine.setAttribute('x1', position.pin0Coords.x);
+        // pin0StubLine.setAttribute('y1', position.pin0Coords.y);
+        // pin0StubLine.setAttribute('x2', position.pin0Coords.x);
+        // pin0StubLine.setAttribute('y2', position.pin0Coords.y + insertionOffset);
+        // pin0StubLine.setAttribute('stroke', '#8C8C8C');
+        // pin0StubLine.setAttribute('stroke-width', '1.5');
+        // pin0StubLine.setAttribute('stroke-linecap', 'round');
+        // pin0StubLine.classList.add('photocell-stub', 'pin0-stub');
 
-        // Pin1 stub
-        const pin1StubLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        pin1StubLine.setAttribute('x1', position.pin1Coords.x);
-        pin1StubLine.setAttribute('y1', position.pin1Coords.y);
-        pin1StubLine.setAttribute('x2', position.pin1Coords.x);
-        pin1StubLine.setAttribute('y2', position.pin1Coords.y + insertionOffset);
-        pin1StubLine.setAttribute('stroke', '#8C8C8C');
-        pin1StubLine.setAttribute('stroke-width', '1.5');
-        pin1StubLine.setAttribute('stroke-linecap', 'round');
-        pin1StubLine.classList.add('photocell-stub', 'pin1-stub');
+        // // Pin1 stub
+        // const pin1StubLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        // pin1StubLine.setAttribute('x1', position.pin1Coords.x);
+        // pin1StubLine.setAttribute('y1', position.pin1Coords.y);
+        // pin1StubLine.setAttribute('x2', position.pin1Coords.x);
+        // pin1StubLine.setAttribute('y2', position.pin1Coords.y + insertionOffset);
+        // pin1StubLine.setAttribute('stroke', '#8C8C8C');
+        // pin1StubLine.setAttribute('stroke-width', '1.5');
+        // pin1StubLine.setAttribute('stroke-linecap', 'round');
+        // pin1StubLine.classList.add('photocell-stub', 'pin1-stub');
 
-        // Add stubs BEFORE photocell body
-        componentsLayer.appendChild(pin0StubLine);
-        componentsLayer.appendChild(pin1StubLine);
+        // // Add stubs BEFORE photocell body
+        // componentsLayer.appendChild(pin0StubLine);
+        // componentsLayer.appendChild(pin1StubLine);
 
         // Add photocell body
         componentsLayer.appendChild(photocellGroup);
