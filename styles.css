@@ -809,11 +809,12 @@ h3 {
 }
 
 .circuit-name {
-    flex: 1;
+    flex: 0 1 auto;
+    max-width: 150px;
     background: transparent;
     border: none;
     color: #d4d4d4;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
     padding: 4px 8px;
     border-radius: 3px;
