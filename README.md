@@ -50,7 +50,7 @@ python3 -m http.server 8000
 | **LED (Red/Green/Blue/Yellow 5mm)** | Output | Polarity-aware, dynamic positioning, Fritzing graphics |
 | **Resistor (220Ω, 10KΩ)** | Passive | Dynamic scaling, orientation-aware, color bands |
 | **Photocell (LDR)** | Sensor | Light-dependent resistor, 2-pin placement |
-| **Push Button (STSP)** | Sensor | Momentary - Single Throew Single Pole, 2-pin placement |
+| **Push Button (STSP)** | Sensor | Momentary - Single Throw Single Pole, 2-pin placement |
 
 ### Core Features
 
