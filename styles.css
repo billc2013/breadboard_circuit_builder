@@ -706,3 +706,272 @@ h3 {
     color: #66BB6A;
     text-decoration: underline;
 }
+
+/* ==================== JSON Text Input Section ==================== */
+
+#json-input-section {
+    margin-top: 30px;
+    background: #2a2a2a;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.section-toggle {
+    width: 100%;
+    background: #1e1e1e;
+    color: #dcdcaa;
+    border: none;
+    padding: 15px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-toggle:hover {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+#json-input-container {
+    padding: 20px;
+    max-height: 600px;
+    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+    overflow: hidden;
+}
+
+#json-input-container.collapsed {
+    max-height: 0;
+    padding: 0 20px;
+}
+
+.help-text {
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+#json-textarea-wrapper {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+#circuit-json-input {
+    width: 100%;
+    height: 300px;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border: 2px solid #3e3e42;
+    border-radius: 5px;
+    padding: 12px;
+    font-family: 'Courier New', Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    resize: vertical;
+    tab-size: 2;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+    transition: border-color 0.3s;
+}
+
+#circuit-json-input:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+#circuit-json-input::placeholder {
+    color: #666;
+    opacity: 1;
+}
+
+/* Tab key behavior - insert tabs instead of changing focus */
+#circuit-json-input {
+    -moz-tab-size: 2;
+    tab-size: 2;
+}
+
+/* Line numbers (optional enhancement) */
+#json-line-numbers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    background: #181818;
+    border-right: 1px solid #3e3e42;
+    padding: 12px 8px;
+    font-family: 'Courier New', Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #858585;
+    text-align: right;
+    user-select: none;
+    pointer-events: none;
+    display: none; /* Hidden for now, can be enabled later */
+}
+
+/* Error display */
+.error-message {
+    background: #3d1f1f;
+    border: 2px solid #d32f2f;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        max-height: 0;
+        opacity: 0;
+    }
+    to {
+        max-height: 300px;
+        opacity: 1;
+    }
+}
+
+#json-error-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: #2d1616;
+    border-bottom: 1px solid #d32f2f;
+}
+
+#json-error-icon {
+    font-size: 18px;
+}
+
+#json-error-title {
+    flex: 1;
+    font-weight: bold;
+    color: #ff6b6b;
+}
+
+.close-error-btn {
+    background: transparent;
+    color: #999;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.close-error-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+#json-error-content {
+    padding: 15px;
+    font-family: 'Courier New', Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #ffcccb;
+}
+
+#json-error-content .error-line {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+#json-error-content .error-detail {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    color: #ddd;
+}
+
+/* Highlight error line in textarea */
+#circuit-json-input.has-error {
+    border-color: #d32f2f;
+}
+
+/* Control buttons */
+#json-input-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.json-btn {
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.json-btn.primary {
+    background: #0066cc;
+    color: white;
+}
+
+.json-btn.primary:hover {
+    background: #0088ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3);
+}
+
+.json-btn.primary:active {
+    background: #004499;
+    transform: translateY(0);
+}
+
+.json-btn.secondary {
+    background: #3e3e42;
+    color: #d4d4d4;
+}
+
+.json-btn.secondary:hover {
+    background: #505050;
+}
+
+.json-btn.secondary:active {
+    background: #2a2a2a;
+}
+
+.json-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Success feedback */
+#circuit-json-input.success {
+    border-color: #4CAF50;
+    animation: successPulse 0.5s ease-out;
+}
+
+@keyframes successPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+    }
+}

@@ -64,6 +64,51 @@
                 <button id="export-circuit-btn">💾 Export Circuit</button>
                 <div id="wire-count">Wires: 0</div>
             </div>
+
+            <!-- JSON Text Input Section -->
+            <div id="json-input-section">
+                <button id="toggle-json-input" class="section-toggle">
+                    ▼ Paste Circuit JSON
+                </button>
+
+                <div id="json-input-container" class="collapsed">
+                    <div id="json-input-header">
+                        <p class="help-text">
+                            Paste circuit JSON from an LLM (Claude, GPT-4, etc.) and load it directly:
+                        </p>
+                    </div>
+
+                    <div id="json-textarea-wrapper">
+                        <textarea
+                            id="circuit-json-input"
+                            placeholder='Paste your circuit JSON here...&#10;&#10;Example:&#10;{&#10;  "circuit": {&#10;    "metadata": { "name": "My Circuit" },&#10;    "components": [...],&#10;    "wires": [...]&#10;  }&#10;}'
+                            spellcheck="false"
+                        ></textarea>
+                        <div id="json-line-numbers"></div>
+                    </div>
+
+                    <div id="json-error-display" class="error-message" style="display:none;">
+                        <div id="json-error-header">
+                            <span id="json-error-icon">⚠️</span>
+                            <span id="json-error-title">JSON Error</span>
+                            <button id="close-json-error" class="close-error-btn">×</button>
+                        </div>
+                        <div id="json-error-content"></div>
+                    </div>
+
+                    <div id="json-input-controls">
+                        <button id="load-from-text-btn" class="json-btn primary">
+                            ▶ Load from Text
+                        </button>
+                        <button id="copy-current-circuit-btn" class="json-btn secondary">
+                            📋 Copy Current Circuit
+                        </button>
+                        <button id="clear-json-input-btn" class="json-btn secondary">
+                            🗑️ Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
     
@@ -142,6 +187,7 @@
     <script src="guided-wiring.js"></script>
     <script src="app.js"></script>
     <script src="validator-panel-ui.js"></script>
+    <script src="json-text-input.js"></script>
 
     <!-- Attribution Footer -->
     <footer id="attribution-footer">
