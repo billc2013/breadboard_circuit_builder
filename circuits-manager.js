@@ -72,6 +72,7 @@ class CircuitsManager {
             <div class="circuit-header">
                 <input type="text" class="circuit-name" value="${this.escapeHtml(circuit.name)}" data-id="${circuit.id}">
                 <button class="circuit-btn expand-btn" title="Expand/Collapse" data-id="${circuit.id}">▼</button>
+                <button class="circuit-btn upload-btn" title="Load from file" data-id="${circuit.id}">📁</button>
                 <button class="circuit-btn save-btn" title="Save to file" data-id="${circuit.id}">💾</button>
                 <button class="circuit-btn delete-btn" title="Delete circuit" data-id="${circuit.id}">×</button>
             </div>
@@ -115,6 +116,12 @@ class CircuitsManager {
         const expandBtn = item.querySelector('.expand-btn');
         expandBtn.addEventListener('click', () => {
             this.toggleExpand(circuitId);
+        });
+
+        // Upload from file
+        const uploadBtn = item.querySelector('.upload-btn');
+        uploadBtn.addEventListener('click', () => {
+            this.loadCircuitFromFile(circuitId);
         });
 
         // Save to file
@@ -314,6 +321,64 @@ class CircuitsManager {
         } else {
             this.showCircuitError(circuitId, 'Export functionality not available.');
         }
+    }
+
+    /**
+     * Load circuit from file
+     */
+    loadCircuitFromFile(circuitId) {
+        const circuit = this.circuits.find(c => c.id === circuitId);
+        if (!circuit) return;
+
+        // Create file input
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json,application/json';
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                // Read file
+                const text = await file.text();
+
+                // Update circuit name from file if it has metadata
+                try {
+                    const data = JSON.parse(text);
+                    if (data.circuit && data.circuit.metadata && data.circuit.metadata.name) {
+                        this.updateCircuitName(circuitId, data.circuit.metadata.name);
+                        const item = document.getElementById(circuitId);
+                        const nameInput = item.querySelector('.circuit-name');
+                        nameInput.value = data.circuit.metadata.name;
+                    }
+                } catch (e) {
+                    // JSON parse error - will be shown when trying to load
+                }
+
+                // Load into textarea
+                const item = document.getElementById(circuitId);
+                const textarea = item.querySelector('.circuit-textarea');
+                textarea.value = text;
+
+                // Update circuit data
+                this.updateCircuitJSON(circuitId, text);
+                this.markDirty(circuitId, false);
+
+                // Expand if collapsed
+                if (!circuit.isExpanded) {
+                    this.toggleExpand(circuitId);
+                }
+
+                console.log('Circuit loaded from file:', file.name);
+            } catch (error) {
+                console.error('Error loading file:', error);
+                this.showCircuitError(circuitId, `Failed to load file: ${error.message}`);
+            }
+        });
+
+        // Trigger file picker
+        fileInput.click();
     }
 
     /**

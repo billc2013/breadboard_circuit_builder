@@ -229,49 +229,6 @@ async init() {
         document.getElementById('toggle-labels').addEventListener('click', () => {
             this.toggleLabels();
         });
-
-        // Circuit import/export buttons
-    document.getElementById('load-circuit-btn')?.addEventListener('click', () => {
-        document.getElementById('circuit-file-input').click();
-    });
-
-    document.getElementById('circuit-file-input')?.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            try {
-                const text = await file.text();
-                const json = JSON.parse(text);
-                
-                console.log('📁 Loading circuit from file:', file.name);
-                const result = await this.circuitLoader.loadCircuit(json);
-                
-                if (result.success) {
-                    this.infoPanel.textContent = `✅ Circuit loaded: ${result.components} components, ${result.wires} wires`;
-                } else {
-                    this.infoPanel.textContent = `❌ Circuit loaded with ${result.errors.length} errors`;
-                }
-            } catch (error) {
-                this.infoPanel.textContent = `❌ Error loading circuit: ${error.message}`;
-                console.error('Circuit load error:', error);
-            }
-        }
-        // Clear file input so same file can be loaded again
-        e.target.value = '';
-    });
-
-    document.getElementById('export-circuit-btn')?.addEventListener('click', () => {
-        const circuit = this.circuitLoader.exportCircuit();
-        const json = JSON.stringify(circuit, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `circuit-${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        this.infoPanel.textContent = '✅ Circuit exported';
-    });
-
     }
     
     handleHoleHover(holeElement) {
