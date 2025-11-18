@@ -92,7 +92,7 @@ class JSONTextInputHandler {
         console.log('Loading circuit from text input:', circuitData);
 
         // Use existing circuit loader - try multiple locations
-        const circuitLoader = window.app?.circuitLoader || window.circuitLoader;
+        const circuitLoader = window.breadboardApp?.circuitLoader || window.circuitLoader;
 
         if (circuitLoader && typeof circuitLoader.loadCircuit === 'function') {
             try {
@@ -110,8 +110,8 @@ class JSONTextInputHandler {
             }
         } else {
             console.error('Circuit loader not found. Checked:', {
-                app: window.app,
-                appCircuitLoader: window.app?.circuitLoader,
+                breadboardApp: window.breadboardApp,
+                breadboardAppCircuitLoader: window.breadboardApp?.circuitLoader,
                 windowCircuitLoader: window.circuitLoader
             });
             this.showError('Circuit loader not initialized. Please check console for errors.');
@@ -120,8 +120,8 @@ class JSONTextInputHandler {
 
     copyCurrentCircuit() {
         // Export current circuit state
-        // Try to get circuit loader from app
-        const circuitLoader = window.app?.circuitLoader || window.circuitLoader;
+        // Try to get circuit loader from breadboardApp
+        const circuitLoader = window.breadboardApp?.circuitLoader || window.circuitLoader;
 
         if (circuitLoader && typeof circuitLoader.exportCircuit === 'function') {
             const circuitJSON = circuitLoader.exportCircuit();
@@ -146,7 +146,10 @@ class JSONTextInputHandler {
             }
         } else {
             this.showError('Export functionality not available. Circuit loader not found.');
-            console.error('Circuit loader not available:', { app: window.app, circuitLoader: window.circuitLoader });
+            console.error('Circuit loader not available:', {
+                breadboardApp: window.breadboardApp,
+                circuitLoader: window.circuitLoader
+            });
         }
     }
 
