@@ -159,35 +159,26 @@ createComponentLabel(componentId, metadata, position) {
 
 **Candidates for Next Components**:
 
-#### 3.1 Push Button (Momentary Switch)
+#### 3.1 Ultrasonic Sensor (HC-SR04)
 - **Fritzing available**: Yes
-- **Pins**: 4 (but 2 pairs are connected)
-- **Complexity**: Low (similar to resistor)
-- **Use case**: User input, reset circuits
+- **Pins**: 4 (VCC, Trig, Echo, GND)
+- **Complexity**: Medium (4-pin + larger physical size)
+- **Use case**: Distance measurement, robotics
 
-#### 3.2 Potentiometer (Variable Resistor)
+#### 3.2 Two Motor Controller (TB6612 - Adafruit)
+- **Fritzing available**: Yes
+- **Pins**: 16 (Power: VM, VCC, 3×GND | Signal: AIN1, AIN2, PWMA, BIN1, BIN2, PWMB, STBY | Motor Out: A01, A02, B01, B02)
+- **Complexity**: Medium++ (16-pin + larger physical size)
+- **Use case**: Dual H-Bridge for powering and controlling speed and direction of two DC motors independently
+
+#### 3.3 Potentiometer (Variable Resistor)
 - **Fritzing available**: Yes
 - **Pins**: 3 (wiper + 2 ends)
 - **Complexity**: Medium (3-pin placement)
 - **Use case**: Analog input, voltage divider
 
-#### 3.3 Capacitor (Electrolytic)
-- **Fritzing available**: Yes
-- **Pins**: 2 (polarity matters!)
-- **Complexity**: Low (similar to LED)
-- **Use case**: Power smoothing, timing circuits
 
-#### 3.4 Transistor (NPN/PNP)
-- **Fritzing available**: Yes
-- **Pins**: 3 (collector, base, emitter)
-- **Complexity**: Medium (3-pin + orientation matters)
-- **Use case**: Switching, amplification
 
-#### 3.5 Ultrasonic Sensor (HC-SR04)
-- **Fritzing available**: Yes (likely)
-- **Pins**: 4 (VCC, Trig, Echo, GND)
-- **Complexity**: Medium (4-pin + larger physical size)
-- **Use case**: Distance measurement, robotics
 
 **Implementation Pattern**:
 For each component:

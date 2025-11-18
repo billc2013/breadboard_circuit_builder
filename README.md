@@ -10,7 +10,7 @@ The Breadboard Circuit Builder is a proof-of-concept educational tool that rende
 - Interactive breadboard visualization (400 holes with accurate positioning)
 - Component rendering (LEDs, resistors, Raspberry Pi Pico, photocells)
 - Automated circuit loading from JSON files
-- 5-layer circuit validation system
+- 5-layer circuit validation system (in progress)
 - Guided wiring workflow with step-by-step instructions
 - Extensible component adapter architecture
 - LLM-ready JSON schema
@@ -47,9 +47,10 @@ python3 -m http.server 8000
 | Component | Type | Features |
 |-----------|------|----------|
 | **Raspberry Pi Pico** | Microcontroller | 40 interactive pins, PWM indicators, pre-rendered |
-| **LED (Red/Yellow 5mm)** | Output | Polarity-aware, dynamic positioning, Fritzing graphics |
-| **Resistor (220Ω)** | Passive | Dynamic scaling, orientation-aware, color bands |
+| **LED (Red/Green/Blue/Yellow 5mm)** | Output | Polarity-aware, dynamic positioning, Fritzing graphics |
+| **Resistor (220Ω, 10KΩ)** | Passive | Dynamic scaling, orientation-aware, color bands |
 | **Photocell (LDR)** | Sensor | Light-dependent resistor, 2-pin placement |
+| **Push Button (STSP)** | Sensor | Momentary - Single Throew Single Pole, 2-pin placement |
 
 ### Core Features
 
@@ -64,7 +65,7 @@ python3 -m http.server 8000
 
 ### Validation System
 
-5-layer validation architecture:
+5-layer validation architecture (in progress):
 1. **Structural**: JSON schema validation
 2. **Reference**: Component types and pin references
 3. **Electrical**: Short circuits, bus conflicts, power-to-ground shorts
@@ -88,13 +89,19 @@ breadboard_circuit_builder/
 ├── components/                 # Component library
 │   ├── library.json           # Component registry
 │   ├── basic/                 # LEDs, resistors, sensors
+│   │   ├── button-tactile-6mm.json
+│   │   ├── button-geometry.js
+│   │   ├── button-adapter.js
 │   │   ├── led-red-5mm.json
 │   │   ├── led-red-5mm-geometry.js
 │   │   ├── led-red-5mm-adapter.js
+│   │   ├── led-green-5mm.json
+│   │   ├── led-blue-5mm.json
 │   │   ├── led-yellow-5mm.json
 │   │   ├── led-5mm-adapter.js
 │   │   ├── led-5mm-geometry.js
 │   │   ├── resistor-220.json
+│   │   ├── resistor-10k.json
 │   │   ├── resistor-geometry.js
 │   │   ├── resistor-adapter.js
 │   │   ├── photocell.json
@@ -109,6 +116,7 @@ breadboard_circuit_builder/
 │   ├── LED-5mm-red-leg.svg
 │   ├── ldr.svg
 │   └── resistor_220.svg
+│   └── Pushbuttonc.svg
 │
 ├── circuits/                   # Example circuits
 │   └── *.json                 # Circuit definition files
@@ -330,8 +338,7 @@ This is a proof-of-concept system with intentional scope limitations:
 This project uses component graphics from [Fritzing](https://fritzing.org), which are licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
 
 **Component Graphics:**
-- Breadboard, LED, Resistor, Photocell graphics © Fritzing contributors
-- Raspberry Pi Pico graphic created for this project
+- Raspberry Pi Pico, Breadboard, LED, Resistor, Photocell graphics © Fritzing contributors
 
 ## Educational Context
 
@@ -341,8 +348,8 @@ This tool is designed for introductory robotics and electronics education. Stude
 3. Student loads JSON into this tool
 4. System validates circuit for electrical correctness
 5. Student sees visual representation of breadboard assembly
-6. Student builds physical circuit following on-screen layout
-7. Student uses guided wiring feature for step-by-step assembly
+6. Student uses guided wiring feature for step-by-step assembly
+7. Student builds physical circuit following on-screen layout
 
 ## Contributing
 
@@ -394,7 +401,6 @@ See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 
 **Low Priority:**
 - Multi-breadboard layouts
-- 3D view toggle
 - Circuit simulation (LED brightness, motor speed)
 - Code generation (MicroPython/CircuitPython)
 - Bill of materials export
