@@ -91,10 +91,12 @@ class JSONTextInputHandler {
 
         console.log('Loading circuit from text input:', circuitData);
 
-        // Use existing circuit loader
-        if (typeof window.circuitLoader !== 'undefined') {
+        // Use existing circuit loader - try multiple locations
+        const circuitLoader = window.app?.circuitLoader || window.circuitLoader;
+
+        if (circuitLoader && typeof circuitLoader.loadCircuit === 'function') {
             try {
-                const result = await window.circuitLoader.loadCircuit(circuitData);
+                const result = await circuitLoader.loadCircuit(circuitData);
 
                 if (result.success) {
                     this.showSuccess();
@@ -107,7 +109,11 @@ class JSONTextInputHandler {
                 this.showError(`Error loading circuit: ${error.message}`);
             }
         } else {
-            console.error('Circuit loader not found');
+            console.error('Circuit loader not found. Checked:', {
+                app: window.app,
+                appCircuitLoader: window.app?.circuitLoader,
+                windowCircuitLoader: window.circuitLoader
+            });
             this.showError('Circuit loader not initialized. Please check console for errors.');
         }
     }
