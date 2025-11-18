@@ -116,13 +116,18 @@ class ResistorAdapter {
         
         // Calculate dynamic scale
         const scale = calculateResistorScale(position.actualSpacing);
-        
+
+        // Handle horizontal flip (like LEDs do)
+        // Ensures resistor always renders left-to-right or top-to-bottom regardless of pin order
+        const scaleX = position.flipHorizontal ? -scale : scale;
+        const scaleY = scale;
+
         // Get SVG connector positions
         const { pin0, pin1 } = RESISTOR_CONFIG.svg.connectors;
-        
+
         // Calculate translation
         let translateX, translateY, rotation;
-        
+
         if (position.orientation === 'horizontal') {
             translateX = position.pin0Coords.x - (pin0.x * scale);
             translateY = position.pin0Coords.y - (pin0.y * scale);
@@ -133,17 +138,17 @@ class ResistorAdapter {
             translateY = position.centerY;
             rotation = 90;
         }
-        
+
         // Apply transform
         if (position.orientation === 'horizontal') {
-            resistorGroup.setAttribute('transform', 
-                `translate(${translateX}, ${translateY}) scale(${scale})`
+            resistorGroup.setAttribute('transform',
+                `translate(${translateX}, ${translateY}) scale(${scaleX}, ${scaleY})`
             );
         } else {
             const adjustX = -((pin0.x + pin1.x) / 2) * scale;
             const adjustY = -((pin0.y + pin1.y) / 2) * scale;
-            resistorGroup.setAttribute('transform', 
-                `translate(${translateX}, ${translateY}) rotate(${rotation}) translate(${adjustX}, ${adjustY}) scale(${scale})`
+            resistorGroup.setAttribute('transform',
+                `translate(${translateX}, ${translateY}) rotate(${rotation}) translate(${adjustX}, ${adjustY}) scale(${scaleX}, ${scaleY})`
             );
         }
         

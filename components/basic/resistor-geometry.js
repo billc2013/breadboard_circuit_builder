@@ -138,23 +138,28 @@ function calculateResistorPosition(placement, breadboardHoles) {
     
     const deltaX = Math.abs(pin1Hole.x - pin0Hole.x);
     const deltaY = Math.abs(pin1Hole.y - pin0Hole.y);
-    
-    let orientation, rotation;
+
+    let orientation, rotation, flipHorizontal;
     if (deltaX > deltaY) {
+        // Horizontal layout
         orientation = 'horizontal';
         rotation = 0;
+        flipHorizontal = pin0Hole.x > pin1Hole.x; // Flip if pin0 is on the right
     } else {
+        // Vertical layout
         orientation = 'vertical';
         rotation = 90;
+        flipHorizontal = pin0Hole.y > pin1Hole.y; // Flip if pin0 is below pin1
     }
-    
+
     const actualSpacing = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    
+
     return {
         centerX,
         centerY,
         orientation,
         rotation,
+        flipHorizontal,
         pin0Coords: { x: pin0Hole.x, y: pin0Hole.y },
         pin1Coords: { x: pin1Hole.x, y: pin1Hole.y },
         pin0HoleId: placement.pin0,
