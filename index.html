@@ -16,97 +16,66 @@
             </div>
         </header>
         
-        <main>
-            <div id="breadboard-container">
-                <svg id="breadboard-svg" width="800" height="600" viewBox="0 0 400 200">
-                    <!-- Pico board (NEW) -->
-                    <image 
-                        id="pico-board"
-                        href="components_svg/pico-breadboard.svg" 
-                        x="20" 
-                        y="20" 
-                        width="59.53" 
-                        height="150.24"
-                        preserveAspectRatio="xMidYMid meet"
-                        data-config-ref="pico.svg"
-                    />
-                    
-                    <!-- Pico pins layer (NEW - interactive overlays) -->
-                    <g id="pico-pins-layer"></g>
+        <main id="workspace">
+            <!-- Left: Breadboard Area -->
+            <div id="breadboard-area">
+                <div id="breadboard-container">
+                    <svg id="breadboard-svg" width="800" height="600" viewBox="0 0 400 200">
+                        <!-- Pico board -->
+                        <image
+                            id="pico-board"
+                            href="components_svg/pico-breadboard.svg"
+                            x="20"
+                            y="20"
+                            width="59.53"
+                            height="150.24"
+                            preserveAspectRatio="xMidYMid meet"
+                            data-config-ref="pico.svg"
+                        />
 
-                    <!-- Breadboard background image -->
-                    <image 
-                        id="breadboard-image"
-                        href="components_svg/Half_breadboard56a.svg" 
-                        x="100" 
-                        y="20" 
-                        width="292.41" 
-                        height="189"
-                        preserveAspectRatio="xMidYMid meet"
-                        data-config-ref="breadboard.svg"
-                    />
-                    <!-- Wires layer (above image, below holes) -->
-                    <g id="wires-layer"></g>
-                    <!-- Components layer -->
-                    <g id="components-layer"></g>
-                    <!-- Holes layer (interactive overlays) -->
-                    <g id="holes-layer"></g>
-                    <!-- Labels layer -->
-                    <g id="labels-layer"></g>
-                </svg>
+                        <!-- Pico pins layer -->
+                        <g id="pico-pins-layer"></g>
+
+                        <!-- Breadboard background image -->
+                        <image
+                            id="breadboard-image"
+                            href="components_svg/Half_breadboard56a.svg"
+                            x="100"
+                            y="20"
+                            width="292.41"
+                            height="189"
+                            preserveAspectRatio="xMidYMid meet"
+                            data-config-ref="breadboard.svg"
+                        />
+                        <!-- Wires layer -->
+                        <g id="wires-layer"></g>
+                        <!-- Components layer -->
+                        <g id="components-layer"></g>
+                        <!-- Holes layer -->
+                        <g id="holes-layer"></g>
+                        <!-- Labels layer -->
+                        <g id="labels-layer"></g>
+                    </svg>
+                </div>
+
+                <div id="controls">
+                    <button id="clear-wires">Clear All Wires</button>
+                    <button id="toggle-labels">Toggle Labels</button>
+                    <button id="load-circuit-btn">📁 Load Circuit</button>
+                    <input type="file" id="circuit-file-input" accept=".json" style="display:none">
+                    <button id="export-circuit-btn">💾 Export Circuit</button>
+                    <div id="wire-count">Wires: 0</div>
+                </div>
             </div>
-            
-            <div id="controls">
-                <button id="clear-wires">Clear All Wires</button>
-                <button id="toggle-labels">Toggle Labels</button>
-                <button id="load-circuit-btn">📁 Load Circuit</button>
-                <input type="file" id="circuit-file-input" accept=".json" style="display:none">
-                <button id="export-circuit-btn">💾 Export Circuit</button>
-                <div id="wire-count">Wires: 0</div>
-            </div>
 
-            <!-- JSON Text Input Section -->
-            <div id="json-input-section">
-                <button id="toggle-json-input" class="section-toggle">
-                    ▼ Paste Circuit JSON
-                </button>
-
-                <div id="json-input-container" class="collapsed">
-                    <div id="json-input-header">
-                        <p class="help-text">
-                            Paste circuit JSON from an LLM (Claude, GPT-4, etc.) and load it directly:
-                        </p>
-                    </div>
-
-                    <div id="json-textarea-wrapper">
-                        <textarea
-                            id="circuit-json-input"
-                            placeholder='Paste your circuit JSON here...&#10;&#10;Example:&#10;{&#10;  "circuit": {&#10;    "metadata": { "name": "My Circuit" },&#10;    "components": [...],&#10;    "wires": [...]&#10;  }&#10;}'
-                            spellcheck="false"
-                        ></textarea>
-                        <div id="json-line-numbers"></div>
-                    </div>
-
-                    <div id="json-error-display" class="error-message" style="display:none;">
-                        <div id="json-error-header">
-                            <span id="json-error-icon">⚠️</span>
-                            <span id="json-error-title">JSON Error</span>
-                            <button id="close-json-error" class="close-error-btn">×</button>
-                        </div>
-                        <div id="json-error-content"></div>
-                    </div>
-
-                    <div id="json-input-controls">
-                        <button id="load-from-text-btn" class="json-btn primary">
-                            ▶ Load from Text
-                        </button>
-                        <button id="copy-current-circuit-btn" class="json-btn secondary">
-                            📋 Copy Current Circuit
-                        </button>
-                        <button id="clear-json-input-btn" class="json-btn secondary">
-                            🗑️ Clear
-                        </button>
-                    </div>
+            <!-- Right: Circuits Panel -->
+            <div id="circuits-panel">
+                <div class="panel-header">
+                    <h3>Circuits</h3>
+                    <button id="add-circuit-btn" class="icon-btn" title="Add new circuit">+</button>
+                </div>
+                <div id="circuits-list">
+                    <!-- Circuit items will be added dynamically -->
                 </div>
             </div>
         </main>
@@ -187,7 +156,7 @@
     <script src="guided-wiring.js"></script>
     <script src="app.js"></script>
     <script src="validator-panel-ui.js"></script>
-    <script src="json-text-input.js"></script>
+    <script src="circuits-manager.js"></script>
 
     <!-- Attribution Footer -->
     <footer id="attribution-footer">
