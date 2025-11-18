@@ -74,7 +74,7 @@ class CircuitsManager {
                 <button class="circuit-btn expand-btn" title="Expand/Collapse" data-id="${circuit.id}">▼</button>
                 <button class="circuit-btn upload-btn" title="Load from file" data-id="${circuit.id}">📁</button>
                 <button class="circuit-btn save-btn" title="Save to file" data-id="${circuit.id}">💾</button>
-                <button class="circuit-btn delete-btn" title="Delete circuit" data-id="${circuit.id}">×</button>
+                <button class="circuit-btn delete-btn" title="Delete circuit" data-id="${circuit.id}">🗑️</button>
             </div>
             <div class="circuit-content">
                 <textarea
