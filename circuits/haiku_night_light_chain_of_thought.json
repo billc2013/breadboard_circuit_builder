@@ -1,0 +1,109 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Night Light with Light Sensor",
+      "description": "Battery-powered night light using photocell sensor. LED activates in darkness via ADC threshold detection.",
+      "created": "2025-01-15"
+    },
+    "components": [
+      {
+        "id": "r_divider",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "12F",
+          "pin1": "12C"
+        },
+        "description": "Voltage divider resistor - part of light sensor circuit"
+      },
+      {
+        "id": "photocell",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "15F",
+          "pin1": "15C"
+        },
+        "description": "Light sensor - resistance varies with ambient light"
+      },
+      {
+        "id": "r_led",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "22F",
+          "pin1": "22C"
+        },
+        "description": "LED current-limiting resistor"
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "25F",
+          "cathode": "26F"
+        },
+        "description": "Red LED - illuminates when dark detected"
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "12W",
+        "description": "Power supply to voltage divider - connects Pico 3.3V to breadboard power rail"
+      },
+      {
+        "id": "w2",
+        "from": "12W",
+        "to": "12F",
+        "description": "Power rail to divider resistor pin 1 - 3.3V to resistor"
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_3",
+        "to": "12X",
+        "description": "Ground rail setup - connects Pico ground to breadboard ground rail"
+      },
+      {
+        "id": "w4",
+        "from": "12X",
+        "to": "12C",
+        "description": "Ground rail to divider resistor pin 2 - completes voltage divider"
+      },
+      {
+        "id": "w5",
+        "from": "12C",
+        "to": "15C",
+        "description": "Voltage divider junction to photocell - same bus connection (column 15)"
+      },
+      {
+        "id": "w6",
+        "from": "15F",
+        "to": "pico1.GP28_ADC2",
+        "description": "ADC input from sensor - photocell top pin to Pico ADC2 for light level reading"
+      },
+      {
+        "id": "w7",
+        "from": "15C",
+        "to": "pico1.GND_8",
+        "description": "Photocell to ground - completes sensor circuit"
+      },
+      {
+        "id": "w8",
+        "from": "pico1.GP16",
+        "to": "22F",
+        "description": "GPIO to LED resistor - signal from Pico to current-limiting resistor"
+      },
+      {
+        "id": "w9",
+        "from": "22C",
+        "to": "25F",
+        "description": "Resistor to LED anode - current flows to LED positive side"
+      },
+      {
+        "id": "w10",
+        "from": "26F",
+        "to": "pico1.GND_13",
+        "description": "LED cathode to ground - completes LED circuit"
+      }
+    ]
+  }
+}

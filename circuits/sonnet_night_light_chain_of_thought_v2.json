@@ -1,0 +1,81 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Night Light with Photocell",
+      "description": "LED turns on when dark, off when bright. Photocell voltage divider feeds GP26 ADC, LED controlled by GP15.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "photocell1",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "5E",
+          "pin1": "8E"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "8D",
+          "pin1": "13D"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "18F",
+          "pin1": "21F"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "21E",
+          "cathode": "22E"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "5F",
+        "description": "Wire from Pico 3.3V to breadboard 5F. Provides power to photocell voltage divider."
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GND_23",
+        "to": "25A",
+        "description": "Wire from Pico ground to breadboard 25A. Common ground point for entire circuit."
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GP26_ADC0",
+        "to": "8A",
+        "description": "Wire from Pico ADC pin GP26 to breadboard 8A. Reads voltage divider output to measure light level."
+      },
+      {
+        "id": "w4",
+        "from": "13A",
+        "to": "25B",
+        "description": "Wire from breadboard 13A to 25B. Connects bottom of voltage divider resistor to common ground."
+      },
+      {
+        "id": "w5",
+        "from": "pico1.GP15",
+        "to": "18E",
+        "description": "Wire from Pico GPIO15 to breadboard 18E. Controls LED on/off via current-limiting resistor."
+      },
+      {
+        "id": "w6",
+        "from": "22A",
+        "to": "25C",
+        "description": "Wire from breadboard 22A to 25C. Connects LED cathode to common ground."
+      }
+    ]
+  }
+}
