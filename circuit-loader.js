@@ -50,31 +50,34 @@ class CircuitLoader {
      * @returns {Object} Component metadata
      */
     async loadComponentMetadata(componentType) {
+        // Normalize component type to lowercase for case-insensitive lookup
+        const normalizedType = this.normalizeComponentType(componentType);
+
         // Check cache first
-        if (this.loadedMetadata.has(componentType)) {
-            return this.loadedMetadata.get(componentType);
+        if (this.loadedMetadata.has(normalizedType)) {
+            return this.loadedMetadata.get(normalizedType);
         }
-        
+
         // Get component info from registry
-        const componentInfo = this.componentRegistry[componentType];
+        const componentInfo = this.componentRegistry[normalizedType];
         if (!componentInfo || !componentInfo.metadata) {
-            throw new Error(`Component type "${componentType}" not found in registry`);
+            throw new Error(`Component type "${componentType}" not found in registry. Available types: ${Object.keys(this.componentRegistry).join(', ')}`);
         }
-        
+
         // Load metadata file
         const metadataPath = `components/${componentInfo.metadata}`;
         const response = await fetch(metadataPath);
         if (!response.ok) {
             throw new Error(`Failed to load component metadata: ${metadataPath}`);
         }
-        
+
         const data = await response.json();
         const metadata = data.component;
-        
-        // Cache it
-        this.loadedMetadata.set(componentType, metadata);
-        console.log(`  ✓ Loaded metadata for ${componentType}`);
-        
+
+        // Cache it with normalized key
+        this.loadedMetadata.set(normalizedType, metadata);
+        console.log(`  ✓ Loaded metadata for ${normalizedType}`);
+
         return metadata;
     }
     
@@ -84,30 +87,33 @@ class CircuitLoader {
      * @returns {Promise} Resolves when script is loaded
      */
     async loadGeometryScript(componentType) {
+        // Normalize component type to lowercase
+        const normalizedType = this.normalizeComponentType(componentType);
+
         // Check if already loaded
-        if (this.loadedGeometry.has(componentType)) {
+        if (this.loadedGeometry.has(normalizedType)) {
             return;
         }
-        
-            // SPECIAL CASE: Pico geometry is pre-loaded in HTML
-        if (componentType === 'raspberry-pi-pico' && typeof PICO_CONFIG !== 'undefined') {
+
+        // SPECIAL CASE: Pico geometry is pre-loaded in HTML
+        if (normalizedType === 'raspberry-pi-pico' && typeof PICO_CONFIG !== 'undefined') {
             console.log(`  ℹ️  Pico geometry already loaded (pre-loaded in HTML)`);
-            this.loadedGeometry.set(componentType, true);
+            this.loadedGeometry.set(normalizedType, true);
             return;
         }
 
         // Get component info from registry
-        const componentInfo = this.componentRegistry[componentType];
+        const componentInfo = this.componentRegistry[normalizedType];
         if (!componentInfo || !componentInfo.geometry) {
             throw new Error(`No geometry script defined for ${componentType}`);
         }
-        
+
         const geometryPath = `components/${componentInfo.geometry}`;
-        
+
         await this.loadScript(geometryPath);
-        
-        this.loadedGeometry.set(componentType, true);
-        console.log(`  ✓ Loaded geometry for ${componentType}`);
+
+        this.loadedGeometry.set(normalizedType, true);
+        console.log(`  ✓ Loaded geometry for ${normalizedType}`);
     }
     
     /**
@@ -116,35 +122,38 @@ class CircuitLoader {
      * @returns {Object} Adapter instance
      */
     async loadAdapter(componentType) {
+        // Normalize component type to lowercase
+        const normalizedType = this.normalizeComponentType(componentType);
+
         // Check cache
-        if (this.loadedAdapters.has(componentType)) {
-            return this.loadedAdapters.get(componentType);
+        if (this.loadedAdapters.has(normalizedType)) {
+            return this.loadedAdapters.get(normalizedType);
         }
-        
+
         // Get adapter info from registry
-        const componentInfo = this.componentRegistry[componentType];
+        const componentInfo = this.componentRegistry[normalizedType];
         if (!componentInfo || !componentInfo.adapter) {
             throw new Error(`No adapter defined for ${componentType}`);
         }
-        
+
         // Load geometry script first (adapters depend on geometry functions)
-        await this.loadGeometryScript(componentType);
-        
+        await this.loadGeometryScript(normalizedType);
+
         // Load adapter script
         const adapterPath = `components/${componentInfo.adapter}`;
         await this.loadScript(adapterPath);
-        
+
         // Instantiate adapter class
         const AdapterClass = window[componentInfo.adapterClass];
         if (!AdapterClass) {
             throw new Error(`Adapter class ${componentInfo.adapterClass} not found after loading ${adapterPath}`);
         }
-        
+
         const adapter = new AdapterClass();
-        
-        // Cache it
-        this.loadedAdapters.set(componentType, adapter);
-        console.log(`  ✓ Loaded adapter for ${componentType}`);
+
+        // Cache it with normalized key
+        this.loadedAdapters.set(normalizedType, adapter);
+        console.log(`  ✓ Loaded adapter for ${normalizedType}`);
         
         return adapter;
     }
@@ -287,41 +296,44 @@ class CircuitLoader {
      */
     async renderComponent(componentData) {
         const { id, type, placement } = componentData;
-        
+
         if (!id || !type || !placement) {
             throw new Error('Component missing required fields: id, type, or placement');
         }
-        
+
+        // Normalize all hole references to uppercase
+        const normalizedPlacement = this.normalizePlacement(placement);
+
         console.log(`\n📦 ${id} (${type})`);
-        
+
         // Load metadata
         const metadata = await this.loadComponentMetadata(type);
         
         // Load adapter
         const adapter = await this.loadAdapter(type);
-        
+
         // Validate placement
         console.log(`  🔍 Validating placement...`);
-        const validation = adapter.validate(placement, BREADBOARD_HOLES);
-        
+        const validation = adapter.validate(normalizedPlacement, BREADBOARD_HOLES);
+
         if (!validation.valid) {
             throw new Error(`Invalid placement: ${validation.error}`);
         }
-        
+
         if (validation.warning) {
             console.warn(`  ⚠️  ${validation.warning}`);
         }
-        
+
         // Calculate position
         console.log(`  📐 Calculating position...`);
-        const position = adapter.calculatePosition(placement, BREADBOARD_HOLES);
-        
+        const position = adapter.calculatePosition(normalizedPlacement, BREADBOARD_HOLES);
+
         if (!position) {
             throw new Error('Failed to calculate position');
         }
-        
+
         // Check hole availability (only for components that use holes)
-        const requiredHoles = adapter.getRequiredHoles(placement);
+        const requiredHoles = adapter.getRequiredHoles(normalizedPlacement);
         if (requiredHoles.length > 0) {
             console.log(`  🔒 Checking ${requiredHoles.length} required holes...`);
             
@@ -340,15 +352,50 @@ class CircuitLoader {
         await adapter.render(id, position, metadata);
         
         // Track it
-        this.renderedComponents.set(id, { 
-            type, 
-            placement, 
+        this.renderedComponents.set(id, {
+            type,
+            placement: normalizedPlacement,
             metadata,
             adapter,
             position
         });
-        
+
         console.log(`  ✅ ${id} rendered successfully`);
+    }
+
+    /**
+     * Normalize component type to lowercase for case-insensitive lookup
+     * Converts "LED-Red-5mm" → "led-red-5mm", "Resistor-10K" → "resistor-10k", etc.
+     * @param {string} componentType - Component type from circuit JSON
+     * @returns {string} - Normalized lowercase component type
+     */
+    normalizeComponentType(componentType) {
+        return componentType.toLowerCase();
+    }
+
+    /**
+     * Normalize placement object - converts all hole references to uppercase
+     * @param {Object} placement - Placement object with hole references
+     * @returns {Object} - Normalized placement object
+     */
+    normalizePlacement(placement) {
+        const normalized = {};
+
+        for (const [key, value] of Object.entries(placement)) {
+            // Check if it's a hole reference (string that doesn't start with 'pico')
+            if (typeof value === 'string' && !value.startsWith('pico')) {
+                // Normalize to uppercase (e.g., "2e" → "2E")
+                normalized[key] = value.toUpperCase();
+            } else if (typeof value === 'object' && value !== null) {
+                // Recursively normalize nested objects (like position)
+                normalized[key] = this.normalizePlacement(value);
+            } else {
+                // Keep other values as-is
+                normalized[key] = value;
+            }
+        }
+
+        return normalized;
     }
     
     /**

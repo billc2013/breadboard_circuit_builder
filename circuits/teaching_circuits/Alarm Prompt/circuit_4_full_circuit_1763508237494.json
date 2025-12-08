@@ -1,0 +1,121 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Light Sensor Silent Alarm",
+      "description": "Complete circuit with photoresistor light detection, blinking LED alarm, and pushbutton reset",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "ldr1",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "10J",
+          "pin1": "13J"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "13H",
+          "pin1": "16H"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "20H",
+          "pin1": "23H"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "23G",
+          "cathode": "24G"
+        }
+      },
+      {
+        "id": "button1",
+        "type": "button-tactile-6mm",
+        "placement": {
+          "leg0": "3D",
+          "leg1": "4D"
+        }
+      },
+      {
+        "id": "r3",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "4C",
+          "pin1": "9C"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "10W",
+        "description": "Wire from Pico 3.3V to top power rail at 10W. Powers photoresistor voltage divider."
+      },
+      {
+        "id": "w2",
+        "from": "10W",
+        "to": "10J",
+        "description": "Wire from power rail to photoresistor pin0 at 10J. Top of voltage divider."
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GP26_ADC0",
+        "to": "13G",
+        "description": "Wire from Pico analog pin GP26 to voltage divider junction at 13G. Reads light level."
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GND_23",
+        "to": "10Z",
+        "description": "Wire from Pico ground to bottom ground rail at 10Z. Ground reference for photoresistor circuit."
+      },
+      {
+        "id": "w5",
+        "from": "10Z",
+        "to": "16G",
+        "description": "Wire from ground rail to voltage divider resistor at 16G. Bottom of voltage divider to ground."
+      },
+      {
+        "id": "w6",
+        "from": "pico1.GP15",
+        "to": "20J",
+        "description": "Wire from Pico GPIO15 to LED current-limiting resistor at 20J. Controls alarm LED blinking."
+      },
+      {
+        "id": "w7",
+        "from": "10Z",
+        "to": "24E",
+        "description": "Wire from ground rail to LED cathode at 24E. Completes LED circuit to ground."
+      },
+      {
+        "id": "w8",
+        "from": "10W",
+        "to": "3E",
+        "description": "Wire from power rail to button leg0 at 3E. Provides 3.3V to button circuit."
+      },
+      {
+        "id": "w9",
+        "from": "pico1.GP16",
+        "to": "4B",
+        "description": "Wire from Pico GPIO16 to button junction at 4B. Reads button state to disable alarm."
+      },
+      {
+        "id": "w10",
+        "from": "10Z",
+        "to": "9A",
+        "description": "Wire from ground rail to pulldown resistor at 9A. Keeps button input LOW when not pressed."
+      }
+    ]
+  }
+}

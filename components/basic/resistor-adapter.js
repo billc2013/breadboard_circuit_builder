@@ -160,19 +160,7 @@ class ResistorAdapter {
 
         // Add to components layer
         componentsLayer.appendChild(resistorGroup);
-        
-        // Add label with resistance value
-        const labelElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        labelElement.setAttribute('x', position.centerX);
-        labelElement.setAttribute('y', position.centerY - 8);
-        labelElement.setAttribute('text-anchor', 'middle');
-        labelElement.setAttribute('font-size', '8');
-        labelElement.setAttribute('fill', '#333');
-        labelElement.setAttribute('font-weight', 'bold');
-        labelElement.textContent = label;
-        labelElement.classList.add('component-label');
-        componentsLayer.appendChild(labelElement);
-        
+
         // Store metadata
         resistorGroup._componentData = {
             position,
@@ -182,7 +170,25 @@ class ResistorAdapter {
             resistanceValue: valueKey,
             label
         };
-        
+
+        // Add hover event listeners for info box
+        const placement = {
+            pin0: position.pin0HoleId,
+            pin1: position.pin1HoleId
+        };
+
+        resistorGroup.addEventListener('mouseover', () => {
+            if (window.breadboardApp) {
+                window.breadboardApp.showComponentInfo(componentId, metadata, placement, position);
+            }
+        });
+
+        resistorGroup.addEventListener('mouseout', () => {
+            if (window.breadboardApp) {
+                window.breadboardApp.hideComponentInfo();
+            }
+        });
+
         // Mark holes as occupied
         markHoleOccupied(position.pin0HoleId, 'component', componentId);
         markHoleOccupied(position.pin1HoleId, 'component', componentId);

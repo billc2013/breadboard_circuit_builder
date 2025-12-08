@@ -136,24 +136,30 @@ class PhotocellAdapter {
         // Add photocell body
         componentsLayer.appendChild(photocellGroup);
 
-        // Add label
-        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        label.setAttribute('x', position.centerX);
-        label.setAttribute('y', position.centerY - 15);
-        label.setAttribute('text-anchor', 'middle');
-        label.setAttribute('font-size', '8');
-        label.setAttribute('fill', '#333');
-        label.setAttribute('font-weight', 'bold');
-        label.textContent = `${componentId.toUpperCase()} (LDR)`;
-        label.classList.add('component-label');
-        componentsLayer.appendChild(label);
-
         // Store metadata
         photocellGroup._componentData = {
             position,
             metadata,
             config: PHOTOCELL_CONFIG
         };
+
+        // Add hover event listeners for info box
+        const placement = {
+            pin0: position.pin0HoleId,
+            pin1: position.pin1HoleId
+        };
+
+        photocellGroup.addEventListener('mouseover', () => {
+            if (window.breadboardApp) {
+                window.breadboardApp.showComponentInfo(componentId, metadata, placement, position);
+            }
+        });
+
+        photocellGroup.addEventListener('mouseout', () => {
+            if (window.breadboardApp) {
+                window.breadboardApp.hideComponentInfo();
+            }
+        });
 
         // Mark holes as occupied
         markHoleOccupied(position.pin0HoleId, 'component', componentId);

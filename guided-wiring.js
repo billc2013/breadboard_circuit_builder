@@ -128,8 +128,31 @@ class GuidedWiringManager {
             return;
         }
 
+        // Resolve bus references to actual hole IDs
+        const resolvedWires = wires.map(wire => {
+            const resolvedWire = { ...wire };
+
+            // Resolve 'from' endpoint
+            if (wire.from && typeof resolveWireEndpoint === 'function') {
+                const fromResolution = resolveWireEndpoint(wire.from);
+                resolvedWire.from = fromResolution.resolvedId;
+                resolvedWire.fromBusReference = fromResolution.busReference;
+                resolvedWire.fromValidHoles = fromResolution.validHoles;
+            }
+
+            // Resolve 'to' endpoint
+            if (wire.to && typeof resolveWireEndpoint === 'function') {
+                const toResolution = resolveWireEndpoint(wire.to);
+                resolvedWire.to = toResolution.resolvedId;
+                resolvedWire.toBusReference = toResolution.busReference;
+                resolvedWire.toValidHoles = toResolution.validHoles;
+            }
+
+            return resolvedWire;
+        });
+
         // Sort wires: ground/power connections first
-        this.wireQueue = this.prioritizeWires(wires);
+        this.wireQueue = this.prioritizeWires(resolvedWires);
         this.currentWireIndex = 0;
 
         console.log(`\n🎯 Guided Wiring Mode Activated`);
@@ -220,6 +243,7 @@ class GuidedWiringManager {
         this.stopPulsing();
         this.clearWaypoints();
         this.startPoint = null;
+        this.startPointIsFrom = false;
 
         console.log('⏸️  Guided Wiring Stopped');
     }
@@ -330,18 +354,24 @@ class GuidedWiringManager {
         const currentWire = this.wireQueue[this.currentWireIndex];
         if (!currentWire) return false;
 
-        // Check if clicked point is one of the valid endpoints
-        const isValidEndpoint = (pointData.id === currentWire.from ||
-                                 pointData.id === currentWire.to);
+        // Check if clicked point is one of the valid endpoints (including bus flexibility)
+        const isFromEndpoint = (pointData.id === currentWire.from ||
+                                (currentWire.fromValidHoles && currentWire.fromValidHoles.includes(pointData.id)));
+        const isToEndpoint = (pointData.id === currentWire.to ||
+                              (currentWire.toValidHoles && currentWire.toValidHoles.includes(pointData.id)));
+        const isValidEndpoint = isFromEndpoint || isToEndpoint;
 
         if (!this.startPoint) {
             // First click - must be a valid endpoint
             if (!isValidEndpoint) {
-                console.warn(`⚠️  Please click on ${currentWire.from} or ${currentWire.to}`);
+                const fromLabel = currentWire.fromBusReference || currentWire.from;
+                const toLabel = currentWire.toBusReference || currentWire.to;
+                console.warn(`⚠️  Please click on ${fromLabel} or ${toLabel}`);
                 return true; // Block the click
             }
 
             this.startPoint = pointData;
+            this.startPointIsFrom = isFromEndpoint; // Track which endpoint we started from
             console.log(`✓ Starting from ${pointData.id}`);
 
             // Audio feedback - wire initiated
@@ -359,16 +389,22 @@ class GuidedWiringManager {
             return true; // Handled
         } else {
             // Second click - must be the OTHER endpoint
-            const otherEndpoint = (this.startPoint.id === currentWire.from) ?
-                                  currentWire.to : currentWire.from;
+            const needsToEndpoint = this.startPointIsFrom;
+            const needsFromEndpoint = !this.startPointIsFrom;
 
-            if (pointData.id === otherEndpoint) {
+            const isCorrectOtherEndpoint = (needsToEndpoint && isToEndpoint) ||
+                                           (needsFromEndpoint && isFromEndpoint);
+
+            if (isCorrectOtherEndpoint) {
                 // Valid completion!
                 this.completeCurrentWire(this.startPoint, pointData);
                 return true;
             } else if (isValidEndpoint) {
                 // Clicked same endpoint again
-                console.warn(`⚠️  Please click on ${otherEndpoint} to complete the wire`);
+                const otherLabel = needsToEndpoint ?
+                                   (currentWire.toBusReference || currentWire.to) :
+                                   (currentWire.fromBusReference || currentWire.from);
+                console.warn(`⚠️  Please click on ${otherLabel} to complete the wire`);
                 return true;
             } else {
                 // Clicked somewhere else - add waypoint
@@ -562,6 +598,7 @@ class GuidedWiringManager {
         this.clearPreview();
         this.stopLivePreview();  // Stop cursor tracking and live preview
         this.startPoint = null;
+        this.startPointIsFrom = false;
         this.waypoints = [];
 
         // Move to next wire

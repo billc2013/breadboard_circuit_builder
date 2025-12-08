@@ -526,6 +526,105 @@ getConnectionElement(pointId) {
             timestamp: new Date().toISOString()
         };
     }
+
+    // Show component info box
+    showComponentInfo(componentId, metadata, placement, position) {
+        const infoBox = document.getElementById('component-info-box');
+        const infoTitle = document.getElementById('info-box-title');
+        const infoDetails = document.getElementById('info-box-details');
+
+        // Set title
+        infoTitle.textContent = `${componentId.toUpperCase()}`;
+
+        // Build details HTML
+        let detailsHTML = '';
+
+        // Component type and name
+        if (metadata && metadata.name) {
+            detailsHTML += `<div class="info-section">
+                <span class="info-label">Type:</span>
+                <span class="info-value">${metadata.name}</span>
+            </div>`;
+        }
+
+        // Component description
+        if (metadata && metadata.description) {
+            detailsHTML += `<div class="info-section">
+                <span class="info-label">Description:</span>
+                <span class="info-value">${metadata.description}</span>
+            </div>`;
+        }
+
+        // Placement information
+        if (placement) {
+            detailsHTML += `<div class="info-section">
+                <span class="info-label">Placement:</span>
+                <ul>`;
+            for (const [pin, location] of Object.entries(placement)) {
+                if (pin !== 'position') {
+                    detailsHTML += `<li>${pin}: ${location}</li>`;
+                }
+            }
+            detailsHTML += `</ul></div>`;
+        }
+
+        // Electrical properties
+        if (metadata && metadata.properties) {
+            const props = metadata.properties;
+            detailsHTML += `<div class="info-section">
+                <span class="info-label">Electrical:</span>
+                <ul>`;
+
+            if (props.forward_voltage) {
+                detailsHTML += `<li>Forward voltage: ${props.forward_voltage}</li>`;
+            }
+            if (props.max_current) {
+                detailsHTML += `<li>Max current: ${props.max_current}</li>`;
+            }
+            if (props.resistance) {
+                detailsHTML += `<li>Resistance: ${props.resistance}</li>`;
+            }
+            if (props.power_rating) {
+                detailsHTML += `<li>Power rating: ${props.power_rating}</li>`;
+            }
+            if (props.color) {
+                detailsHTML += `<li>Color: ${props.color}</li>`;
+            }
+
+            detailsHTML += `</ul></div>`;
+        }
+
+        infoDetails.innerHTML = detailsHTML;
+
+        // Position the info box next to the component
+        if (position) {
+            const svg = this.svg;
+            const svgRect = svg.getBoundingClientRect();
+            const container = document.getElementById('breadboard-container');
+            const containerRect = container.getBoundingClientRect();
+
+            // Calculate position relative to the SVG viewBox
+            const viewBox = svg.viewBox.baseVal;
+            const scaleX = svgRect.width / viewBox.width;
+            const scaleY = svgRect.height / viewBox.height;
+
+            // Position to the right of the component
+            const screenX = containerRect.left + (position.centerX * scaleX) + 30;
+            const screenY = containerRect.top + (position.centerY * scaleY) - 20;
+
+            infoBox.style.left = `${screenX}px`;
+            infoBox.style.top = `${screenY}px`;
+        }
+
+        // Show the info box
+        infoBox.style.display = 'block';
+    }
+
+    // Hide component info box
+    hideComponentInfo() {
+        const infoBox = document.getElementById('component-info-box');
+        infoBox.style.display = 'none';
+    }
 }
 
 // Helper: Mark hole as physically occupied

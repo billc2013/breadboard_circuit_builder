@@ -1,0 +1,59 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Photoresistor Light Sensor",
+      "description": "Voltage divider circuit using photoresistor and 10kΩ resistor to detect light levels via analog input",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "ldr1",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "10J",
+          "pin1": "13J"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "13H",
+          "pin1": "16H"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "10W",
+        "description": "Wire from Pico 3.3V to top power rail at 10W. Provides power to voltage divider."
+      },
+      {
+        "id": "w2",
+        "from": "10W",
+        "to": "10J",
+        "description": "Wire from power rail to photoresistor pin0 at 10J. Connects 3.3V to top of voltage divider."
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GP26_ADC0",
+        "to": "13G",
+        "description": "Wire from Pico ADC pin GP26 to junction at 13G. Reads voltage between photoresistor and resistor."
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GND_23",
+        "to": "10Z",
+        "description": "Wire from Pico ground to bottom ground rail at 10Z. Establishes ground reference."
+      },
+      {
+        "id": "w5",
+        "from": "10Z",
+        "to": "16G",
+        "description": "Wire from ground rail to resistor pin1 at 16G. Connects bottom of voltage divider to ground."
+      }
+    ]
+  }
+}

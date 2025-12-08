@@ -186,3 +186,145 @@ function getBreadboardBounds() {
 }
 
 console.log('Breadboard data generated:', BREADBOARD_HOLES.length, 'holes');
+
+/**
+ * Parse bus reference from LLM format (e.g., "Bus9A-D", "Bus2F-J")
+ * @param {string} busRef - Bus reference string
+ * @returns {Object} - { column: number, rows: string[], section: 'top'|'bottom' }
+ */
+function parseBusReference(busRef) {
+    // Match pattern: Bus[number][row]-[row]
+    // Examples: "Bus9A-D", "Bus2F-J", "Bus15E-A"
+    const match = busRef.match(/^Bus(\d+)([A-J])-([A-J])$/i);
+
+    if (!match) {
+        throw new Error(`Invalid bus reference format: ${busRef}. Expected format: Bus9A-D`);
+    }
+
+    const column = parseInt(match[1]);
+    const startRow = match[2].toUpperCase();
+    const endRow = match[3].toUpperCase();
+
+    // Define row order for each section
+    const bottomRows = ['A', 'B', 'C', 'D', 'E'];  // Bottom section
+    const topRows = ['F', 'G', 'H', 'I', 'J'];     // Top section
+
+    // Determine which section
+    let section, allRows;
+    if (bottomRows.includes(startRow) && bottomRows.includes(endRow)) {
+        section = 'bottom';
+        allRows = bottomRows;
+    } else if (topRows.includes(startRow) && topRows.includes(endRow)) {
+        section = 'top';
+        allRows = topRows;
+    } else {
+        throw new Error(`Bus reference spans both sections: ${busRef}. Use A-E or F-J only.`);
+    }
+
+    // Get row range
+    const startIdx = allRows.indexOf(startRow);
+    const endIdx = allRows.indexOf(endRow);
+
+    if (startIdx === -1 || endIdx === -1) {
+        throw new Error(`Invalid rows in bus reference: ${busRef}`);
+    }
+
+    // Support both directions (A-D or D-A)
+    const minIdx = Math.min(startIdx, endIdx);
+    const maxIdx = Math.max(startIdx, endIdx);
+    const rows = allRows.slice(minIdx, maxIdx + 1);
+
+    return { column, rows, section };
+}
+
+/**
+ * Get all holes matching a bus reference
+ * @param {string} busRef - Bus reference (e.g., "Bus9A-D")
+ * @returns {Array} - Array of matching holes
+ */
+function getHolesForBusReference(busRef) {
+    const { column, rows, section } = parseBusReference(busRef);
+    const busName = `bus${column}-${section}`;
+
+    // Find all holes in this bus matching the row constraints
+    const matchingHoles = BREADBOARD_HOLES.filter(hole => {
+        return hole.bus === busName && rows.includes(hole.row);
+    });
+
+    if (matchingHoles.length === 0) {
+        throw new Error(`No holes found for bus reference: ${busRef}`);
+    }
+
+    return matchingHoles;
+}
+
+/**
+ * Get first available hole from bus reference
+ * @param {string} busRef - Bus reference (e.g., "Bus9A-D")
+ * @returns {Object} - First available hole, or null if all occupied
+ */
+function getAvailableHoleFromBus(busRef) {
+    const holes = getHolesForBusReference(busRef);
+
+    // Find first unoccupied hole
+    for (const hole of holes) {
+        const holeElement = document.querySelector(`[data-hole-id="${hole.id}"]`);
+        if (holeElement && !holeElement.classList.contains('occupied')) {
+            return hole;
+        }
+    }
+
+    // If all occupied, return first hole (will trigger warning)
+    console.warn(`⚠️  All holes in ${busRef} are occupied, using first hole: ${holes[0].id}`);
+    return holes[0];
+}
+
+/**
+ * Resolve wire endpoint to hole ID
+ * Supports both direct hole references (e.g., "20J") and bus references (e.g., "Bus9A-D")
+ * @param {string} endpoint - Wire endpoint reference
+ * @returns {Object} - { resolvedId: string, busReference: string|null, validHoles: Array|null }
+ */
+function resolveWireEndpoint(endpoint) {
+    // Check if it's a Pico pin reference
+    if (endpoint.startsWith('pico1.')) {
+        return {
+            resolvedId: endpoint,
+            busReference: null,
+            validHoles: null
+        };
+    }
+
+    // Check if it's a bus reference (case-insensitive)
+    if (endpoint.toLowerCase().startsWith('bus')) {
+        const allHoles = getHolesForBusReference(endpoint);
+        const availableHole = getAvailableHoleFromBus(endpoint);
+        console.log(`  ℹ️  Resolved ${endpoint} → ${availableHole.id} (${allHoles.length} holes in bus)`);
+
+        return {
+            resolvedId: availableHole.id,
+            busReference: endpoint,
+            validHoles: allHoles.map(h => h.id)  // All hole IDs in this bus
+        };
+    }
+
+    // Otherwise, treat as direct hole reference (e.g., "20J" or "20j")
+    // Normalize to uppercase to match stored hole IDs
+    const normalizedEndpoint = normalizeHoleReference(endpoint);
+    return {
+        resolvedId: normalizedEndpoint,
+        busReference: null,
+        validHoles: null
+    };
+}
+
+/**
+ * Normalize hole reference to uppercase
+ * Converts "2e" → "2E", "10j" → "10J", etc.
+ * @param {string} holeRef - Hole reference
+ * @returns {string} - Normalized uppercase reference
+ */
+function normalizeHoleReference(holeRef) {
+    // Convert to uppercase for consistency with stored hole IDs
+    return holeRef.toUpperCase();
+}

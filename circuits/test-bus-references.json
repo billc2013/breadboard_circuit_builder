@@ -1,0 +1,47 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Test Circuit with Bus References",
+      "description": "Switch connected to GPIO with external pull-down resistor using bus references.",
+      "created": "2025-12-08"
+    },
+    "components": [
+      {
+        "id": "switch1",
+        "type": "button-tactile-6mm",
+        "placement": {
+          "leg0": "2E",
+          "leg1": "4E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "4D",
+          "pin1": "9D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP16",
+        "to": "Bus9A-D",
+        "description": "Wire from Pico GPIO 16 to Breadboard the 9th Bus with holes A-D. This wire is for high/low measurement."
+      },
+      {
+        "id": "w2",
+        "from": "pico1.3V3_OUT",
+        "to": "Bus2A-D",
+        "description": "Wire from Pico 3.3V pin to Breadboard the 2nd Bus with holes A-D. This wire connects the switch to 3.3V."
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "Bus9A-D",
+        "description": "Wire from Pico ground pin to Breadboard the 9th Bus with holes A-D. This wire connects the pulldown resistor to ground."
+      }
+    ]
+  }
+}
