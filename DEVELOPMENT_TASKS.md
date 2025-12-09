@@ -2,8 +2,61 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: November 2025
-**Current Phase**: POC Refinement & Expansion
+**Last Updated**: December 8, 2025
+**Current Phase**: Enhanced POC - Hover Info, Bus References, Case-Insensitive System
+
+---
+
+## Recently Completed (December 2025 Session)
+
+### ✅ Component Hover Information System
+**Completed**: December 8, 2025
+
+**What was delivered**:
+- Removed static component labels cluttering the breadboard
+- Added interactive hover info boxes that appear next to components
+- Info boxes show:
+  - Component ID, type, and description
+  - Pin placements with hole IDs
+  - Electrical properties (voltage, current, resistance, power rating, color)
+- Dynamic positioning next to hovered component
+- Professional styling with blue border and shadow
+
+**Files modified**: `index.html`, `styles.css`, `app.js`, all 4 component adapters
+
+**Impact**: Cleaner interface, better user experience, comprehensive component information on demand
+
+---
+
+### ✅ Bus Reference System for Wire Endpoints
+**Completed**: December 8, 2025
+
+**What was delivered**:
+- LLMs can now specify buses instead of exact holes for wires
+- Format: `"Bus{column}{startRow}-{endRow}"` (e.g., "Bus9A-D")
+- System automatically selects first available unoccupied hole in bus
+- Occupation checking accounts for both components AND wires
+- During guided wiring, users can click ANY hole in the specified bus
+- Clear console feedback showing resolution (e.g., "Resolved Bus9A-D → 9C (4 holes in bus)")
+
+**Files modified**: `breadboard-data.js` (added 5 new functions), `guided-wiring.js`
+
+**Impact**: Reduced LLM precision requirements, fewer placement errors, more robust circuit generation
+
+---
+
+### ✅ Comprehensive Case-Insensitive System
+**Completed**: December 8, 2025
+
+**What was delivered**:
+- All component types now case-insensitive: `led-yellow-5mm`, `LED-Yellow-5mm`, `LED-YELLOW-5MM` all work
+- All hole references case-insensitive: `2E`, `2e`, `20J`, `20j` all work
+- All bus references case-insensitive: `Bus9A-D`, `bus9a-d`, `BUS9A-D` all work
+- Normalization happens automatically in circuit loader
+
+**Files modified**: `breadboard-data.js`, `circuit-loader.js`
+
+**Impact**: System robust to LLM output variations, reduced errors from capitalization inconsistencies
 
 ---
 
@@ -123,35 +176,27 @@
 
 #### 2.4 Component Label Text Position
 
-**Observed Problems**:
-- [ ] No component labels currently rendered (ID, type, value)
-- [ ] Need to decide: show labels by default or on hover?
-- [ ] Where to position labels? (above component, below, to side?)
-- [ ] Label text size/style for different components?
+**Status**: ✅ **COMPLETED** - December 8, 2025
 
-**Decisions Needed**:
-- Show component ID? (e.g., "R1", "LED1")
-- Show component value? (e.g., "220Ω", "Red LED")
-- Toggle visibility? (button to show/hide all labels)
-- Collision detection? (prevent labels from overlapping)
+**Solution Implemented**: Interactive hover-based information system instead of static labels
 
-**Implementation Ideas**:
-```javascript
-// In adapter render():
-createComponentLabel(componentId, metadata, position) {
-    const label = document.createElementNS(SVG_NS, 'text');
-    label.textContent = `${componentId} (${metadata.properties.value})`;
-    label.setAttribute('x', position.centerX);
-    label.setAttribute('y', position.centerY - 15);  // Above component
-    label.setAttribute('class', 'component-label');
-    return label;
-}
-```
+**What was delivered**:
+- Removed static component labels to eliminate clutter
+- Implemented hover info boxes that appear next to components on mouseover
+- Info boxes show comprehensive details:
+  - Component ID, type, and description
+  - Pin placements with hole IDs
+  - Electrical properties (voltage, current, resistance, power rating, color)
+- Dynamic positioning next to hovered component
+- Professional styling with blue border and shadow
 
-**Files to Create/Modify**:
-- `styles.css` (add `.component-label` styling)
-- All `*-adapter.js` files (add label creation)
-- `app.js` (add "Toggle Labels" button)
+**Files Modified**:
+- `index.html` - Added component info box HTML
+- `styles.css` - Added info box styling
+- `app.js` - Added showComponentInfo() and hideComponentInfo() methods
+- All 4 component adapters - Removed static labels, added hover listeners
+
+**Outcome**: Cleaner interface with comprehensive information available on demand
 
 ---
 
@@ -351,9 +396,12 @@ For each component:
 1. ✅ Archive old documentation
 2. ✅ Create new README.md
 3. ✅ Create this DEVELOPMENT_TASKS.md
-4. JSON text input feature
-5. Component rendering issue investigation/fixes
-6. Consider adding button component (high demand, low complexity)
+4. ✅ JSON text input feature (Completed November 2025)
+5. ✅ Component hover information system (Completed December 8, 2025)
+6. ✅ Bus reference system for wires (Completed December 8, 2025)
+7. ✅ Case-insensitive system (Completed December 8, 2025)
+8. Component rendering issue investigation/fixes (Ongoing - see section 2)
+9. Consider adding button component (✅ Completed - button already in library)
 
 ---
 

@@ -8,7 +8,10 @@ The Breadboard Circuit Builder is a proof-of-concept educational tool that rende
 
 **Key Features:**
 - Interactive breadboard visualization (400 holes with accurate positioning)
-- Component rendering (LEDs, resistors, Raspberry Pi Pico, photocells)
+- Component rendering (LEDs, resistors, Raspberry Pi Pico, photocells, buttons)
+- **Hover-based component information** - Interactive info boxes with full component details
+- **Bus-aware wire routing** - LLMs specify buses instead of exact holes for flexible placement
+- **Fully case-insensitive** - Handles any capitalization in component types, holes, and buses
 - Automated circuit loading from JSON files
 - 5-layer circuit validation system (in progress)
 - Guided wiring workflow with step-by-step instructions
@@ -57,10 +60,23 @@ python3 -m http.server 8000
 - **Accurate Hole Positioning**: 400 breadboard holes with correct spacing (8.982mm)
 - **Power Rails**: 4 power rails (top/bottom power/ground) with 5-hole grouping
 - **Bus Connectivity**: Automatic electrical bus definitions (5 holes per column)
+- **Bus Reference System**: LLMs specify buses (e.g., "Bus9A-D") instead of exact holes for wires
+  - Automatic hole selection from available holes in bus
+  - Occupation checking for components and wires
+  - Flexible user input during guided wiring (any hole in bus is valid)
 - **Hole Occupation**: Physical enforcement (one component/wire per hole)
+- **Component Hover Info**: Interactive info boxes showing:
+  - Component ID, type, and description
+  - Pin placements with hole IDs
+  - Electrical properties (voltage, current, resistance)
+  - Positioned dynamically next to hovered component
 - **Wire Routing**: Click-to-click wire creation between any connection points
 - **Guided Wiring**: Step-by-step wire placement with visual cues and LLM descriptions
 - **Component Validation**: Pre-render checks for placement validity
+- **Case-Insensitive System**: Accepts any capitalization for:
+  - Component types (LED-Yellow-5mm, led-yellow-5mm, etc.)
+  - Hole references (2E, 2e, etc.)
+  - Bus references (Bus9A-D, bus9a-d, etc.)
 - **Circuit Export**: Save current circuit state as JSON
 
 ### Validation System
@@ -201,18 +217,18 @@ LLMs generate circuit descriptions in this format:
       {
         "id": "w1",
         "from": "pico1.GP0",
-        "to": "20J",
+        "to": "Bus20F-J",
         "description": "PWM signal from Pico to current-limiting resistor"
       },
       {
         "id": "w2",
-        "from": "25J",
-        "to": "14E",
+        "from": "Bus25F-J",
+        "to": "Bus14A-E",
         "description": "Resistor to LED cathode (negative)"
       },
       {
         "id": "w3",
-        "from": "15E",
+        "from": "Bus15A-E",
         "to": "pico1.GND_3",
         "description": "LED anode to ground, completing the circuit"
       }
@@ -225,10 +241,15 @@ LLMs generate circuit descriptions in this format:
 
 See `prompts/` directory for detailed instructions to give LLMs:
 - Component library reference
-- Breadboard hole naming conventions
+- Breadboard hole naming conventions (direct holes and bus references)
+- **Bus reference format**: `Bus{column}{startRow}-{endRow}` (e.g., "Bus9A-D", "Bus15F-J")
+  - Reduces LLM precision requirements
+  - System automatically selects available holes
+  - More robust than exact hole placement
 - Pico pin capabilities (GPIO, PWM, ADC)
 - Electrical best practices
 - JSON schema specification
+- **Case-insensitive**: Any capitalization works for components, holes, and buses
 
 ## Extending the System
 
@@ -328,10 +349,11 @@ This is a proof-of-concept system with intentional scope limitations:
 - **No wire deletion**: Wires can be cleared all at once, not individually
 - **No component deletion**: Components are permanent once placed
 - **No undo/redo**: No action history
-- **Simple wire routing**: Straight lines only (no Manhattan routing or pathfinding)
+- **Simple wire routing**: Straight lines only (Manhattan routing available in guided mode via waypoints)
 - **No drag-and-drop**: Components placed via JSON only
 - **Pico is pre-rendered**: Not dynamically positioned from JSON
 - **No real-time validation**: Validation runs on circuit load, not during manual editing
+- **Hover info desktop-only**: Touch devices don't support hover (tap-and-hold could be added)
 
 ## License and Attribution
 
@@ -386,24 +408,31 @@ python3 -m http.server 8000
 
 See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 
+**Recently Completed (December 2025):**
+- ✅ Component hover information system
+- ✅ Bus reference system for wire endpoints
+- ✅ Case-insensitive component types, holes, and buses
+- ✅ JSON text input functionality
+
 **High Priority:**
-- JSON text input (paste from LLM without file upload)
-- Component rendering refinements (alignment, stub length, label positions)
+- Component rendering refinements (alignment, stub length, consistency)
 - Wire deletion with occupation cleanup
-- Additional component library expansion
+- Additional component library expansion (HC-SR04, TB6612, potentiometer)
+- Individual wire color-coding and editing
 
 **Medium Priority:**
 - Drag-and-drop component positioning
 - Undo/redo system
-- Manhattan routing for wires
 - Component rotation support
 - Real-time validation during manual editing
+- Touch device support for hover info (tap-and-hold)
 
 **Low Priority:**
 - Multi-breadboard layouts
 - Circuit simulation (LED brightness, motor speed)
 - Code generation (MicroPython/CircuitPython)
 - Bill of materials export
+- Collision-aware label positioning (optional alternative to hover)
 
 ## Contact and Support
 
@@ -411,6 +440,6 @@ For questions, issues, or contributions, please refer to the project repository 
 
 ---
 
-**Last Updated**: November 2025
-**Status**: Proof of Concept Complete - Ready for Refinement and Extension
-**Version**: 1.0-POC
+**Last Updated**: December 8, 2025
+**Status**: Enhanced POC - Component Hover Info, Bus References, Case-Insensitive System
+**Version**: 1.1-POC
