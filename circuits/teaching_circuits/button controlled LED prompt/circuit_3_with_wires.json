@@ -1,0 +1,174 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Exported Circuit",
+      "description": "Circuit exported from Breadboard Builder",
+      "exported": "2025-12-09T03:59:17.260Z"
+    },
+    "components": [
+      {
+        "id": "button1",
+        "type": "button-tactile-6mm",
+        "placement": {
+          "leg0": "5E",
+          "leg1": "6E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "6D",
+          "pin1": "11D"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "18E",
+          "anode": "19E"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "19D",
+          "pin1": "24D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "11A",
+        "fromCoords": {
+          "x": 74.96000000000001,
+          "y": 151.94
+        },
+        "toCoords": {
+          "x": 203.72,
+          "y": 163.822
+        },
+        "waypoints": [
+          {
+            "x": 166.16699999999997,
+            "y": 166.16699999999997
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Wire from Pico ground pin to breadboard Bus11A-E. This completes the pull-down resistor path to ground."
+      },
+      {
+        "id": "w5",
+        "from": "18D",
+        "to": "pico1.GND_28",
+        "fromCoords": {
+          "x": 266.594,
+          "y": 136.876
+        },
+        "toCoords": {
+          "x": 74.96000000000001,
+          "y": 115.94
+        },
+        "waypoints": [
+          {
+            "x": 247.005,
+            "y": 103.29299999999999
+          },
+          {
+            "x": 193.113,
+            "y": 67.365
+          },
+          {
+            "x": 130.23899999999998,
+            "y": 67.365
+          },
+          {
+            "x": 103.29299999999999,
+            "y": 112.27499999999999
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Wire from Pico ground pin to breadboard Bus18A-E. This connects the LED cathode to ground."
+      },
+      {
+        "id": "w2",
+        "from": "5D",
+        "to": "pico1.3V3_OUT",
+        "fromCoords": {
+          "x": 149.828,
+          "y": 136.876
+        },
+        "toCoords": {
+          "x": 74.96000000000001,
+          "y": 58.34
+        },
+        "waypoints": [
+          {
+            "x": 85.329,
+            "y": 130.23899999999998
+          },
+          {
+            "x": 85.329,
+            "y": 58.382999999999996
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Wire from Pico 3.3V pin to breadboard Bus5A-E. This provides HIGH voltage when button is pressed."
+      },
+      {
+        "id": "w1",
+        "from": "pico1.GP14",
+        "to": "6C",
+        "fromCoords": {
+          "x": 24.56,
+          "y": 159.14
+        },
+        "toCoords": {
+          "x": 158.81,
+          "y": 145.858
+        },
+        "waypoints": [
+          {
+            "x": 148.20299999999997,
+            "y": 175.149
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Wire from Pico GPIO 14 to breadboard Bus6A-E. This digital input pin reads the button state."
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GP15",
+        "to": "24E",
+        "fromCoords": {
+          "x": 24.56,
+          "y": 166.34
+        },
+        "toCoords": {
+          "x": 320.486,
+          "y": 127.894
+        },
+        "waypoints": [
+          {
+            "x": 211.077,
+            "y": 211.077
+          },
+          {
+            "x": 327.84299999999996,
+            "y": 166.16699999999997
+          },
+          {
+            "x": 345.80699999999996,
+            "y": 130.23899999999998
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Wire from Pico GPIO 15 to breadboard Bus24A-E. This digital output pin controls the LED."
+      }
+    ]
+  }
+}

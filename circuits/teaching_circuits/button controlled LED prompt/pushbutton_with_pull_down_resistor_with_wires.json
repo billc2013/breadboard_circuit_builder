@@ -1,0 +1,91 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Exported Circuit",
+      "description": "Circuit exported from Breadboard Builder",
+      "exported": "2025-12-09T03:51:11.489Z"
+    },
+    "components": [
+      {
+        "id": "button1",
+        "type": "button-tactile-6mm",
+        "placement": {
+          "leg0": "5E",
+          "leg1": "6E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "6D",
+          "pin1": "11D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "11E",
+        "fromCoords": {
+          "x": 74.96000000000001,
+          "y": 151.94
+        },
+        "toCoords": {
+          "x": 203.72,
+          "y": 127.894
+        },
+        "waypoints": [
+          {
+            "x": 184.13099999999997,
+            "y": 166.16699999999997
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Wire from Pico ground pin to breadboard Bus11A-E. This completes the pull-down resistor path to ground."
+      },
+      {
+        "id": "w2",
+        "from": "5D",
+        "to": "pico1.3V3_OUT",
+        "fromCoords": {
+          "x": 149.828,
+          "y": 136.876
+        },
+        "toCoords": {
+          "x": 74.96000000000001,
+          "y": 58.34
+        },
+        "waypoints": [],
+        "routingMode": "straight",
+        "description": "Wire from Pico 3.3V pin to breadboard Bus5A-E. This provides HIGH voltage when button is pressed."
+      },
+      {
+        "id": "w1",
+        "from": "pico1.GP14",
+        "to": "6C",
+        "fromCoords": {
+          "x": 24.56,
+          "y": 159.14
+        },
+        "toCoords": {
+          "x": 158.81,
+          "y": 145.858
+        },
+        "waypoints": [
+          {
+            "x": 49.400999999999996,
+            "y": 193.113
+          },
+          {
+            "x": 157.185,
+            "y": 184.13099999999997
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Wire from Pico GPIO 14 to breadboard Bus6A-E. This is the digital input pin that reads button state."
+      }
+    ]
+  }
+}

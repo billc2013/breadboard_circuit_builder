@@ -7,6 +7,7 @@ class CircuitsManager {
     constructor() {
         this.circuits = [];
         this.LOCAL_STORAGE_KEY = 'breadboard_circuits';
+        this.activeCircuitId = null; // Track which circuit is currently loaded on the board
 
         // DOM elements
         this.circuitsList = document.getElementById('circuits-list');
@@ -34,7 +35,7 @@ class CircuitsManager {
      * Generate unique circuit ID
      */
     generateId() {
-        return 'circuit-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        return 'circuit-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
     }
 
     /**
@@ -71,6 +72,7 @@ class CircuitsManager {
         item.innerHTML = `
             <div class="circuit-header">
                 <input type="text" class="circuit-name" value="${this.escapeHtml(circuit.name)}" data-id="${circuit.id}">
+                <span class="wire-completion" data-id="${circuit.id}" title="Wire completion status"></span>
                 <button class="circuit-btn expand-btn" title="Expand/Collapse" data-id="${circuit.id}">▼</button>
                 <button class="circuit-btn upload-btn" title="Load from file" data-id="${circuit.id}">📁</button>
                 <button class="circuit-btn save-btn" title="Save to file" data-id="${circuit.id}">💾</button>
@@ -98,6 +100,9 @@ class CircuitsManager {
 
         // Add event listeners
         this.attachCircuitEvents(circuit.id);
+
+        // Update wire completion indicator
+        this.updateWireCompletionIndicator(circuit.id);
     }
 
     /**
@@ -141,6 +146,9 @@ class CircuitsManager {
         let saveTimeout;
         textarea.addEventListener('input', (e) => {
             this.markDirty(circuitId, true);
+
+            // Update wire completion indicator immediately
+            this.updateWireCompletionIndicator(circuitId);
 
             // Auto-save to localStorage (debounced)
             clearTimeout(saveTimeout);
@@ -278,7 +286,14 @@ class CircuitsManager {
                 if (result.success) {
                     this.showSuccess(circuitId);
                     this.markDirty(circuitId, false);
+
+                    // Track this as the active circuit on the board
+                    this.activeCircuitId = circuitId;
+
                     console.log('Circuit loaded successfully:', circuit.name);
+
+                    // Update wire completion indicator after loading
+                    this.updateWireCompletionIndicator(circuitId);
                 } else {
                     this.showCircuitError(circuitId, `Loading failed:\n${result.errors.join('\n')}`);
                 }
@@ -313,6 +328,9 @@ class CircuitsManager {
 
                 this.updateCircuitJSON(circuitId, prettyJSON);
                 this.showSuccess(circuitId);
+
+                // Update wire completion indicator after copying circuit
+                this.updateWireCompletionIndicator(circuitId);
 
                 console.log('Current circuit copied to:', circuit.name);
             } else {
@@ -364,6 +382,9 @@ class CircuitsManager {
                 // Update circuit data
                 this.updateCircuitJSON(circuitId, text);
                 this.markDirty(circuitId, false);
+
+                // Update wire completion indicator after loading from file
+                this.updateWireCompletionIndicator(circuitId);
 
                 // Expand if collapsed
                 if (!circuit.isExpanded) {
@@ -550,6 +571,103 @@ class CircuitsManager {
             }
         } catch (error) {
             console.warn('Failed to load circuits from localStorage:', error);
+        }
+    }
+
+    /**
+     * Auto-save current circuit when guided wiring completes
+     * Called by guided wiring system when all wires are placed
+     */
+    autoSaveCurrentCircuit() {
+        // Only save if we have an active circuit panel
+        if (!this.activeCircuitId) {
+            console.log('No active circuit to auto-save');
+            return;
+        }
+
+        const circuitId = this.activeCircuitId;
+        const circuit = this.circuits.find(c => c.id === circuitId);
+        if (!circuit) {
+            console.warn('Active circuit not found:', circuitId);
+            return;
+        }
+
+        const circuitLoader = window.breadboardApp?.circuitLoader || window.circuitLoader;
+
+        if (circuitLoader && typeof circuitLoader.exportCircuit === 'function') {
+            const circuitJSON = circuitLoader.exportCircuit();
+
+            if (circuitJSON) {
+                const prettyJSON = JSON.stringify(circuitJSON, null, 2);
+
+                const item = document.getElementById(circuitId);
+                const textarea = item.querySelector('.circuit-textarea');
+                textarea.value = prettyJSON;
+
+                this.updateCircuitJSON(circuitId, prettyJSON);
+
+                // Update wire completion indicator
+                this.updateWireCompletionIndicator(circuitId);
+
+                console.log('✅ Auto-saved circuit with completed wires:', circuit.name);
+            } else {
+                console.warn('No circuit to export for auto-save');
+            }
+        } else {
+            console.warn('Export functionality not available for auto-save');
+        }
+    }
+
+    /**
+     * Update wire completion indicator for a circuit
+     * Shows visual progress of wires placed (X/Y) with completion percentage
+     */
+    updateWireCompletionIndicator(circuitId) {
+        const circuit = this.circuits.find(c => c.id === circuitId);
+        if (!circuit) return;
+
+        const indicator = document.querySelector(`.wire-completion[data-id="${circuitId}"]`);
+        if (!indicator) return;
+
+        try {
+            // Parse circuit JSON
+            const circuitData = JSON.parse(circuit.json);
+            const wires = circuitData?.circuit?.wires;
+
+            if (!wires || wires.length === 0) {
+                // No wires defined - hide indicator
+                indicator.style.display = 'none';
+                return;
+            }
+
+            // Count how many wires are placed (have coordinate data)
+            const totalWires = wires.length;
+            const placedWires = wires.filter(wire => wire.fromCoords && wire.toCoords).length;
+            const percentage = Math.round((placedWires / totalWires) * 100);
+
+            // Show indicator
+            indicator.style.display = 'inline-flex';
+
+            // Update content and styling based on completion
+            if (placedWires === 0) {
+                // Not started
+                indicator.textContent = `⚡ ${totalWires} wires`;
+                indicator.className = 'wire-completion status-pending';
+                indicator.title = `${totalWires} wires need to be placed`;
+            } else if (placedWires < totalWires) {
+                // In progress
+                indicator.textContent = `🔌 ${placedWires}/${totalWires}`;
+                indicator.className = 'wire-completion status-progress';
+                indicator.title = `${placedWires} of ${totalWires} wires placed (${percentage}% complete)`;
+            } else {
+                // Complete
+                indicator.textContent = `✓ ${totalWires}/${totalWires}`;
+                indicator.className = 'wire-completion status-complete';
+                indicator.title = `All ${totalWires} wires placed!`;
+            }
+        } catch (error) {
+            // Invalid JSON or error - hide indicator
+            indicator.style.display = 'none';
         }
     }
 

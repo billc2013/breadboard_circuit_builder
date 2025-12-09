@@ -29,6 +29,12 @@ class GuidedWiringManager {
         this.cursorMarker = null;      // Orange circle following cursor
         this.livePreviewLine = null;   // Preview line from last point to cursor
 
+        // Floating instruction box offset tracking (in SVG coordinates)
+        this.instructionBoxOffset = {
+            x: 0,  // SVG coordinate offset horizontally
+            y: 0   // SVG coordinate offset vertically
+        };
+
         // Alternate waypoint grid configuration
         // Offset by half-spacing to sit "between" breadboard holes
         this.waypointGrid = {
@@ -38,6 +44,8 @@ class GuidedWiringManager {
 
         this.initKeyboardHandlers();
         this.initAudioFeedback();
+        this.setupSpacebarListener();
+        this.setupArrowKeyListener();
     }
 
     /**
@@ -233,6 +241,8 @@ class GuidedWiringManager {
 
         console.log('\n▶️  Guided Wiring Started');
         console.log('   Press M for Manhattan routing, S for Straight');
+        console.log('   Press SPACE to show/hide wire description');
+        console.log('   Press Arrow Keys to reposition instruction box (logged in SVG coordinates)');
     }
 
     /**
@@ -244,6 +254,12 @@ class GuidedWiringManager {
         this.clearWaypoints();
         this.startPoint = null;
         this.startPointIsFrom = false;
+
+        // Hide floating instruction box
+        const floatingBox = document.getElementById('wire-instruction-floating');
+        if (floatingBox) {
+            floatingBox.style.display = 'none';
+        }
 
         console.log('⏸️  Guided Wiring Stopped');
     }
@@ -379,6 +395,9 @@ class GuidedWiringManager {
 
             // Visual feedback - brief flash on start point
             this.showStartFeedback(pointData);
+
+            // REPOSITION FLOATING INSTRUCTION BOX near second endpoint
+            this.repositionFloatingBox();
 
             // Start live preview - show cursor and preview line
             this.startLivePreview();
@@ -594,6 +613,11 @@ class GuidedWiringManager {
         // Audio feedback
         this.playSuccessSound();
 
+        // Log final instruction box offset for this wire (if adjusted)
+        if (this.instructionBoxOffset.x !== 0 || this.instructionBoxOffset.y !== 0) {
+            console.log(`📊 Wire ${wire.id} completed with instruction box offset: x=${this.instructionBoxOffset.x}, y=${this.instructionBoxOffset.y} (SVG coordinates)`);
+        }
+
         // Clear preview and state
         this.clearPreview();
         this.stopLivePreview();  // Stop cursor tracking and live preview
@@ -606,6 +630,11 @@ class GuidedWiringManager {
 
         // Update info
         this.app.infoPanel.textContent = `Wire ${this.currentWireIndex}/${this.wireQueue.length} completed! ✓`;
+
+        // Auto-save progress after each wire completion
+        if (window.circuitsManager && typeof window.circuitsManager.autoSaveCurrentCircuit === 'function') {
+            window.circuitsManager.autoSaveCurrentCircuit();
+        }
 
         // Show next wire after brief delay
         setTimeout(() => {
@@ -682,8 +711,19 @@ class GuidedWiringManager {
 
         this.app.infoPanel.textContent = `All wires completed! Circuit ready. 🎉`;
 
-        // Clear wire instruction display
+        // Clear wire instruction display (old header)
         this.clearWireInstruction();
+
+        // Hide floating instruction box
+        const floatingBox = document.getElementById('wire-instruction-floating');
+        if (floatingBox) {
+            floatingBox.style.display = 'none';
+        }
+
+        // Auto-save circuit with completed wires to the active circuit panel
+        if (window.circuitsManager && typeof window.circuitsManager.autoSaveCurrentCircuit === 'function') {
+            window.circuitsManager.autoSaveCurrentCircuit();
+        }
 
         // Play completion fanfare
         this.playCompletionFanfare();
@@ -732,29 +772,302 @@ class GuidedWiringManager {
     }
 
     /**
+     * Calculate screen position for floating instruction box
+     * @param {Object} fromPoint - Start endpoint coordinates
+     * @param {Object} toPoint - End endpoint coordinates
+     * @param {boolean} afterFirstClick - Has student clicked first endpoint?
+     * @returns {Object} - { x, y } screen coordinates
+     */
+    calculateInstructionBoxPosition(fromPoint, toPoint, afterFirstClick = false) {
+        // Get SVG viewport and container
+        const svg = document.getElementById('breadboard-svg');
+        const svgRect = svg.getBoundingClientRect();
+        const container = document.getElementById('breadboard-container');
+        const containerRect = container.getBoundingClientRect();
+        const viewBox = svg.viewBox.baseVal;
+
+        // Calculate scale factors
+        const scaleX = svgRect.width / viewBox.width;
+        const scaleY = svgRect.height / viewBox.height;
+
+        // Convert SVG coordinates to screen coordinates
+        const fromScreenX = containerRect.left + (fromPoint.x * scaleX);
+        const fromScreenY = containerRect.top + (fromPoint.y * scaleY);
+        const toScreenX = containerRect.left + (toPoint.x * scaleX);
+        const toScreenY = containerRect.top + (toPoint.y * scaleY);
+
+        let targetX, targetY;
+
+        if (!afterFirstClick) {
+            // Before first click: Position between endpoints (slightly offset)
+            targetX = (fromScreenX + toScreenX) / 2;
+            targetY = Math.min(fromScreenY, toScreenY) - 60; // Above the higher point
+        } else {
+            // After first click: Position near second endpoint
+            targetX = toScreenX + 20; // Slight offset to right
+            targetY = toScreenY - 40; // Slightly above
+        }
+
+        // Boundary checking (keep within viewport)
+        const boxWidth = 280; // max-width from CSS
+        const boxHeight = 80; // estimated height
+
+        if (targetX + boxWidth > window.innerWidth) {
+            targetX = window.innerWidth - boxWidth - 10;
+        }
+        if (targetX < 10) {
+            targetX = 10;
+        }
+        if (targetY < 10) {
+            targetY = 10;
+        }
+        if (targetY + boxHeight > window.innerHeight) {
+            targetY = window.innerHeight - boxHeight - 10;
+        }
+
+        return { x: targetX, y: targetY };
+    }
+
+    /**
+     * Setup SPACEBAR listener for toggling wire description
+     */
+    setupSpacebarListener() {
+        // Listen for spacebar keydown globally
+        document.addEventListener('keydown', (e) => {
+            // Only respond to spacebar during guided wiring mode
+            if (!this.isActive) return;
+
+            // Check if spacebar was pressed
+            if (e.code === 'Space' || e.key === ' ') {
+                e.preventDefault(); // Prevent page scroll
+
+                const floatingBox = document.getElementById('wire-instruction-floating');
+                if (!floatingBox) return;
+
+                const descriptionDiv = floatingBox.querySelector('.wire-description');
+                const hintText = floatingBox.querySelector('.wire-hint');
+
+                // Only toggle if description exists
+                if (descriptionDiv && descriptionDiv.textContent) {
+                    if (descriptionDiv.classList.contains('expanded')) {
+                        // Collapse - hide description, show hint
+                        descriptionDiv.classList.remove('expanded');
+                        if (hintText) hintText.style.display = 'block';
+                    } else {
+                        // Expand - show description, hide hint
+                        descriptionDiv.classList.add('expanded');
+                        if (hintText) hintText.style.display = 'none';
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Setup arrow key listener for repositioning floating instruction box
+     * Tracks offset in SVG coordinates for consistency across screen sizes
+     */
+    setupArrowKeyListener() {
+        // Arrow key step size in SVG coordinates
+        const STEP_SIZE = 5; // SVG units per arrow key press
+
+        document.addEventListener('keydown', (e) => {
+            // Only respond during guided wiring mode when floating box is visible
+            if (!this.isActive) return;
+
+            const floatingBox = document.getElementById('wire-instruction-floating');
+            if (!floatingBox || floatingBox.style.display === 'none') return;
+
+            // Check for arrow keys
+            let offsetChanged = false;
+
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.instructionBoxOffset.y -= STEP_SIZE;
+                offsetChanged = true;
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.instructionBoxOffset.y += STEP_SIZE;
+                offsetChanged = true;
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this.instructionBoxOffset.x -= STEP_SIZE;
+                offsetChanged = true;
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                this.instructionBoxOffset.x += STEP_SIZE;
+                offsetChanged = true;
+            }
+
+            // If offset changed, reposition the box and log the offset
+            if (offsetChanged) {
+                this.repositionFloatingBox();
+                console.log(`📐 Instruction box offset (SVG coordinates): x=${this.instructionBoxOffset.x}, y=${this.instructionBoxOffset.y}`);
+            }
+        });
+    }
+
+    /**
+     * Reposition the floating instruction box with current offset
+     * Applies the stored SVG coordinate offset to the calculated position
+     */
+    repositionFloatingBox() {
+        const floatingBox = document.getElementById('wire-instruction-floating');
+        if (!floatingBox || floatingBox.style.display === 'none') return;
+
+        const currentWire = this.wireQueue[this.currentWireIndex];
+        if (!currentWire) return;
+
+        const fromPoint = this.app.pointsById.get(currentWire.from);
+        const toPoint = this.app.pointsById.get(currentWire.to);
+
+        if (fromPoint && toPoint) {
+            // Determine which endpoint to position near
+            let targetPoint, otherPoint;
+
+            if (this.startPoint === null) {
+                // Before first click: position between both endpoints
+                targetPoint = null;
+                otherPoint = null;
+            } else if (this.startPointIsFrom) {
+                // Started from "from" endpoint → guide to "to" endpoint
+                targetPoint = toPoint;
+                otherPoint = fromPoint;
+            } else {
+                // Started from "to" endpoint → guide to "from" endpoint
+                targetPoint = fromPoint;
+                otherPoint = toPoint;
+            }
+
+            // Calculate base position
+            const afterFirstClick = this.startPoint !== null;
+            let basePosition;
+
+            if (afterFirstClick && targetPoint && otherPoint) {
+                // Position near the target endpoint (the one they need to click next)
+                basePosition = this.calculateInstructionBoxPositionNear(targetPoint);
+            } else {
+                // Position between both endpoints
+                basePosition = this.calculateInstructionBoxPosition(fromPoint, toPoint, false);
+            }
+
+            // Get SVG scale factors for converting offset to screen coordinates
+            const svg = document.getElementById('breadboard-svg');
+            const svgRect = svg.getBoundingClientRect();
+            const viewBox = svg.viewBox.baseVal;
+            const scaleX = svgRect.width / viewBox.width;
+            const scaleY = svgRect.height / viewBox.height;
+
+            // Apply offset (convert SVG coordinates to screen coordinates)
+            const adjustedX = basePosition.x + (this.instructionBoxOffset.x * scaleX);
+            const adjustedY = basePosition.y + (this.instructionBoxOffset.y * scaleY);
+
+            // Update position
+            floatingBox.style.left = `${adjustedX}px`;
+            floatingBox.style.top = `${adjustedY}px`;
+        }
+    }
+
+    /**
+     * Calculate position near a specific endpoint
+     * @param {Object} targetPoint - The endpoint to position near
+     * @returns {Object} - { x, y } screen coordinates
+     */
+    calculateInstructionBoxPositionNear(targetPoint) {
+        // Get SVG viewport and container
+        const svg = document.getElementById('breadboard-svg');
+        const svgRect = svg.getBoundingClientRect();
+        const container = document.getElementById('breadboard-container');
+        const containerRect = container.getBoundingClientRect();
+        const viewBox = svg.viewBox.baseVal;
+
+        // Calculate scale factors
+        const scaleX = svgRect.width / viewBox.width;
+        const scaleY = svgRect.height / viewBox.height;
+
+        // Convert SVG coordinates to screen coordinates
+        const targetScreenX = containerRect.left + (targetPoint.x * scaleX);
+        const targetScreenY = containerRect.top + (targetPoint.y * scaleY);
+
+        // Position near target endpoint (offset to right and slightly above)
+        let targetX = targetScreenX + 20; // Slight offset to right
+        let targetY = targetScreenY - 40; // Slightly above
+
+        // Boundary checking (keep within viewport)
+        const boxWidth = 280; // max-width from CSS
+        const boxHeight = 80; // estimated height
+
+        if (targetX + boxWidth > window.innerWidth) {
+            targetX = window.innerWidth - boxWidth - 10;
+        }
+        if (targetX < 10) {
+            targetX = 10;
+        }
+        if (targetY < 10) {
+            targetY = 10;
+        }
+        if (targetY + boxHeight > window.innerHeight) {
+            targetY = window.innerHeight - boxHeight - 10;
+        }
+
+        return { x: targetX, y: targetY };
+    }
+
+    /**
      * Update wire instruction display
      * Shows the current wire information and description in the info panel
      * @param {Object} wire - Current wire to display
      */
     updateWireInstruction(wire) {
+        // Update both old header instruction and new floating box for backward compatibility
         const wireInstructionDiv = document.getElementById('wire-instruction');
-
-        if (!wireInstructionDiv) {
-            console.warn('wire-instruction element not found in DOM');
-            return;
-        }
+        const floatingBox = document.getElementById('wire-instruction-floating');
 
         // Build instruction text
         const wireNumber = `Wire ${this.currentWireIndex + 1}/${this.wireQueue.length}`;
         const connection = `${wire.from} → ${wire.to}`;
-        const description = wire.description || 'Connect the pulsing endpoints';
+        const description = wire.description || '';
 
-        // Update the display
-        wireInstructionDiv.innerHTML = `
-            <strong>${wireNumber}:</strong> ${connection}<br>
-            <span class="wire-desc">${description}</span>
-        `;
-        wireInstructionDiv.style.display = 'block';
+        // Update old header instruction (backward compatibility)
+        if (wireInstructionDiv) {
+            const displayDescription = description || 'Connect the pulsing endpoints';
+            wireInstructionDiv.innerHTML = `
+                <strong>${wireNumber}:</strong> ${connection}<br>
+                <span class="wire-desc">${displayDescription}</span>
+            `;
+            wireInstructionDiv.style.display = 'block';
+        }
+
+        // Update floating instruction box
+        if (floatingBox) {
+            floatingBox.querySelector('.wire-number').textContent = wireNumber;
+            floatingBox.querySelector('.wire-connection').textContent = `Connect: ${connection}`;
+            const descriptionDiv = floatingBox.querySelector('.wire-description');
+            descriptionDiv.textContent = description;
+
+            // Hide description by default (collapsed state)
+            descriptionDiv.classList.remove('expanded');
+
+            // Show/hide "?" indicator and hint based on description existence
+            const whyIndicator = floatingBox.querySelector('.wire-why-indicator');
+            const hintText = floatingBox.querySelector('.wire-hint');
+
+            if (description) {
+                whyIndicator.style.display = 'inline-flex';
+                hintText.style.display = 'block';
+            } else {
+                whyIndicator.style.display = 'none';
+                hintText.style.display = 'none';
+            }
+
+            // Reset offset for new wire
+            this.instructionBoxOffset.x = 0;
+            this.instructionBoxOffset.y = 0;
+
+            // Position the box (this will show it)
+            floatingBox.style.display = 'block';
+            this.repositionFloatingBox();
+        }
     }
 
     /**

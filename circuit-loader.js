@@ -238,27 +238,63 @@ class CircuitLoader {
             }
         }
         
-        // Start guided wiring mode (instead of auto-rendering)
+        // Handle wires - either render placed wires or start guided wiring
         if (circuit.wires && circuit.wires.length > 0) {
-            console.log('\n⚡ Initializing Guided Wiring Mode');
-            console.log('-'.repeat(60));
-            console.log('DEBUG: this.app.guidedWiring exists?', !!this.app.guidedWiring);
-            console.log('DEBUG: circuit.wires:', circuit.wires);
+            // Check if wires are already placed (have coordinate data)
+            const firstWire = circuit.wires[0];
+            const wiresAlreadyPlaced = firstWire.fromCoords && firstWire.toCoords;
 
-            if (this.app.guidedWiring) {
-                console.log('DEBUG: Calling loadWires()...');
-                this.app.guidedWiring.loadWires(circuit.wires);
-                console.log('DEBUG: Calling start()...');
-                this.app.guidedWiring.start();
-                console.log(`✓ Guided wiring mode activated`);
-                console.log(`  ${circuit.wires.length} wires queued for placement`);
+            if (wiresAlreadyPlaced) {
+                // Wires have been placed - render them directly
+                console.log('\n🔌 Rendering Placed Wires');
+                console.log('-'.repeat(60));
+
+                for (const wireData of circuit.wires) {
+                    try {
+                        // Reconstruct point objects from saved data
+                        const fromPoint = {
+                            id: wireData.from,
+                            x: wireData.fromCoords.x,
+                            y: wireData.fromCoords.y
+                        };
+                        const toPoint = {
+                            id: wireData.to,
+                            x: wireData.toCoords.x,
+                            y: wireData.toCoords.y
+                        };
+
+                        // Create wire with all saved data
+                        this.app.createWire(fromPoint, toPoint, {
+                            id: wireData.id,
+                            waypoints: wireData.waypoints || [],
+                            routingMode: wireData.routingMode || 'straight',
+                            description: wireData.description
+                        });
+
+                        console.log(`  ✓ Rendered wire: ${wireData.id} (${wireData.from} → ${wireData.to})`);
+                    } catch (error) {
+                        const errorMsg = `Failed to render wire ${wireData.id}: ${error.message}`;
+                        console.error(`❌ ${errorMsg}`);
+                        errors.push(errorMsg);
+                    }
+                }
+
+                console.log(`✓ ${circuit.wires.length} placed wires rendered`);
             } else {
-                warnings.push('Guided wiring system not available - wires not loaded');
-                console.warn('⚠️  Guided wiring system not initialized');
+                // Wires are instructions - start guided wiring mode
+                console.log('\n⚡ Initializing Guided Wiring Mode');
+                console.log('-'.repeat(60));
+
+                if (this.app.guidedWiring) {
+                    this.app.guidedWiring.loadWires(circuit.wires);
+                    this.app.guidedWiring.start();
+                    console.log(`✓ Guided wiring mode activated`);
+                    console.log(`  ${circuit.wires.length} wires queued for placement`);
+                } else {
+                    warnings.push('Guided wiring system not available - wires not loaded');
+                    console.warn('⚠️  Guided wiring system not initialized');
+                }
             }
-        } else {
-            console.log('DEBUG: No wires in circuit, or wires array is empty');
-            console.log('DEBUG: circuit.wires:', circuit.wires);
         }
         
         // Summary
@@ -491,11 +527,16 @@ class CircuitLoader {
             });
         });
         
-        // Export wires
+        // Export wires with full data (for persistence)
         const wires = this.app.wires.map(wire => ({
             id: wire.id,
             from: wire.from,
-            to: wire.to
+            to: wire.to,
+            fromCoords: wire.fromCoords,
+            toCoords: wire.toCoords,
+            waypoints: wire.waypoints || [],
+            routingMode: wire.routingMode || 'straight',
+            description: wire.description || null
         }));
         
         return {

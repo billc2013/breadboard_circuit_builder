@@ -12,9 +12,17 @@ The Breadboard Circuit Builder is a proof-of-concept educational tool that rende
 - **Hover-based component information** - Interactive info boxes with full component details
 - **Bus-aware wire routing** - LLMs specify buses instead of exact holes for flexible placement
 - **Fully case-insensitive** - Handles any capitalization in component types, holes, and buses
+- **Contextual guided wiring** - Floating instruction box with progressive disclosure
+  - Positioned near wire endpoints for reduced eye movement
+  - SPACEBAR toggle to show/hide "why" explanations
+  - Smart bidirectional guidance (follows student to next endpoint)
+  - Arrow key repositioning for manual adjustment
+- **Multi-circuit workflow** - Side panel system for managing multiple circuits
+  - Auto-save wire progress after each placement
+  - Visual completion indicators (⚡ pending, 🔌 X/Y in progress, ✓ complete)
+  - Load/save circuits from files with persistent wire data
 - Automated circuit loading from JSON files
 - 5-layer circuit validation system (in progress)
-- Guided wiring workflow with step-by-step instructions
 - Extensible component adapter architecture
 - LLM-ready JSON schema
 
@@ -71,13 +79,25 @@ python3 -m http.server 8000
   - Electrical properties (voltage, current, resistance)
   - Positioned dynamically next to hovered component
 - **Wire Routing**: Click-to-click wire creation between any connection points
-- **Guided Wiring**: Step-by-step wire placement with visual cues and LLM descriptions
+- **Contextual Guided Wiring**: Advanced step-by-step wire placement system
+  - Floating instruction box positioned near wire endpoints (not fixed header)
+  - Progressive disclosure: SPACEBAR toggles "why" explanations for each wire
+  - Smart bidirectional guidance: box repositions to guide toward next endpoint
+  - Arrow key repositioning with SVG coordinate logging for manual adjustment
+  - Visual feedback: pulsing endpoints, orange start marker, live preview wire
+  - Auto-save progress after each wire completion
+- **Multi-Circuit Management**: Side panel workflow for practice circuits
+  - Add/edit/delete multiple circuit configurations
+  - Wire completion indicators (⚡ pending, 🔌 X/Y in progress, ✓ complete)
+  - Auto-save wire data to panel after each placement
+  - Load circuits from files with persistent wire coordinates
+  - Copy current breadboard state to any panel
 - **Component Validation**: Pre-render checks for placement validity
 - **Case-Insensitive System**: Accepts any capitalization for:
   - Component types (LED-Yellow-5mm, led-yellow-5mm, etc.)
   - Hole references (2E, 2e, etc.)
   - Bus references (Bus9A-D, bus9a-d, etc.)
-- **Circuit Export**: Save current circuit state as JSON
+- **Circuit Export**: Save current circuit state as JSON with complete wire data
 
 ### Validation System
 
@@ -367,11 +387,16 @@ This project uses component graphics from [Fritzing](https://fritzing.org), whic
 This tool is designed for introductory robotics and electronics education. Students:
 1. Describe a circuit goal to an LLM (e.g., "Make an LED blink")
 2. LLM generates circuit JSON with component placement and connections
-3. Student loads JSON into this tool
+3. Student loads JSON into a circuit panel
 4. System validates circuit for electrical correctness
 5. Student sees visual representation of breadboard assembly
-6. Student uses guided wiring feature for step-by-step assembly
+6. Student uses contextual guided wiring for step-by-step assembly:
+   - Floating instruction box appears near wire endpoints
+   - Pulsing visual cues show where to connect
+   - SPACEBAR reveals why each wire is needed (circuit topology learning)
+   - Progress auto-saves after each wire
 7. Student builds physical circuit following on-screen layout
+8. Student can manage multiple practice circuits simultaneously
 
 ## Contributing
 
@@ -413,6 +438,12 @@ See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 - ✅ Bus reference system for wire endpoints
 - ✅ Case-insensitive component types, holes, and buses
 - ✅ JSON text input functionality
+- ✅ Contextual floating wire instruction box with progressive disclosure
+- ✅ Smart bidirectional guided wiring (adapts to student's starting point)
+- ✅ Arrow key repositioning for instruction box
+- ✅ Multi-circuit panel management system
+- ✅ Automatic wire progress saving
+- ✅ Wire completion indicators in circuit panels
 
 **High Priority:**
 - Component rendering refinements (alignment, stub length, consistency)
@@ -441,5 +472,5 @@ For questions, issues, or contributions, please refer to the project repository 
 ---
 
 **Last Updated**: December 8, 2025
-**Status**: Enhanced POC - Component Hover Info, Bus References, Case-Insensitive System
-**Version**: 1.1-POC
+**Status**: Enhanced POC - Contextual Guided Wiring, Multi-Circuit Management, Auto-Save
+**Version**: 1.2-POC

@@ -1,0 +1,47 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Pushbutton with Pull-Down Resistor",
+      "description": "Digital input circuit with tactile button and pull-down resistor for clean signal reading.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "button1",
+        "type": "button-tactile-6mm",
+        "placement": {
+          "leg0": "5E",
+          "leg1": "6E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "6D",
+          "pin1": "11D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP14",
+        "to": "Bus6A-E",
+        "description": "Wire from Pico GPIO 14 to breadboard Bus6A-E. This is the digital input pin that reads button state."
+      },
+      {
+        "id": "w2",
+        "from": "pico1.3V3_OUT",
+        "to": "Bus5A-E",
+        "description": "Wire from Pico 3.3V pin to breadboard Bus5A-E. This provides HIGH voltage when button is pressed."
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "Bus11A-E",
+        "description": "Wire from Pico ground pin to breadboard Bus11A-E. This completes the pull-down resistor path to ground."
+      }
+    ]
+  }
+}

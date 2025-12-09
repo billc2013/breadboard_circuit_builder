@@ -3,11 +3,65 @@
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
 **Last Updated**: December 8, 2025
-**Current Phase**: Enhanced POC - Hover Info, Bus References, Case-Insensitive System
+**Current Phase**: Enhanced POC - Contextual Guided Wiring, Multi-Circuit Management, Auto-Save
 
 ---
 
-## Recently Completed (December 2025 Session)
+## Recently Completed (December 2025 Sessions)
+
+### ✅ Contextual Floating Wire Instruction Box
+**Completed**: December 8, 2025
+
+**What was delivered**:
+- Floating instruction box positioned near wire endpoints (not fixed header)
+- Progressive disclosure: SPACEBAR toggle to show/hide "why" explanations for each wire
+- Smart bidirectional guidance: box repositions to guide toward whichever endpoint student hasn't clicked yet
+- Arrow key repositioning with SVG coordinate logging for manual adjustment
+- Visual feedback: pulsing endpoints, orange start marker, live preview wire
+- Box automatically hides when guided wiring completes
+
+**Files modified**: `index.html`, `styles.css`, `guided-wiring.js`
+
+**Impact**: Reduced eye movement for students, contextual learning with "why" information invites deeper circuit topology understanding, more intuitive guidance system
+
+---
+
+### ✅ Multi-Circuit Panel Management System
+**Completed**: December 8, 2025
+
+**What was delivered**:
+- Side panel system for managing multiple circuit configurations
+- Add/edit/delete circuit panels with expandable/collapsible UI
+- JSON editing directly in panel text areas
+- Load circuits from files, save circuits to files
+- Copy current breadboard state to any panel
+- Wire completion indicators showing progress (⚡ pending, 🔌 X/Y in progress, ✓ complete)
+- Auto-save wire data to active panel after each wire placement
+- localStorage persistence for all circuit panels
+
+**Files created**: `circuits-manager.js`
+**Files modified**: `index.html`, `styles.css`
+
+**Impact**: Students can practice with multiple "teaching" circuits before attempting full project circuit, seamless workflow with automatic progress saving, visual feedback on completion status
+
+---
+
+### ✅ Automatic Wire Progress Saving
+**Completed**: December 8, 2025
+
+**What was delivered**:
+- System tracks which circuit panel is currently loaded on breadboard
+- After each wire placement, complete wire data auto-saves to panel JSON
+- Wire data includes: coordinates, waypoints, routing mode, description
+- Students can reload circuits and see their placed wires persist
+- No manual "Copy Current" needed - happens automatically
+- Wire completion indicators update in real-time as wires are placed
+
+**Files modified**: `circuits-manager.js`, `circuit-loader.js`, `guided-wiring.js`
+
+**Impact**: No lost progress, students can switch between circuits freely, encourages experimentation without fear of losing work
+
+---
 
 ### ✅ Component Hover Information System
 **Completed**: December 8, 2025

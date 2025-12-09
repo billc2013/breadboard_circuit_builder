@@ -803,22 +803,26 @@ h3 {
 .circuit-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 15px;
+    gap: 6px;
+    padding: 12px 12px;
     background: #252526;
 }
 
 .circuit-name {
     flex: 0 1 auto;
-    max-width: 150px;
+    min-width: 80px;
+    max-width: 120px;
     background: transparent;
     border: none;
     color: #d4d4d4;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
-    padding: 4px 8px;
+    padding: 4px 6px;
     border-radius: 3px;
     transition: background 0.2s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .circuit-name:hover {
@@ -831,19 +835,20 @@ h3 {
 }
 
 .circuit-btn {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 4px;
     border: none;
     background: transparent;
     color: #d4d4d4;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
     line-height: 1;
+    flex-shrink: 0;
 }
 
 .circuit-btn:hover {
@@ -874,6 +879,50 @@ h3 {
 .circuit-btn.delete-btn:hover {
     color: #ff6b6b;
     background: rgba(255, 107, 107, 0.1);
+}
+
+/* Wire Completion Indicator */
+.wire-completion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 3px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+    margin-left: auto;
+    margin-right: 2px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.wire-completion.status-pending {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.wire-completion.status-progress {
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196f3;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    animation: pulse-progress 2s ease-in-out infinite;
+}
+
+.wire-completion.status-complete {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+@keyframes pulse-progress {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
 }
 
 /* Circuit Content */
@@ -1054,4 +1103,78 @@ h3 {
 #info-box-details li {
     margin: 2px 0;
     color: #666;
+}
+
+/* ==================== Floating Wire Instruction Box ====================  */
+
+#wire-instruction-floating {
+    position: absolute;
+    background: rgba(42, 42, 42, 0.95);
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+    padding: 10px 12px;
+    max-width: 280px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 900;
+    font-size: 12px;
+    color: #ffffff;
+    pointer-events: auto;
+    /* Smooth transitions when repositioning */
+    transition: left 300ms ease, top 300ms ease;
+}
+
+.wire-instruction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.wire-number {
+    color: #4CAF50;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.wire-why-indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #00ccff;
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wire-hint {
+    color: #888;
+    font-size: 10px;
+    font-style: italic;
+    margin-top: 4px;
+}
+
+.wire-connection {
+    color: #ffaa00;
+    margin-bottom: 4px;
+}
+
+.wire-description {
+    color: #00ccff;
+    font-style: italic;
+    font-size: 11px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #444;
+    /* Smooth expand/collapse animation */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 200ms ease;
+}
+
+.wire-description.expanded {
+    max-height: 200px;  /* Adjust based on expected content */
 }
