@@ -1,3 +1,19 @@
+/* ==================== CSS Variables (Configurable) ====================  */
+:root {
+    /* Explorer Mode - Configurable Properties */
+    --explorer-breadboard-fade: 0.8;
+    --explorer-wire-faded-opacity: 0.25;
+    --explorer-wire-highlighted-opacity: 1.0;
+    --explorer-wire-highlighted-width: 3;
+    --explorer-wire-normal-width: 1.5;
+    --explorer-overlay-color: rgba(26, 26, 26, 0.85);
+
+    /* Wire Category Colors */
+    --wire-pico-component-color: #4CAF50;
+    --wire-component-component-color: #2196F3;
+    --wire-power-ground-color: #FF9800;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -1177,4 +1193,261 @@ h3 {
 
 .wire-description.expanded {
     max-height: 200px;  /* Adjust based on expected content */
+}
+
+/* ==================== Circuit Explorer Mode ====================  */
+
+/* Mode Toggle UI */
+#mode-toggle-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 20px;
+    vertical-align: middle;
+}
+
+.mode-label {
+    color: #888;
+    font-size: 13px;
+}
+
+#mode-toggle {
+    background: #2a2a2a;
+    border: 2px solid #4CAF50;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#mode-toggle:hover {
+    background: #3a3a3a;
+}
+
+.mode-option {
+    color: #888;
+    font-size: 13px;
+    transition: color 0.3s;
+}
+
+.mode-option.active {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.mode-divider {
+    color: #555;
+}
+
+/* Wire Filters */
+#wire-filters {
+    display: none;  /* Hidden by default, shown in explorer mode */
+    gap: 15px;
+    align-items: center;
+    padding: 8px 15px;
+    background: #2a2a2a;
+    border-radius: 5px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+#wire-filters.visible {
+    display: flex;
+}
+
+.filter-label {
+    color: #888;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.wire-filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #d4d4d4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.wire-filter-checkbox:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.wire-filter-checkbox input[type="checkbox"] {
+    accent-color: #4CAF50;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* Color indicators for filter checkboxes */
+.wire-filter-checkbox[data-category="pico-component"] .filter-text::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--wire-pico-component-color);
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.wire-filter-checkbox[data-category="component-component"] .filter-text::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--wire-component-component-color);
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.wire-filter-checkbox[data-category="power-ground"] .filter-text::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--wire-power-ground-color);
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* Breadboard Fade Overlay */
+.breadboard-fade-overlay {
+    fill: var(--explorer-overlay-color);
+    opacity: var(--explorer-breadboard-fade);
+    pointer-events: none;
+}
+
+/* Explorer Wire Styles */
+.explorer-mode .wire {
+    pointer-events: auto !important;  /* Enable clicking */
+    cursor: pointer;
+    opacity: var(--explorer-wire-faded-opacity);
+    transition: opacity 0.2s, stroke-width 0.2s;
+}
+
+.explorer-mode .wire:hover {
+    opacity: 0.6;
+    stroke-width: 2.5;
+}
+
+.explorer-mode .wire.highlighted {
+    opacity: var(--explorer-wire-highlighted-opacity) !important;
+    stroke-width: var(--explorer-wire-highlighted-width) !important;
+    filter: drop-shadow(0 0 4px currentColor);
+}
+
+.explorer-mode .wire.hidden {
+    display: none !important;
+}
+
+/* Wire Category Colors */
+.explorer-mode .wire.category-pico-component {
+    stroke: var(--wire-pico-component-color);
+}
+
+.explorer-mode .wire.category-component-component {
+    stroke: var(--wire-component-component-color);
+}
+
+.explorer-mode .wire.category-power-ground {
+    stroke: var(--wire-power-ground-color);
+}
+
+/* Explorer Educational Tooltip */
+#explorer-tooltip {
+    position: absolute;
+    min-width: 250px;
+    max-width: 350px;
+    background: rgba(42, 42, 42, 0.98);
+    border: 2px solid #00ccff;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    font-size: 13px;
+    color: #ffffff;
+    transition: left 300ms ease, top 300ms ease;
+    display: none;
+}
+
+#explorer-tooltip .tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #444;
+}
+
+#explorer-tooltip .tooltip-title {
+    color: #00ccff;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#explorer-tooltip .tooltip-close {
+    cursor: pointer;
+    color: #888;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+#explorer-tooltip .tooltip-close:hover {
+    color: #ff6b6b;
+}
+
+#explorer-tooltip .tooltip-purpose {
+    color: #4CAF50;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+#explorer-tooltip .tooltip-warnings {
+    color: #FF9800;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+#explorer-tooltip .tooltip-warnings ul {
+    margin: 4px 0 0 16px;
+    padding: 0;
+}
+
+#explorer-tooltip .tooltip-warnings li {
+    margin: 4px 0;
+}
+
+#explorer-tooltip .tooltip-troubleshooting {
+    color: #888;
+    font-size: 12px;
+}
+
+#explorer-tooltip .tooltip-troubleshooting ul {
+    margin: 4px 0 0 16px;
+    padding: 0;
+}
+
+#explorer-tooltip .tooltip-troubleshooting li {
+    margin: 4px 0;
+    font-style: italic;
+}
+
+#explorer-tooltip .tooltip-hint {
+    color: #666;
+    font-size: 10px;
+    margin-top: 12px;
+    text-align: right;
+    border-top: 1px solid #333;
+    padding-top: 8px;
 }

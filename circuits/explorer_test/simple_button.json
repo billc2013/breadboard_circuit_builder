@@ -1,0 +1,91 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Simple Button Circuit",
+      "description": "A basic button input circuit with pull-down resistor on GP14",
+      "created": "2025-12-10"
+    },
+    "components": [
+      {
+        "id": "button1",
+        "type": "button-tactile-6mm",
+        "placement": {
+          "leg0": "5E",
+          "leg1": "6E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "5D",
+          "pin1": "10D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP14",
+        "to": "5C",
+        "fromCoords": {
+          "x": 24.56,
+          "y": 159.14
+        },
+        "toCoords": {
+          "x": 149.828,
+          "y": 145.858
+        },
+        "waypoints": [
+          {
+            "x": 24.56,
+            "y": 180
+          },
+          {
+            "x": 149.828,
+            "y": 180
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Signal wire from GPIO 14 to button leg0. Reads button press state."
+      },
+      {
+        "id": "w2",
+        "from": "6D",
+        "to": "pico1.3V3_OUT",
+        "fromCoords": {
+          "x": 158.81,
+          "y": 136.876
+        },
+        "toCoords": {
+          "x": 74.96,
+          "y": 58.34
+        },
+        "waypoints": [],
+        "routingMode": "straight",
+        "description": "Power wire from 3.3V to button leg1. Provides HIGH signal when pressed."
+      },
+      {
+        "id": "w3",
+        "from": "10E",
+        "to": "pico1.GND_23",
+        "fromCoords": {
+          "x": 194.738,
+          "y": 127.894
+        },
+        "toCoords": {
+          "x": 74.96,
+          "y": 151.94
+        },
+        "waypoints": [
+          {
+            "x": 194.738,
+            "y": 151.94
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Ground wire from pull-down resistor to GND. Ensures LOW when button released."
+      }
+    ]
+  }
+}

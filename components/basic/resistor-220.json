@@ -20,13 +20,38 @@
         "number": 1,
         "name": "Pin 0",
         "description": "Pin0",
-        "connectorId": "connector0"
+        "connectorId": "connector0",
+        "connectionGuide": {
+          "purpose": "One end of the 220Ω current-limiting resistor. Resistors are not polarized, so either pin can connect to either side of the circuit.",
+          "warnings": [
+            "This 220Ω resistor is typically used with LEDs to limit current",
+            "For a 3.3V Pico with a red LED (~1.8V), this gives about 7mA - safe and bright"
+          ],
+          "troubleshooting": [
+            "Resistors have no polarity - you can connect either end to the signal",
+            "Read color bands: Red-Red-Brown-Gold = 220Ω ±5%",
+            "If LED is too dim, try a lower value resistor (but not below 100Ω)",
+            "If LED burns out, try a higher value resistor"
+          ]
+        }
       },
       "pin1": {
         "number": 2,
         "name": "Pin 1",
         "description": "Pin 1",
-        "connectorId": "connector1"
+        "connectorId": "connector1",
+        "connectionGuide": {
+          "purpose": "Other end of the 220Ω current-limiting resistor. Connect this to the LED's anode or the GPIO pin - either direction works.",
+          "warnings": [
+            "This 220Ω resistor is typically used with LEDs to limit current",
+            "Without this resistor, the LED will draw too much current and may burn out"
+          ],
+          "troubleshooting": [
+            "Resistors have no polarity - you can connect either end to the signal",
+            "Common circuit: GPIO → Resistor → LED Anode → LED Cathode → GND",
+            "Alternative: GPIO → LED Anode → LED Cathode → Resistor → GND (also works)"
+          ]
+        }
       }
     },
     "properties": {

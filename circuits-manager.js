@@ -276,8 +276,10 @@ class CircuitsManager {
 
         console.log('Loading circuit to board:', circuit.name, circuitData);
 
-        // Use existing circuit loader
-        const circuitLoader = window.breadboardApp?.circuitLoader || window.circuitLoader;
+        // Use existing circuit loader (support both guided wiring and explorer apps)
+        const circuitLoader = window.breadboardApp?.circuitLoader ||
+                              window.explorerApp?.circuitLoader ||
+                              window.circuitLoader;
 
         if (circuitLoader && typeof circuitLoader.loadCircuit === 'function') {
             try {
@@ -294,6 +296,11 @@ class CircuitsManager {
 
                     // Update wire completion indicator after loading
                     this.updateWireCompletionIndicator(circuitId);
+
+                    // If in explorer mode, notify the explorer app
+                    if (window.explorerApp && typeof window.explorerApp.loadCircuit === 'function') {
+                        window.explorerApp.loadCircuit(circuitData);
+                    }
                 } else {
                     this.showCircuitError(circuitId, `Loading failed:\n${result.errors.join('\n')}`);
                 }
@@ -314,7 +321,9 @@ class CircuitsManager {
         const circuit = this.circuits.find(c => c.id === circuitId);
         if (!circuit) return;
 
-        const circuitLoader = window.breadboardApp?.circuitLoader || window.circuitLoader;
+        const circuitLoader = window.breadboardApp?.circuitLoader ||
+                              window.explorerApp?.circuitLoader ||
+                              window.circuitLoader;
 
         if (circuitLoader && typeof circuitLoader.exportCircuit === 'function') {
             const circuitJSON = circuitLoader.exportCircuit();
@@ -592,7 +601,9 @@ class CircuitsManager {
             return;
         }
 
-        const circuitLoader = window.breadboardApp?.circuitLoader || window.circuitLoader;
+        const circuitLoader = window.breadboardApp?.circuitLoader ||
+                              window.explorerApp?.circuitLoader ||
+                              window.circuitLoader;
 
         if (circuitLoader && typeof circuitLoader.exportCircuit === 'function') {
             const circuitJSON = circuitLoader.exportCircuit();
@@ -609,7 +620,7 @@ class CircuitsManager {
                 // Update wire completion indicator
                 this.updateWireCompletionIndicator(circuitId);
 
-                console.log('✅ Auto-saved circuit with completed wires:', circuit.name);
+                console.log('Auto-saved circuit with completed wires:', circuit.name);
             } else {
                 console.warn('No circuit to export for auto-save');
             }

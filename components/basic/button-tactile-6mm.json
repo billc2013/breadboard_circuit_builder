@@ -23,14 +23,40 @@
         "name": "leg0",
         "description": "Button terminal 1 (either side of switch)",
         "connectorId": "connector0",
-        "electricalType": "io"
+        "electricalType": "io",
+        "connectionGuide": {
+          "purpose": "One terminal of the momentary push button. When pressed, this connects electrically to the other terminal (leg1). Typically connects to the GPIO input pin.",
+          "warnings": [
+            "Buttons are NOT polarized - either leg can connect to either side",
+            "ALWAYS use a pull-down resistor (10kΩ to GND) for stable readings",
+            "Without pull-down, the GPIO will 'float' and give random readings"
+          ],
+          "troubleshooting": [
+            "If readings are random: check that 10kΩ pull-down resistor connects this bus to GND",
+            "If button seems always pressed: check for shorts or wrong wiring",
+            "If button seems always released: verify 3.3V connects to the OTHER leg",
+            "Add software debouncing (10-50ms delay) to avoid multiple triggers per press"
+          ]
+        }
       },
       "leg1": {
         "number": 2,
         "name": "leg1",
         "description": "Button terminal 2 (either side of switch)",
         "connectorId": "connector1",
-        "electricalType": "io"
+        "electricalType": "io",
+        "connectionGuide": {
+          "purpose": "Other terminal of the push button. In a typical pull-DOWN configuration, this leg connects to 3.3V power. When pressed, 3.3V flows through to the GPIO pin.",
+          "warnings": [
+            "Connect to 3.3V (not 5V) when using with Raspberry Pi Pico",
+            "Do NOT connect button directly between 3.3V and GND (short circuit!)"
+          ],
+          "troubleshooting": [
+            "Typical wiring: leg0 → GPIO + 10kΩ to GND, leg1 → 3.3V",
+            "Pressed = HIGH (1), Released = LOW (0) with pull-down config",
+            "If behavior is inverted, you may have pull-UP instead of pull-DOWN"
+          ]
+        }
       }
     },
     "properties": {
@@ -91,6 +117,34 @@
         "Debouncing recommended in software (10-50ms delay)",
         "Do not connect button directly between power and ground"
       ]
+    },
+    "functionalGroup": {
+      "groupLabel": "Button Input",
+      "requires": [
+        {
+          "type": "resistor",
+          "role": "pull-down",
+          "typicalValue": "10k",
+          "typicalResistance": 10000
+        }
+      ],
+      "wireLabels": {
+        "signal": {
+          "label": "Signal",
+          "colorHint": "any",
+          "pinConnection": "leg0"
+        },
+        "power": {
+          "label": "Power 3.3V",
+          "colorHint": "red",
+          "pinConnection": "leg1"
+        },
+        "ground": {
+          "label": "Ground",
+          "colorHint": "black",
+          "pinConnection": "pull-down-resistor"
+        }
+      }
     }
   }
 }

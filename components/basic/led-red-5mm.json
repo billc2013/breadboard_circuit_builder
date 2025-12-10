@@ -17,14 +17,40 @@
         "name": "cathode",
         "description": "cathode pin (negative, shorter leg, flat side of lens)",
         "connectorId": "connector0",
-        "electricalType": "ground"
+        "electricalType": "ground",
+        "connectionGuide": {
+          "purpose": "The cathode connects to ground (GND) to complete the LED circuit. Current flows from anode through the LED to cathode, then to ground.",
+          "warnings": [
+            "Must connect to ground - LED will not light if polarity is reversed",
+            "Never connect cathode directly to a positive voltage source"
+          ],
+          "troubleshooting": [
+            "If LED doesn't light, check that cathode is connected to GND",
+            "The cathode is the SHORTER leg and has a flat edge on the LED housing",
+            "Try swapping the LED orientation if it doesn't light"
+          ]
+        }
       },
       "anode": {
         "number": 2,
         "name": "anode",
         "description": "anode pin (positive, longer leg)",
         "connectorId": "connector1",
-        "electricalType": "input"
+        "electricalType": "input",
+        "connectionGuide": {
+          "purpose": "The anode receives current from the GPIO pin (through a current-limiting resistor). This is where power enters the LED to make it light up.",
+          "warnings": [
+            "ALWAYS use a current-limiting resistor (typically 220Ω) between GPIO and anode",
+            "Direct connection to GPIO without resistor will damage the LED and possibly the Pico",
+            "The Pico's GPIO pins output 3.3V - too much current without a resistor"
+          ],
+          "troubleshooting": [
+            "If LED doesn't light: verify GPIO pin is set to OUTPUT in your code",
+            "If LED is dim: check resistor value - lower resistance = brighter (but more current)",
+            "If LED burns out quickly: resistor value is too low or missing",
+            "The anode is the LONGER leg of the LED"
+          ]
+        }
       }
     },
     "properties": {
@@ -91,6 +117,29 @@
         "Typical operating current is 10mA for good brightness and longevity",
         "Connect anode to signal/power, cathode to ground"
       ]
+    },
+    "functionalGroup": {
+      "groupLabel": "LED Circuit",
+      "requires": [
+        {
+          "type": "resistor",
+          "role": "current-limiting",
+          "typicalValue": "220R",
+          "typicalResistance": 220
+        }
+      ],
+      "wireLabels": {
+        "signal": {
+          "label": "Signal",
+          "colorHint": "any-except-red",
+          "pinConnection": "anode"
+        },
+        "ground": {
+          "label": "Ground",
+          "colorHint": "black",
+          "pinConnection": "cathode"
+        }
+      }
     }
   }
 }

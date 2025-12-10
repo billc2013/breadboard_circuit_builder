@@ -1,0 +1,359 @@
+/* ==================== Circuit Explorer Mode Styles ====================  */
+
+/* View Toggle UI */
+#view-toggle-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 20px;
+    vertical-align: middle;
+}
+
+.view-label {
+    color: #888;
+    font-size: 13px;
+}
+
+#view-toggle {
+    background: #2a2a2a;
+    border: 2px solid #00ccff;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#view-toggle:hover {
+    background: #3a3a3a;
+}
+
+.view-option {
+    color: #888;
+    font-size: 13px;
+    transition: color 0.3s;
+}
+
+.view-option.active {
+    color: #00ccff;
+    font-weight: bold;
+}
+
+.view-divider {
+    color: #555;
+}
+
+/* Wire Filters */
+#wire-filters {
+    display: none;  /* Hidden by default */
+    gap: 15px;
+    align-items: center;
+    padding: 8px 15px;
+    background: #2a2a2a;
+    border-radius: 5px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+#wire-filters.visible {
+    display: flex;
+}
+
+.filter-label {
+    color: #888;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.wire-filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #d4d4d4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.wire-filter-checkbox:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.wire-filter-checkbox input[type="checkbox"] {
+    accent-color: #00ccff;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+/* Color indicators for filter checkboxes */
+.wire-filter-checkbox[data-category="pico-component"] .filter-text::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--wire-pico-component-color);
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.wire-filter-checkbox[data-category="component-component"] .filter-text::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--wire-component-component-color);
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.wire-filter-checkbox[data-category="power-ground"] .filter-text::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--wire-power-ground-color);
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+/* Breadboard Fade Overlay */
+.breadboard-fade-overlay {
+    fill: var(--explorer-overlay-color);
+    opacity: var(--explorer-breadboard-fade);
+    pointer-events: none;
+}
+
+/* Explorer Wire Styles - Applied when explorer mode is active */
+.explorer-mode .wire {
+    pointer-events: auto !important;
+    cursor: pointer;
+    opacity: var(--explorer-wire-faded-opacity);
+    transition: opacity 0.2s, stroke-width 0.2s;
+}
+
+.explorer-mode .wire:hover {
+    opacity: 0.6;
+    stroke-width: 2.5;
+}
+
+.explorer-mode .wire.highlighted {
+    opacity: var(--explorer-wire-highlighted-opacity) !important;
+    stroke-width: var(--explorer-wire-highlighted-width) !important;
+    filter: drop-shadow(0 0 4px currentColor);
+}
+
+.explorer-mode .wire.hidden {
+    display: none !important;
+}
+
+/* Wire Category Colors */
+.explorer-mode .wire.category-pico-component {
+    stroke: var(--wire-pico-component-color);
+}
+
+.explorer-mode .wire.category-component-component {
+    stroke: var(--wire-component-component-color);
+}
+
+.explorer-mode .wire.category-power-ground {
+    stroke: var(--wire-power-ground-color);
+}
+
+/* Wire Group Styles - When a group is highlighted, all wires in it highlight */
+.explorer-mode .wire.group-highlighted {
+    opacity: var(--explorer-wire-highlighted-opacity) !important;
+    stroke-width: var(--explorer-wire-highlighted-width) !important;
+    filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* Wire Labels - Only visible in Wire Groups view */
+.wire-label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 8px;
+    fill: #ffffff;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.wire-groups-view .wire-label {
+    opacity: 1;
+}
+
+.wire-label-bg {
+    fill: rgba(26, 26, 26, 0.85);
+    rx: 3;
+    ry: 3;
+}
+
+.wire-label.signal {
+    fill: var(--wire-pico-component-color);
+}
+
+.wire-label.ground {
+    fill: #888;
+}
+
+.wire-label.power {
+    fill: var(--wire-power-ground-color);
+}
+
+/* Explorer Educational Tooltip */
+#explorer-tooltip {
+    position: absolute;
+    min-width: 250px;
+    max-width: 350px;
+    background: rgba(42, 42, 42, 0.98);
+    border: 2px solid #00ccff;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    font-size: 13px;
+    color: #ffffff;
+    transition: left 300ms ease, top 300ms ease;
+    display: none;
+}
+
+#explorer-tooltip.visible {
+    display: block;
+}
+
+#explorer-tooltip .tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #444;
+}
+
+#explorer-tooltip .tooltip-title {
+    color: #00ccff;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#explorer-tooltip .tooltip-close {
+    cursor: pointer;
+    color: #888;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+#explorer-tooltip .tooltip-close:hover {
+    color: #ff6b6b;
+}
+
+#explorer-tooltip .tooltip-purpose {
+    color: #4CAF50;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+#explorer-tooltip .tooltip-warnings {
+    color: #FF9800;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+#explorer-tooltip .tooltip-warnings ul {
+    margin: 4px 0 0 16px;
+    padding: 0;
+}
+
+#explorer-tooltip .tooltip-warnings li {
+    margin: 4px 0;
+}
+
+#explorer-tooltip .tooltip-troubleshooting {
+    color: #888;
+    font-size: 12px;
+}
+
+#explorer-tooltip .tooltip-troubleshooting ul {
+    margin: 4px 0 0 16px;
+    padding: 0;
+}
+
+#explorer-tooltip .tooltip-troubleshooting li {
+    margin: 4px 0;
+    font-style: italic;
+}
+
+#explorer-tooltip .tooltip-hint {
+    color: #666;
+    font-size: 10px;
+    margin-top: 12px;
+    text-align: right;
+    border-top: 1px solid #333;
+    padding-top: 8px;
+}
+
+/* Functional Group Info Panel */
+.group-info-panel {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26, 26, 26, 0.95);
+    border: 2px solid #00ccff;
+    border-radius: 10px;
+    padding: 15px 25px;
+    z-index: 900;
+    display: none;
+    min-width: 300px;
+    text-align: center;
+}
+
+.group-info-panel.visible {
+    display: block;
+}
+
+.group-info-title {
+    color: #00ccff;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.group-info-components {
+    color: #d4d4d4;
+    font-size: 13px;
+}
+
+.group-info-hint {
+    color: #666;
+    font-size: 11px;
+    margin-top: 10px;
+}
+
+/* Explorer Mode - Hide elements not needed */
+.explorer-mode #wire-instruction {
+    display: none !important;
+}
+
+.explorer-mode #wire-instruction-floating {
+    display: none !important;
+}
+
+/* Explorer - Custom header styling */
+.explorer-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.explorer-header h1 {
+    margin-bottom: 0;
+}

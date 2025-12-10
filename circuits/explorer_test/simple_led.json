@@ -1,0 +1,75 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Simple LED Circuit",
+      "description": "A basic LED circuit with current-limiting resistor controlled by GP15",
+      "created": "2025-12-10"
+    },
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "18E",
+          "anode": "19E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "19D",
+          "pin1": "24D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.GP15",
+        "to": "24E",
+        "fromCoords": {
+          "x": 24.56,
+          "y": 166.34
+        },
+        "toCoords": {
+          "x": 320.486,
+          "y": 127.894
+        },
+        "waypoints": [
+          {
+            "x": 24.56,
+            "y": 195
+          },
+          {
+            "x": 320.486,
+            "y": 195
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Signal wire from GPIO 15 to resistor. Controls LED on/off state."
+      },
+      {
+        "id": "w2",
+        "from": "18D",
+        "to": "pico1.GND_28",
+        "fromCoords": {
+          "x": 266.594,
+          "y": 136.876
+        },
+        "toCoords": {
+          "x": 74.96,
+          "y": 115.94
+        },
+        "waypoints": [
+          {
+            "x": 266.594,
+            "y": 115.94
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Ground wire from LED cathode to Pico GND. Completes the circuit."
+      }
+    ]
+  }
+}

@@ -1,0 +1,454 @@
+/* ==================== Guided Wiring Mode Styles ====================  */
+
+/* Wire Instruction in header */
+#wire-instruction {
+    display: none;  /* Hidden by default, shown during guided wiring */
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #444;
+    color: #ffaa00;
+    line-height: 1.6;
+}
+
+#wire-instruction strong {
+    color: #4CAF50;
+}
+
+#wire-instruction .wire-desc {
+    color: #00ccff;
+    font-style: italic;
+}
+
+/* Pulsing animation for guided wiring endpoints */
+@keyframes pulse-endpoint {
+    0% {
+        filter: drop-shadow(0 0 2px #00ff00) brightness(1.0);
+        transform: scale(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 8px #00ff00) brightness(1.5);
+        transform: scale(1.3);
+    }
+    100% {
+        filter: drop-shadow(0 0 2px #00ff00) brightness(1.0);
+        transform: scale(1);
+    }
+}
+
+/* Apply pulsing to hole endpoints */
+.hole.pulse-endpoint circle {
+    fill: hsl(63, 96%, 49%) !important;
+    animation: pulse-endpoint 1.5s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+/* Apply pulsing to pin endpoints */
+.pin.pulse-endpoint rect {
+    fill: hsl(63, 96%, 49%) !important;
+    animation: pulse-endpoint 1.5s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+/* Routing mode indicator */
+.routing-mode-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 255, 0, 0.1);
+    border: 2px solid #00ff00;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #00ff00;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+/* Wire completion progress */
+.wire-progress {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(26, 26, 26, 0.95);
+    border: 2px solid #4CAF50;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 18px;
+    color: #4CAF50;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.wire-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #2a2a2a;
+    border-radius: 4px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.wire-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    transition: width 0.5s ease;
+}
+
+/* Preview wire during routing */
+.wire-preview {
+    stroke: #00ff00;
+    stroke-width: 2;
+    stroke-dasharray: 4, 4;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ==================== Floating Wire Instruction Box ====================  */
+
+#wire-instruction-floating {
+    position: absolute;
+    background: rgba(42, 42, 42, 0.95);
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+    padding: 10px 12px;
+    max-width: 280px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 900;
+    font-size: 12px;
+    color: #ffffff;
+    pointer-events: auto;
+    transition: left 300ms ease, top 300ms ease;
+}
+
+.wire-instruction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.wire-number {
+    color: #4CAF50;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.wire-why-indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #00ccff;
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wire-hint {
+    color: #888;
+    font-size: 10px;
+    font-style: italic;
+    margin-top: 4px;
+}
+
+.wire-connection {
+    color: #ffaa00;
+    margin-bottom: 4px;
+}
+
+.wire-description {
+    color: #00ccff;
+    font-style: italic;
+    font-size: 11px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #444;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 200ms ease;
+}
+
+.wire-description.expanded {
+    max-height: 200px;
+}
+
+/* ==================== Validator Panel Styles ====================  */
+
+#validator-panel {
+    position: fixed;
+    top: 0;
+    right: -500px;
+    width: 500px;
+    height: 100vh;
+    background: #252526;
+    border-left: 2px solid #4ec9b0;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    color: #d4d4d4;
+}
+
+#validator-panel.open {
+    right: 0;
+}
+
+#validator-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+
+#validator-toggle:hover {
+    background: #1177bb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+#validator-toggle.panel-open {
+    right: 520px;
+}
+
+.validator-header {
+    background: #1e1e1e;
+    padding: 20px;
+    border-bottom: 1px solid #3e3e42;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.validator-header h2 {
+    margin: 0 0 10px 0;
+    color: #4ec9b0;
+    font-size: 20px;
+}
+
+.validator-content {
+    padding: 20px;
+}
+
+.upload-zone {
+    border: 2px dashed #666;
+    border-radius: 5px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+
+.upload-zone:hover, .upload-zone.drag-over {
+    border-color: #4ec9b0;
+    background: #2a2a2a;
+}
+
+.upload-zone p {
+    margin: 10px 0;
+    color: #888;
+}
+
+.file-label {
+    background: #0e639c;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-block;
+    margin: 10px 0;
+}
+
+.file-label:hover {
+    background: #1177bb;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.validator-btn {
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 5px;
+    width: calc(50% - 10px);
+}
+
+.validator-btn:hover {
+    background: #1177bb;
+}
+
+.validator-btn:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
+.validator-btn.secondary {
+    background: #555;
+}
+
+.validator-btn.secondary:hover {
+    background: #666;
+}
+
+.file-info {
+    background: #1e3e1e;
+    border-left: 3px solid #4ec9b0;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.results-section {
+    margin-top: 20px;
+}
+
+.status {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 3px;
+    text-align: center;
+}
+
+.status.pass {
+    background: #1e3e1e;
+    color: #4ec9b0;
+    border: 1px solid #4ec9b0;
+}
+
+.status.fail {
+    background: #3e1e1e;
+    color: #f48771;
+    border: 1px solid #f48771;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.stat-box {
+    background: #1e1e1e;
+    border: 1px solid #3e3e42;
+    padding: 12px;
+    border-radius: 3px;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.error-item, .warning-item {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.error-item {
+    background: #3e1e1e;
+    border-left: 3px solid #f48771;
+}
+
+.warning-item {
+    background: #3e3e1e;
+    border-left: 3px solid #dcdcaa;
+}
+
+.error-item strong, .warning-item strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+details {
+    margin: 10px 0;
+}
+
+summary {
+    cursor: pointer;
+    padding: 10px;
+    background: #1e1e1e;
+    border-radius: 3px;
+    user-select: none;
+}
+
+summary:hover {
+    background: #2a2a2a;
+}
+
+pre.report {
+    background: #1e1e1e;
+    border: 1px solid #3e3e42;
+    padding: 10px;
+    overflow-x: auto;
+    border-radius: 3px;
+    font-size: 11px;
+    max-height: 300px;
+}
+
+.close-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    color: #888;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+}
+
+.close-panel:hover {
+    color: #f48771;
+}
+
+.quick-tests {
+    display: flex;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.quick-tests button {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+}

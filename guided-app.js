@@ -1,63 +1,59 @@
-class BreadboardApp {
+/**
+ * Guided Wiring App - Dedicated application for guided wiring mode
+ * Separated from Circuit Explorer for clean event handling
+ */
+class GuidedWiringApp {
     constructor() {
         this.svg = document.getElementById('breadboard-svg');
         this.holesLayer = document.getElementById('holes-layer');
         this.wiresLayer = document.getElementById('wires-layer');
         this.labelsLayer = document.getElementById('labels-layer');
-        this.picoPinsLayer = document.getElementById('pico-pins-layer'); // NEW
+        this.picoPinsLayer = document.getElementById('pico-pins-layer');
         this.infoPanel = document.getElementById('hover-info');
         this.wireCount = document.getElementById('wire-count');
-        
+
         // Merge breadboard holes and Pico pins into unified connection points
         this.connectablePoints = [
             ...BREADBOARD_HOLES,
-            ...PICO_PINS  // NEW
+            ...PICO_PINS
         ];
-        
+
         // Build lookup map for fast access
         this.pointsById = new Map();
         this.connectablePoints.forEach(pt => {
             this.pointsById.set(pt.id, pt);
         });
-        
+
         // Keep separate reference for breadboard-specific operations
         this.holes = BREADBOARD_HOLES;
-        this.picoPins = PICO_PINS; // NEW
-        
+        this.picoPins = PICO_PINS;
+
         this.wires = [];
-        this.selectedPoint = null; // Renamed from selectedHole
+        this.selectedPoint = null;
         this.tempWire = null;
         this.showLabels = false;
 
         // Component metadata (loaded async)
-        this.picoMetadata = null; // NEW
+        this.picoMetadata = null;
 
         // Guided wiring system (initialized after DOM is ready)
         this.guidedWiring = null;
 
-        // Circuit Explorer mode (initialized after DOM is ready)
-        this.circuitExplorer = null;
-        this.currentMode = 'guided'; // 'guided' or 'explorer'
-
         this.init();
     }
-    
-async init() {
-    await this.loadComponentMetadata(); // NEW - Load pico.json
-    this.circuitLoader = new CircuitLoader(this);
-    await this.circuitLoader.init();
-    this.guidedWiring = new GuidedWiringManager(this); // Initialize guided wiring
-    console.log('✓ GuidedWiringManager instantiated:', this.guidedWiring);
 
-    // Initialize Circuit Explorer mode
-    this.circuitExplorer = new CircuitExplorerManager(this);
-    console.log('✓ CircuitExplorerManager instantiated:', this.circuitExplorer);
+    async init() {
+        await this.loadComponentMetadata();
+        this.circuitLoader = new CircuitLoader(this);
+        await this.circuitLoader.init();
+        this.guidedWiring = new GuidedWiringManager(this);
+        console.log('✓ GuidedWiringManager instantiated:', this.guidedWiring);
 
-    this.renderHoles();
-    this.renderPicoPins(); // NEW
-    this.attachEventListeners();
-    this.updateWireCount();
-}
+        this.renderHoles();
+        this.renderPicoPins();
+        this.attachEventListeners();
+        this.updateWireCount();
+    }
 
     async loadComponentMetadata() {
         try {
@@ -74,28 +70,26 @@ async init() {
         }
     }
 
-
-    
     renderHoles() {
         this.holes.forEach(hole => {
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             group.classList.add('hole');
             group.setAttribute('data-hole-id', hole.id);
-            
+
             // Add type-specific class
             if (hole.type === 'power') {
                 group.classList.add('power-rail');
             } else if (hole.type === 'ground') {
                 group.classList.add('ground-rail');
             }
-            
+
             // Create circle
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circle.setAttribute('cx', hole.x);
             circle.setAttribute('cy', hole.y);
             circle.setAttribute('r', BREADBOARD_CONFIG.grid.hole_radius);
             group.appendChild(circle);
-            
+
             // Create label (initially hidden)
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             label.classList.add('label');
@@ -105,29 +99,29 @@ async init() {
             label.textContent = hole.id;
             label.style.display = 'none';
             this.labelsLayer.appendChild(label);
-            
+
             // Store reference
             group._holeData = hole;
             group._label = label;
-            
+
             this.holesLayer.appendChild(group);
         });
     }
-    
+
     renderPicoPins() {
         if (!this.picoPinsLayer) {
             console.error('Pico pins layer not found in DOM');
             return;
         }
-        
+
         this.picoPins.forEach(pinPos => {
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             group.classList.add('pin');
             group.setAttribute('data-pin-id', pinPos.id);
-            
+
             // Get metadata from pico.json
             const pinMeta = this.picoMetadata?.pins[pinPos.pinKey];
-            
+
             // Add type-specific class for styling
             if (pinMeta) {
                 group.classList.add(`pin-${pinMeta.electricalType}`);
@@ -135,36 +129,36 @@ async init() {
                     group.classList.add('pwm-capable');
                 }
             }
-            
-            // Create SQUARE overlay (not circle, per your request)
+
+            // Create SQUARE overlay
             const square = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            square.setAttribute('x', pinPos.x - 1.5);  // Center the 3x3 square
+            square.setAttribute('x', pinPos.x - 1.5);
             square.setAttribute('y', pinPos.y - 1.5);
             square.setAttribute('width', 3);
             square.setAttribute('height', 3);
-            square.setAttribute('rx', 0.3);  // Slight corner rounding
+            square.setAttribute('rx', 0.3);
             group.appendChild(square);
-            
+
             // Create label (initially hidden)
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             label.classList.add('label');
             label.setAttribute('x', pinPos.x);
-            label.setAttribute('y', pinPos.y - 3);  // Slightly above pin
+            label.setAttribute('y', pinPos.y - 3);
             label.setAttribute('text-anchor', 'middle');
             label.textContent = pinMeta ? pinMeta.name : pinPos.pinKey;
             label.style.display = 'none';
             this.labelsLayer.appendChild(label);
-            
+
             // Store references
             group._pinData = {
                 ...pinPos,
                 metadata: pinMeta
             };
             group._label = label;
-            
+
             this.picoPinsLayer.appendChild(group);
         });
-        
+
         console.log('✓ Rendered', this.picoPins.length, 'Pico pins');
     }
 
@@ -175,14 +169,14 @@ async init() {
                 this.handleHoleHover(e.target.closest('.hole'));
             }
         }, true);
-        
+
         this.holesLayer.addEventListener('click', (e) => {
             if (e.target.closest('.hole')) {
                 this.handleHoleClick(e.target.closest('.hole'));
             }
         });
 
-        // Pico pin interactions (NEW)
+        // Pico pin interactions
         this.picoPinsLayer.addEventListener('mouseenter', (e) => {
             if (e.target.closest('.pin')) {
                 this.handlePinHover(e.target.closest('.pin'));
@@ -195,19 +189,18 @@ async init() {
             }
         });
 
-        
         // Mouse move for temporary wire
         this.svg.addEventListener('mousemove', (e) => {
-            if (this.selectedPoint) {  // ✅ FIXED
+            if (this.selectedPoint) {
                 this.updateTempWire(e);
             }
         });
-        
+
         // SVG click handler - handles guided wiring waypoints or background click
         this.svg.addEventListener('click', (e) => {
             // Check if guided wiring is active and wire has been started
             if (this.guidedWiring && this.guidedWiring.isActive && this.guidedWiring.startPoint) {
-                // Don't handle if clicking on a hole or pin (those have their own handlers)
+                // Don't handle if clicking on a hole or pin
                 if (!e.target.closest('.hole') && !e.target.closest('.pin')) {
                     // Get SVG coordinates from click event
                     const pt = this.svg.createSVGPoint();
@@ -229,7 +222,7 @@ async init() {
                 this.clearSelection();
             }
         });
-        
+
         // Control buttons
         document.getElementById('clear-wires').addEventListener('click', () => {
             this.clearAllWires();
@@ -238,93 +231,33 @@ async init() {
         document.getElementById('toggle-labels').addEventListener('click', () => {
             this.toggleLabels();
         });
-
-        // Mode toggle button
-        const modeToggle = document.getElementById('mode-toggle');
-        if (modeToggle) {
-            modeToggle.addEventListener('click', () => {
-                this.toggleMode();
-            });
-        }
     }
 
-    /**
-     * Toggle between Guided Wiring and Circuit Explorer modes
-     */
-    toggleMode() {
-        if (this.currentMode === 'guided') {
-            this.currentMode = 'explorer';
-
-            // Stop guided wiring if active
-            if (this.guidedWiring && this.guidedWiring.isActive) {
-                this.guidedWiring.stop();
-            }
-
-            // Start explorer mode with current circuit data
-            const circuitData = this.circuitLoader.exportCircuit();
-            this.circuitExplorer.start(circuitData);
-
-        } else {
-            this.currentMode = 'guided';
-
-            // Stop explorer mode
-            this.circuitExplorer.stop();
-        }
-
-        this.updateModeUI();
-        console.log(`[App] Mode switched to: ${this.currentMode}`);
-    }
-
-    /**
-     * Update UI to reflect current mode
-     */
-    updateModeUI() {
-        const modeOptions = document.querySelectorAll('.mode-option');
-        modeOptions.forEach(option => {
-            const mode = option.getAttribute('data-mode');
-            if (mode === this.currentMode) {
-                option.classList.add('active');
-            } else {
-                option.classList.remove('active');
-            }
-        });
-
-        // Show/hide wire filters based on mode
-        const wireFilters = document.getElementById('wire-filters');
-        if (wireFilters) {
-            if (this.currentMode === 'explorer') {
-                wireFilters.classList.add('visible');
-            } else {
-                wireFilters.classList.remove('visible');
-            }
-        }
-    }
-    
     handleHoleHover(holeElement) {
         const hole = holeElement._holeData;
-        const typeInfo = hole.type === 'main' ? 'Main Grid' : 
+        const typeInfo = hole.type === 'main' ? 'Main Grid' :
                         hole.type === 'power' ? 'Power Rail (+)' : 'Ground Rail (-)';
-        this.infoPanel.textContent = 
+        this.infoPanel.textContent =
             `Hole: ${hole.id} | Type: ${typeInfo} | Position: (${hole.x.toFixed(2)}, ${hole.y.toFixed(2)}) | Bus: ${hole.bus}`;
     }
-    
+
     handlePinHover(pinElement) {
         const pin = pinElement._pinData;
         const meta = pin.metadata;
-        
+
         if (meta) {
             const typeInfo = meta.electricalType === 'gpio' ? 'GPIO' :
                             meta.electricalType === 'ground' ? 'Ground' :
                             meta.electricalType === 'power' ? 'Power' :
                             meta.electricalType === 'input' ? 'Input' :
                             meta.electricalType;
-            
+
             const pwmInfo = meta.pwmCapable ? ` | PWM: ${meta.pwmChannel}` : '';
-            
-            this.infoPanel.textContent = 
+
+            this.infoPanel.textContent =
                 `Pin: ${meta.name} (${meta.number}) | ${typeInfo}${pwmInfo} | ${meta.description}`;
         } else {
-            this.infoPanel.textContent = 
+            this.infoPanel.textContent =
                 `Pin: ${pin.id} | Position: (${pin.x.toFixed(2)}, ${pin.y.toFixed(2)})`;
         }
     }
@@ -348,98 +281,83 @@ async init() {
 
         if (!this.selectedPoint) {
             // First click - check if starting point is available
-
-            // Breadboard holes must be unoccupied
-            if (!pointData.id.includes('.')) {  // It's a breadboard hole (not pico pin)
+            if (!pointData.id.includes('.')) {  // Breadboard hole
                 if (!isHoleAvailable(pointData.id)) {
                     const alternatives = suggestAlternativeHoles(pointData.id);
-                    
+
                     if (alternatives.length > 0) {
-                        // Highlight available holes on same bus
                         highlightAlternativeHoles(alternatives.map(h => h.id));
-                        
-                        this.infoPanel.textContent = 
+                        this.infoPanel.textContent =
                             `❌ Hole ${pointData.id} is occupied. Try nearby holes on same bus: ${alternatives.slice(0, 3).map(h => h.id).join(', ')}${alternatives.length > 3 ? '...' : ''}`;
                     } else {
-                        this.infoPanel.textContent = 
+                        this.infoPanel.textContent =
                             `❌ Hole ${pointData.id} is occupied and entire bus is full!`;
                     }
-                    
-                    return;  // Block selection
+                    return;
                 }
             }
-            
+
             // Point is available - select it
             this.selectedPoint = pointData;
             this.selectedElement = element;
             element.classList.add('selected');
-            
-            // Clear any alternative highlights from previous attempt
+
             clearAlternativeHighlights();
-            
-            const displayName = pointData.metadata ? 
-                `${pointData.metadata.name} (Pin ${pointData.metadata.number})` : 
+
+            const displayName = pointData.metadata ?
+                `${pointData.metadata.name} (Pin ${pointData.metadata.number})` :
                 pointData.id;
-            
+
             this.infoPanel.textContent = `Selected: ${displayName} - Click another point to connect`;
-            
+
         } else {
             // Second click - check if destination is available
-            
-            // Breadboard holes must be unoccupied
-            if (!pointData.id.includes('.')) {  // It's a breadboard hole
+            if (!pointData.id.includes('.')) {
                 if (!isHoleAvailable(pointData.id)) {
                     const alternatives = suggestAlternativeHoles(pointData.id);
-                    
+
                     if (alternatives.length > 0) {
                         highlightAlternativeHoles(alternatives.map(h => h.id));
-                        
-                        this.infoPanel.textContent = 
+                        this.infoPanel.textContent =
                             `❌ Hole ${pointData.id} is occupied. Try: ${alternatives.slice(0, 3).map(h => h.id).join(', ')}`;
                     } else {
-                        this.infoPanel.textContent = 
+                        this.infoPanel.textContent =
                             `❌ Hole ${pointData.id} is occupied and bus is full!`;
                     }
-                    
-                    // Don't clear selection - let user try another hole
                     return;
                 }
             }
-            
+
             // Both points available - create wire
             if (this.selectedPoint.id !== pointData.id) {
                 this.createWire(this.selectedPoint, pointData);
             }
-            
+
             this.clearSelection();
             clearAlternativeHighlights();
         }
     }
 
-
-    
-
     updateTempWire(e) {
         if (!this.selectedPoint) return;
-        
+
         const pt = this.svg.createSVGPoint();
         pt.x = e.clientX;
         pt.y = e.clientY;
         const svgP = pt.matrixTransform(this.svg.getScreenCTM().inverse());
-        
+
         if (!this.tempWire) {
             this.tempWire = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             this.tempWire.classList.add('wire-temp');
             this.wiresLayer.appendChild(this.tempWire);
         }
-        
+
         this.tempWire.setAttribute('x1', this.selectedPoint.x);
         this.tempWire.setAttribute('y1', this.selectedPoint.y);
         this.tempWire.setAttribute('x2', svgP.x);
         this.tempWire.setAttribute('y2', svgP.y);
     }
 
-    
     createWire(startPoint, endPoint, options = {}) {
         const wire = {
             id: options.id || `wire-${this.wires.length + 1}`,
@@ -451,66 +369,53 @@ async init() {
             routingMode: options.routingMode || 'straight',
             description: options.description || null
         };
-        
+
         this.wires.push(wire);
         this.renderWire(wire);
         this.updateWireCount();
-        
-        // Mark connection points as connected (visual indicator)
+
+        // Mark connection points as connected
         const fromElement = this.getConnectionElement(startPoint.id);
         const toElement = this.getConnectionElement(endPoint.id);
-        
+
         if (fromElement) fromElement.classList.add('connected');
         if (toElement) toElement.classList.add('connected');
-        
-        // Mark breadboard holes as physically occupied by this wire
-        if (!startPoint.id.includes('.')) {  // Breadboard hole (not Pico pin)
+
+        // Mark breadboard holes as physically occupied
+        if (!startPoint.id.includes('.')) {
             markHoleOccupied(startPoint.id, 'wire', wire.id);
         }
-        if (!endPoint.id.includes('.')) {  // Breadboard hole (not Pico pin)
+        if (!endPoint.id.includes('.')) {
             markHoleOccupied(endPoint.id, 'wire', wire.id);
         }
-        
+
         console.log('Wire created:', wire);
     }
 
+    getConnectionElement(pointId) {
+        let element = this.holesLayer.querySelector(`[data-hole-id="${pointId}"]`);
+        if (element) return element;
 
-// Helper to find connection point element (NEW METHOD)
-getConnectionElement(pointId) {
-    // Try breadboard holes first
-    let element = this.holesLayer.querySelector(`[data-hole-id="${pointId}"]`);
-    if (element) return element;
-    
-    // Try Pico pins
-    element = this.picoPinsLayer.querySelector(`[data-pin-id="${pointId}"]`);
-    return element;
-}
+        element = this.picoPinsLayer.querySelector(`[data-pin-id="${pointId}"]`);
+        return element;
+    }
 
-    
     renderWire(wire) {
-        // Check if wire has waypoints
         if (wire.waypoints && wire.waypoints.length > 0) {
-            // Create polyline for wire with waypoints
             const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
             polyline.classList.add('wire');
             polyline.setAttribute('data-wire-id', wire.id);
 
-            // Build points string: start -> waypoint1 -> waypoint2 -> ... -> end
             let points = `${wire.fromCoords.x},${wire.fromCoords.y}`;
-
             wire.waypoints.forEach(waypoint => {
                 points += ` ${waypoint.x},${waypoint.y}`;
             });
-
             points += ` ${wire.toCoords.x},${wire.toCoords.y}`;
             polyline.setAttribute('points', points);
 
             this.wiresLayer.appendChild(polyline);
-
-            // Render waypoint markers
             this.renderWaypointMarkers(wire);
         } else {
-            // Simple straight line (no waypoints)
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             line.classList.add('wire');
             line.setAttribute('x1', wire.fromCoords.x);
@@ -523,71 +428,62 @@ getConnectionElement(pointId) {
     }
 
     renderWaypointMarkers(wire) {
-        // Render small circles at each waypoint
         wire.waypoints.forEach((waypoint, index) => {
             const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             marker.classList.add('waypoint-marker');
             marker.setAttribute('cx', waypoint.x);
             marker.setAttribute('cy', waypoint.y);
-            marker.setAttribute('r', '3');  // Small circle
+            marker.setAttribute('r', '3');
             marker.setAttribute('data-wire-id', wire.id);
             marker.setAttribute('data-waypoint-index', index);
             this.wiresLayer.appendChild(marker);
         });
     }
-    
+
     clearSelection() {
         if (this.selectedPoint && this.selectedElement) {
             this.selectedElement.classList.remove('selected');
             this.selectedPoint = null;
             this.selectedElement = null;
         }
-        
+
         if (this.tempWire) {
             this.tempWire.remove();
             this.tempWire = null;
         }
-        
+
         this.infoPanel.textContent = 'Hover over connection points to see info';
     }
 
-        
     clearAllWires() {
-        // Clear occupation for all wire-occupied holes
         document.querySelectorAll('.hole.occupied[data-occupant-type="wire"]').forEach(holeElement => {
             const holeId = holeElement.getAttribute('data-hole-id');
             clearHoleOccupation(holeId);
         });
-        
+
         this.wires = [];
         this.wiresLayer.innerHTML = '';
-        
-        // Remove connected class from all connection points
+
         document.querySelectorAll('.hole.connected, .pin.connected').forEach(element => {
             element.classList.remove('connected');
         });
-        
-        // Clear any alternative highlights
+
         clearAlternativeHighlights();
-        
         this.updateWireCount();
         console.log('All wires cleared');
     }
 
-
-    
     toggleLabels() {
         this.showLabels = !this.showLabels;
         document.querySelectorAll('.label').forEach(label => {
             label.style.display = this.showLabels ? 'block' : 'none';
         });
     }
-    
+
     updateWireCount() {
         this.wireCount.textContent = `Wires: ${this.wires.length}`;
     }
-    
-    // Export circuit data as JSON
+
     exportCircuit() {
         return {
             breadboard: BREADBOARD_CONFIG,
@@ -596,19 +492,15 @@ getConnectionElement(pointId) {
         };
     }
 
-    // Show component info box
     showComponentInfo(componentId, metadata, placement, position) {
         const infoBox = document.getElementById('component-info-box');
         const infoTitle = document.getElementById('info-box-title');
         const infoDetails = document.getElementById('info-box-details');
 
-        // Set title
         infoTitle.textContent = `${componentId.toUpperCase()}`;
 
-        // Build details HTML
         let detailsHTML = '';
 
-        // Component type and name
         if (metadata && metadata.name) {
             detailsHTML += `<div class="info-section">
                 <span class="info-label">Type:</span>
@@ -616,7 +508,6 @@ getConnectionElement(pointId) {
             </div>`;
         }
 
-        // Component description
         if (metadata && metadata.description) {
             detailsHTML += `<div class="info-section">
                 <span class="info-label">Description:</span>
@@ -624,7 +515,6 @@ getConnectionElement(pointId) {
             </div>`;
         }
 
-        // Placement information
         if (placement) {
             detailsHTML += `<div class="info-section">
                 <span class="info-label">Placement:</span>
@@ -637,7 +527,6 @@ getConnectionElement(pointId) {
             detailsHTML += `</ul></div>`;
         }
 
-        // Electrical properties
         if (metadata && metadata.properties) {
             const props = metadata.properties;
             detailsHTML += `<div class="info-section">
@@ -665,19 +554,16 @@ getConnectionElement(pointId) {
 
         infoDetails.innerHTML = detailsHTML;
 
-        // Position the info box next to the component
         if (position) {
             const svg = this.svg;
             const svgRect = svg.getBoundingClientRect();
             const container = document.getElementById('breadboard-container');
             const containerRect = container.getBoundingClientRect();
 
-            // Calculate position relative to the SVG viewBox
             const viewBox = svg.viewBox.baseVal;
             const scaleX = svgRect.width / viewBox.width;
             const scaleY = svgRect.height / viewBox.height;
 
-            // Position to the right of the component
             const screenX = containerRect.left + (position.centerX * scaleX) + 30;
             const screenY = containerRect.top + (position.centerY * scaleY) - 20;
 
@@ -685,41 +571,35 @@ getConnectionElement(pointId) {
             infoBox.style.top = `${screenY}px`;
         }
 
-        // Show the info box
         infoBox.style.display = 'block';
     }
 
-    // Hide component info box
     hideComponentInfo() {
         const infoBox = document.getElementById('component-info-box');
         infoBox.style.display = 'none';
     }
 }
 
-// Helper: Mark hole as physically occupied
+// Helper functions (same as before)
 function markHoleOccupied(holeId, occupantType, occupantId) {
     const holeElement = document.querySelector(`[data-hole-id="${holeId}"]`);
     if (holeElement) {
         holeElement.classList.add('occupied');
         holeElement.setAttribute('data-occupied-by', occupantId);
-        holeElement.setAttribute('data-occupant-type', occupantType); // 'component' or 'wire'
+        holeElement.setAttribute('data-occupant-type', occupantType);
         console.log(`  Hole ${holeId} occupied by ${occupantType}: ${occupantId}`);
     }
 }
 
-// Helper: Check if hole is physically available
 function isHoleAvailable(holeId) {
     const holeElement = document.querySelector(`[data-hole-id="${holeId}"]`);
     if (!holeElement) {
         console.warn(`Hole ${holeId} not found`);
         return false;
     }
-    
-    const isOccupied = holeElement.classList.contains('occupied');
-    return !isOccupied;
+    return !holeElement.classList.contains('occupied');
 }
 
-// Helper: Clear hole occupation (for wire deletion)
 function clearHoleOccupation(holeId) {
     const holeElement = document.querySelector(`[data-hole-id="${holeId}"]`);
     if (holeElement) {
@@ -730,31 +610,26 @@ function clearHoleOccupation(holeId) {
     }
 }
 
-// Helper: Find available holes on same bus
 function suggestAlternativeHoles(occupiedHoleId) {
     const hole = BREADBOARD_HOLES.find(h => h.id === occupiedHoleId);
     if (!hole || !hole.bus) {
         return [];
     }
-    
-    // Find all holes on same bus that are available
-    const alternatives = BREADBOARD_HOLES.filter(h => 
-        h.bus === hole.bus && 
+
+    const alternatives = BREADBOARD_HOLES.filter(h =>
+        h.bus === hole.bus &&
         h.id !== occupiedHoleId &&
         isHoleAvailable(h.id)
     );
-    
+
     return alternatives;
 }
 
-// Helper: Highlight alternative holes visually
 function highlightAlternativeHoles(holeIds) {
-    // Clear previous highlights
     document.querySelectorAll('.bus-neighbor').forEach(el => {
         el.classList.remove('bus-neighbor');
     });
-    
-    // Highlight new alternatives
+
     holeIds.forEach(holeId => {
         const element = document.querySelector(`[data-hole-id="${holeId}"]`);
         if (element) {
@@ -763,17 +638,15 @@ function highlightAlternativeHoles(holeIds) {
     });
 }
 
-// Helper: Clear alternative hole highlights
 function clearAlternativeHighlights() {
     document.querySelectorAll('.bus-neighbor').forEach(el => {
         el.classList.remove('bus-neighbor');
     });
 }
 
-
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    window.breadboardApp = new BreadboardApp();
-    console.log('Breadboard app initialized');
+    window.breadboardApp = new GuidedWiringApp();
+    console.log('Guided Wiring app initialized');
     console.log('Total holes:', BREADBOARD_HOLES.length);
 });

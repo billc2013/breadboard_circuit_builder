@@ -23,13 +23,38 @@
         "number": 1,
         "name": "Pin 0",
         "description": "Pin0",
-        "connectorId": "connector0"
+        "connectorId": "connector0",
+        "connectionGuide": {
+          "purpose": "One end of the 10kΩ pull-down resistor. Used to keep a GPIO pin at a known LOW state when a button is not pressed.",
+          "warnings": [
+            "This resistor prevents 'floating' inputs that cause unpredictable readings",
+            "Without a pull-down, a button circuit may read random HIGH/LOW values"
+          ],
+          "troubleshooting": [
+            "Resistors have no polarity - either end can connect to either side",
+            "Read color bands: Brown-Black-Orange-Gold = 10kΩ ±5%",
+            "If button readings are erratic, check that pull-down is properly connected to GND",
+            "10kΩ is a standard value - higher values use less power but are more noise-sensitive"
+          ]
+        }
       },
       "pin1": {
         "number": 2,
         "name": "Pin 1",
         "description": "Pin 1",
-        "connectorId": "connector1"
+        "connectorId": "connector1",
+        "connectionGuide": {
+          "purpose": "Other end of the 10kΩ pull-down resistor. One end connects to the GPIO pin (same bus as button), other end connects to GND.",
+          "warnings": [
+            "For pull-DOWN: connect one end to GPIO bus, other end to GND",
+            "For pull-UP: connect one end to GPIO bus, other end to 3.3V"
+          ],
+          "troubleshooting": [
+            "Pull-DOWN circuit: Button connects GPIO to 3.3V when pressed, resistor pulls to GND when released",
+            "In code, button pressed = HIGH (1), button released = LOW (0)",
+            "If behavior is inverted, you may have a pull-UP configuration instead"
+          ]
+        }
       }
     },
     "properties": {

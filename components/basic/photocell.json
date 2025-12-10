@@ -23,13 +23,40 @@
         "number": 1,
         "name": "Pin 0",
         "description": "First terminal (non-polarized)",
-        "connectorId": "connector0"
+        "connectorId": "connector0",
+        "connectionGuide": {
+          "purpose": "One terminal of the light-dependent resistor (LDR). In a voltage divider circuit, this typically connects to 3.3V power. The LDR acts like a variable resistor that changes based on light.",
+          "warnings": [
+            "Photocells are NOT polarized - either pin can connect to either side",
+            "Always use with a fixed resistor (typically 10kΩ) in a voltage divider",
+            "Connect to an ADC (analog) pin to read varying light levels"
+          ],
+          "troubleshooting": [
+            "If readings don't change: verify voltage divider is connected properly",
+            "If readings are always 0: check that 3.3V is connected",
+            "If readings are always max: check that GND is connected through the fixed resistor",
+            "Cover the photocell and shine light on it to test response"
+          ]
+        }
       },
       "pin1": {
         "number": 2,
         "name": "Pin 1",
         "description": "Second terminal (non-polarized)",
-        "connectorId": "connector1"
+        "connectorId": "connector1",
+        "connectionGuide": {
+          "purpose": "Other terminal of the photocell. Connects to the ADC input pin and the fixed resistor. The voltage at this junction varies with light level.",
+          "warnings": [
+            "Must use an ADC-capable GPIO pin (GP26, GP27, or GP28 on Pico)",
+            "Digital GPIO pins won't read analog values - you'll only get HIGH/LOW"
+          ],
+          "troubleshooting": [
+            "Typical circuit: 3.3V → Photocell → ADC pin + 10kΩ → GND",
+            "More light = lower resistance = higher voltage at ADC",
+            "Less light = higher resistance = lower voltage at ADC",
+            "ADC reads 0-65535 on Pico (16-bit), representing 0-3.3V"
+          ]
+        }
       }
     },
     "properties": {
@@ -98,6 +125,35 @@
         "Typical voltage divider: LDR + 10kΩ resistor",
         "Connect to analog input (ADC) to read light level"
       ]
+    },
+    "functionalGroup": {
+      "groupLabel": "Light Sensor",
+      "requires": [
+        {
+          "type": "resistor",
+          "role": "voltage-divider",
+          "typicalValue": "10k",
+          "typicalResistance": 10000
+        }
+      ],
+      "wireLabels": {
+        "power": {
+          "label": "Power 3.3V",
+          "colorHint": "red",
+          "pinConnection": "pin0"
+        },
+        "signal": {
+          "label": "Signal",
+          "colorHint": "any",
+          "pinConnection": "pin1",
+          "note": "ADC pin required (GP26, GP27, GP28)"
+        },
+        "ground": {
+          "label": "Ground",
+          "colorHint": "black",
+          "pinConnection": "voltage-divider-resistor"
+        }
+      }
     }
   }
 }
