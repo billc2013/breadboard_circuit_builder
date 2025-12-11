@@ -1,10 +1,13 @@
 /**
- * Explorer App - Dedicated application for Circuit Explorer mode
- * Clean separation from Guided Wiring for independent event handling
+ * Explorer App - Unified Circuit Explorer
  *
- * Two views:
- * - "All Wires": Click individual wires to highlight and learn
- * - "Wire Groups": Click any wire in functional group to highlight entire sub-circuit
+ * Single unified view combining:
+ * - Physical breadboard with faded background
+ * - Physical Pico with real pins
+ * - Bezier curve wires for visual clarity
+ * - Always-visible wire labels near Pico pins
+ * - Component click → highlight all connected wires + Pico pins
+ * - Wire click → highlight individual wire
  */
 class ExplorerApp {
     constructor() {
@@ -16,8 +19,6 @@ class ExplorerApp {
         this.picoPinsLayer = document.getElementById('pico-pins-layer');
         this.componentsLayer = document.getElementById('components-layer');
         this.infoPanel = document.getElementById('hover-info');
-        this.wireCountDisplay = document.getElementById('wire-count');
-        this.selectedInfo = document.getElementById('selected-info');
 
         // Merge breadboard holes and Pico pins into unified connection points
         this.connectablePoints = [
@@ -42,12 +43,9 @@ class ExplorerApp {
         this.circuitData = null;
         this.circuitLoader = null;
 
-        // View state: 'all-wires' or 'wire-groups'
-        this.currentView = 'all-wires';
-
-        // Wire interaction state
+        // Interaction state
         this.highlightedWire = null;
-        this.highlightedGroup = null;
+        this.highlightedComponent = null;  // Currently selected component
 
         // Wire categorization
         this.wireCategories = {
@@ -56,29 +54,22 @@ class ExplorerApp {
             powerGround: []
         };
 
-        // Wire filter state
-        this.wireFilterState = {
-            picoToComponent: true,
-            componentToComponent: true,
-            powerGround: true
-        };
-
         // Functional groups (populated when circuit loads)
         this.functionalGroups = [];
 
         // Wires array (needed for CircuitLoader compatibility)
         this.wires = [];
 
+        // Wire-to-component mapping (which wires connect to which components)
+        this.wireToComponents = new Map();  // wireId -> [componentIds]
+        this.componentToWires = new Map();  // componentId -> [wireIds]
+
         // Tooltip state
         this.tooltipElement = null;
 
-        // Layout mode state: 'physical' or 'abstract'
-        this.layoutMode = 'physical';
-        this.layoutEngine = null;
-        this.picoAbstractRenderer = null;
-
         // Event handler references (for cleanup)
         this.boundHandleWireClick = this.handleWireClick.bind(this);
+        this.boundHandleComponentClick = this.handleComponentClick.bind(this);
         this.boundHandleKeydown = this.handleKeydown.bind(this);
 
         this.init();
@@ -92,278 +83,9 @@ class ExplorerApp {
         this.renderHoles();
         this.renderPicoPins();
         this.attachEventListeners();
-        this.setupViewToggle();
-        this.setupLayoutToggle();
-        this.setupFilterListeners();
         this.setupKeyboardListeners();
 
-        // Initialize layout system
-        this.initializeLayoutSystem();
-
-        console.log('Explorer app initialized');
-    }
-
-    // ==================== Layout Mode System ====================
-
-    /**
-     * Initialize the layout engine system
-     */
-    initializeLayoutSystem() {
-        // Default to physical layout (current behavior)
-        if (window.layoutRegistry) {
-            this.layoutEngine = window.layoutRegistry.setActive('physical');
-        }
-
-        // Initialize abstract Pico renderer
-        if (window.PicoAbstractRenderer) {
-            this.picoAbstractRenderer = new PicoAbstractRenderer();
-        }
-
-        console.log('[Explorer] Layout system initialized');
-    }
-
-    /**
-     * Setup the layout toggle button
-     */
-    setupLayoutToggle() {
-        const layoutToggle = document.getElementById('layout-toggle');
-        if (!layoutToggle) return;
-
-        layoutToggle.addEventListener('click', () => {
-            this.toggleLayoutMode();
-        });
-    }
-
-    /**
-     * Toggle between physical and abstract layout modes
-     */
-    toggleLayoutMode() {
-        const newMode = this.layoutMode === 'physical' ? 'abstract' : 'physical';
-        this.setLayoutMode(newMode);
-    }
-
-    /**
-     * Set the layout mode
-     * @param {string} mode - 'physical' or 'abstract'
-     */
-    setLayoutMode(mode) {
-        if (mode === this.layoutMode) return;
-
-        console.log(`[Explorer] Switching layout mode: ${this.layoutMode} → ${mode}`);
-
-        this.layoutMode = mode;
-
-        // Update layout engine
-        if (window.layoutRegistry) {
-            const engineName = mode === 'abstract' ? 'hierarchical' : 'physical';
-            this.layoutEngine = window.layoutRegistry.setActive(engineName);
-        }
-
-        // Update UI toggle
-        this.updateLayoutToggleUI();
-
-        // Switch visual mode
-        if (mode === 'abstract') {
-            this.showAbstractView();
-        } else {
-            this.showPhysicalView();
-        }
-
-        // Re-render current circuit if one is loaded
-        if (this.circuitData) {
-            this.reRenderCircuit();
-        }
-    }
-
-    /**
-     * Update the layout toggle button UI
-     */
-    updateLayoutToggleUI() {
-        const physicalOption = document.querySelector('[data-layout="physical"]');
-        const abstractOption = document.querySelector('[data-layout="abstract"]');
-
-        if (physicalOption && abstractOption) {
-            physicalOption.classList.toggle('active', this.layoutMode === 'physical');
-            abstractOption.classList.toggle('active', this.layoutMode === 'abstract');
-        }
-    }
-
-    /**
-     * Show abstract view - hide breadboard, show conceptual layout
-     */
-    showAbstractView() {
-        console.log('[Explorer] Showing abstract view');
-
-        // Hide physical elements
-        const breadboardImage = document.getElementById('breadboard-image');
-        const picoBoard = document.getElementById('pico-board');
-        const holesLayer = document.getElementById('holes-layer');
-        const fadeOverlay = document.getElementById('breadboard-fade-overlay');
-        const picoPinsLayer = document.getElementById('pico-pins-layer');
-
-        if (breadboardImage) breadboardImage.style.display = 'none';
-        if (picoBoard) picoBoard.style.display = 'none';
-        if (holesLayer) holesLayer.style.display = 'none';
-        if (fadeOverlay) fadeOverlay.style.display = 'none';
-        if (picoPinsLayer) picoPinsLayer.style.display = 'none';
-
-        // Add abstract mode class
-        this.svg.classList.add('abstract-mode');
-        document.body.classList.add('abstract-layout');
-
-        // Update SVG viewBox for larger abstract canvas
-        this.svg.setAttribute('viewBox', '0 0 600 500');
-    }
-
-    /**
-     * Show physical view - restore breadboard layout
-     */
-    showPhysicalView() {
-        console.log('[Explorer] Showing physical view');
-
-        // Show physical elements
-        const breadboardImage = document.getElementById('breadboard-image');
-        const picoBoard = document.getElementById('pico-board');
-        const holesLayer = document.getElementById('holes-layer');
-        const picoPinsLayer = document.getElementById('pico-pins-layer');
-
-        if (breadboardImage) breadboardImage.style.display = '';
-        if (picoBoard) picoBoard.style.display = '';
-        if (holesLayer) holesLayer.style.display = '';
-        if (picoPinsLayer) picoPinsLayer.style.display = '';
-
-        // Remove abstract mode class
-        this.svg.classList.remove('abstract-mode');
-        document.body.classList.remove('abstract-layout');
-
-        // Restore original SVG viewBox
-        this.svg.setAttribute('viewBox', '0 0 400 200');
-    }
-
-    /**
-     * Re-render the current circuit with the active layout
-     */
-    async reRenderCircuit() {
-        if (!this.circuitData) return;
-
-        console.log('[Explorer] Re-rendering circuit with', this.layoutMode, 'layout');
-
-        // Clear current rendering
-        this.clearComponents();
-        this.clearAllWires();
-
-        if (this.layoutMode === 'abstract') {
-            await this.renderAbstractCircuit();
-        } else {
-            // Use existing CircuitLoader for physical view
-            await this.circuitLoader.loadCircuit(this.circuitData);
-            this.loadCircuit(this.circuitData);
-        }
-    }
-
-    /**
-     * Clear all rendered components
-     */
-    clearComponents() {
-        if (this.componentsLayer) {
-            this.componentsLayer.innerHTML = '';
-        }
-    }
-
-    /**
-     * Render circuit in abstract layout mode
-     */
-    async renderAbstractCircuit() {
-        if (!this.circuitData || !this.layoutEngine) {
-            console.error('[Explorer] Cannot render abstract circuit: missing data or layout engine');
-            return;
-        }
-
-        console.log('[Explorer] Rendering abstract circuit');
-
-        const components = this.circuitData.circuit?.components || [];
-        const wires = this.circuitData.circuit?.wires || [];
-
-        // 1. Calculate layout
-        this.layoutEngine.calculateLayout(this.circuitData, this.functionalGroups);
-
-        // 2. Render abstract Pico
-        if (this.picoAbstractRenderer && this.layoutEngine.picoPosition) {
-            this.picoAbstractRenderer.render(
-                this.layoutEngine.picoPosition,
-                this.componentsLayer,
-                this.layoutEngine.connectedPicoPins,
-                this.picoMetadata
-            );
-        }
-
-        // 3. Render components using existing adapters with layout-computed positions
-        for (const comp of components) {
-            const position = this.layoutEngine.getComponentPosition(comp.id);
-            if (position) {
-                await this.renderComponentAtPosition(comp, position);
-            }
-        }
-
-        // 4. Render wires with bezier curves
-        for (const wire of wires) {
-            const route = this.layoutEngine.getWireRoute(wire.id);
-            if (route) {
-                this.renderBezierWire(wire, route);
-            }
-        }
-
-        // 5. Apply wire categories and interaction
-        this.categorizeWires(wires, components);
-        this.applyWireCategories();
-        this.updateWireVisibility();
-        this.enableWireInteraction();
-        this.updateWireCount();
-    }
-
-    /**
-     * Render a component at a layout-computed position using existing adapters
-     * @param {Object} componentData - Component from circuit JSON
-     * @param {Object} position - Position from layout engine
-     */
-    async renderComponentAtPosition(componentData, position) {
-        const { id, type } = componentData;
-
-        try {
-            // Load the adapter for this component type
-            const adapter = await this.circuitLoader.loadAdapter(type);
-            const metadata = await this.circuitLoader.loadComponentMetadata(type);
-
-            if (adapter && adapter.render) {
-                // Call the adapter's render method with the layout-computed position
-                await adapter.render(id, position, metadata);
-                console.log(`[Explorer] Rendered ${id} at abstract position`);
-            }
-        } catch (error) {
-            console.error(`[Explorer] Failed to render component ${id}:`, error);
-        }
-    }
-
-    /**
-     * Render a wire as a bezier curve
-     * @param {Object} wire - Wire data from circuit JSON
-     * @param {Object} route - Route from layout engine
-     */
-    renderBezierWire(wire, route) {
-        if (!route || !route.path) return;
-
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.classList.add('wire', 'abstract-wire');
-        path.setAttribute('data-wire-id', wire.id);
-
-        // Generate SVG path data
-        const d = HierarchicalLayoutEngine.getPathData(route);
-        path.setAttribute('d', d);
-
-        // Store wire data for interaction
-        path._wireData = wire;
-
-        this.wiresLayer.appendChild(path);
+        console.log('[Explorer] Unified explorer initialized');
     }
 
     async loadComponentMetadata() {
@@ -514,7 +236,7 @@ class ExplorerApp {
      * @param {Object} circuitJson - The circuit data
      */
     loadCircuit(circuitJson) {
-        console.log('[Explorer] Loading circuit:', circuitJson?.metadata?.name);
+        console.log('[Explorer] Loading circuit:', circuitJson?.circuit?.metadata?.name);
 
         this.circuitData = circuitJson;
 
@@ -522,68 +244,120 @@ class ExplorerApp {
         this.clearHighlights();
         this.hideTooltip();
 
-        // Categorize wires
+        // Categorize wires and build component mappings
         if (circuitJson?.circuit?.wires && circuitJson?.circuit?.components) {
             this.categorizeWires(circuitJson.circuit.wires, circuitJson.circuit.components);
+            this.buildWireComponentMappings(circuitJson.circuit.wires, circuitJson.circuit.components);
             this.detectFunctionalGroups(circuitJson.circuit.components, circuitJson.circuit.wires);
         }
 
         // Apply visual styles
         this.applyBreadboardFade();
         this.applyWireCategories();
-        this.updateWireVisibility();
 
-        // Enable wire interaction
+        // Render wire labels (always visible in unified view)
+        this.renderWireLabels();
+
+        // Enable interactions
         this.enableWireInteraction();
+        this.enableComponentInteraction();
 
-        // Update UI
-        this.updateWireCount();
-        this.updateViewUI();
+        console.log('[Explorer] Circuit loaded with', circuitJson?.circuit?.wires?.length, 'wires');
     }
 
-    // ==================== View Toggle ====================
+    /**
+     * Build mappings between wires and components
+     * Used for component-click highlighting
+     */
+    buildWireComponentMappings(wires, components) {
+        this.wireToComponents.clear();
+        this.componentToWires.clear();
 
-    setupViewToggle() {
-        const viewToggle = document.getElementById('view-toggle');
-        if (!viewToggle) return;
+        // Build hole-to-component lookup
+        const holeToComponent = new Map();
+        for (const comp of components) {
+            if (comp.placement) {
+                for (const [pinName, holeId] of Object.entries(comp.placement)) {
+                    if (holeId) {
+                        holeToComponent.set(holeId.toUpperCase(), comp.id);
+                        // Also add same-bus holes
+                        this.addBusHoles(holeId, comp.id, holeToComponent);
+                    }
+                }
+            }
+        }
 
-        viewToggle.addEventListener('click', () => {
-            this.toggleView();
-        });
+        // Map wires to their connected components
+        for (const wire of wires) {
+            const connectedComponents = new Set();
+
+            // Check 'from' endpoint
+            const fromCompId = this.findComponentForEndpoint(wire.from, holeToComponent);
+            if (fromCompId) connectedComponents.add(fromCompId);
+
+            // Check 'to' endpoint
+            const toCompId = this.findComponentForEndpoint(wire.to, holeToComponent);
+            if (toCompId) connectedComponents.add(toCompId);
+
+            // Store wire -> components mapping
+            this.wireToComponents.set(wire.id, Array.from(connectedComponents));
+
+            // Store component -> wires mapping
+            for (const compId of connectedComponents) {
+                if (!this.componentToWires.has(compId)) {
+                    this.componentToWires.set(compId, []);
+                }
+                this.componentToWires.get(compId).push(wire.id);
+            }
+        }
+
+        console.log('[Explorer] Built wire-component mappings:',
+                    this.componentToWires.size, 'components with wires');
     }
 
-    toggleView() {
-        this.currentView = this.currentView === 'all-wires' ? 'wire-groups' : 'all-wires';
-        console.log('[Explorer] View changed to:', this.currentView);
+    /**
+     * Add holes on the same bus to the lookup
+     */
+    addBusHoles(holeId, componentId, holeToComponent) {
+        const match = holeId.match(/^(\d+)([A-J])$/i);
+        if (!match) return;
 
-        this.updateViewUI();
-        this.clearHighlights();
-        this.hideTooltip();
+        const col = match[1];
+        const row = match[2].toUpperCase();
 
-        // Show/hide wire labels based on view
-        if (this.currentView === 'wire-groups') {
-            document.body.classList.add('wire-groups-view');
-            this.renderWireLabels();
-            // Hide filters in Wire Groups view
-            const filters = document.getElementById('wire-filters');
-            if (filters) filters.classList.remove('visible');
-        } else {
-            document.body.classList.remove('wire-groups-view');
-            this.clearWireLabels();
-            // Show filters in All Wires view
-            const filters = document.getElementById('wire-filters');
-            if (filters) filters.classList.add('visible');
+        // Determine which rows are on the same bus
+        const topRows = ['F', 'G', 'H', 'I', 'J'];
+        const bottomRows = ['A', 'B', 'C', 'D', 'E'];
+
+        const sameBusRows = topRows.includes(row) ? topRows : bottomRows;
+
+        // Add all holes on the same bus
+        for (const r of sameBusRows) {
+            const busHoleId = `${col}${r}`;
+            if (!holeToComponent.has(busHoleId)) {
+                holeToComponent.set(busHoleId, componentId);
+            }
         }
     }
 
-    updateViewUI() {
-        const allWiresOption = document.querySelector('[data-view="all-wires"]');
-        const wireGroupsOption = document.querySelector('[data-view="wire-groups"]');
+    /**
+     * Find which component is connected to a wire endpoint
+     */
+    findComponentForEndpoint(endpoint, holeToComponent) {
+        if (!endpoint) return null;
 
-        if (allWiresOption && wireGroupsOption) {
-            allWiresOption.classList.toggle('active', this.currentView === 'all-wires');
-            wireGroupsOption.classList.toggle('active', this.currentView === 'wire-groups');
+        // Direct hole reference
+        const normalized = endpoint.toUpperCase();
+        if (holeToComponent.has(normalized)) {
+            return holeToComponent.get(normalized);
         }
+
+        // Pico pin - return 'pico1' as a pseudo-component
+        if (this.isPicoPin(endpoint)) {
+            return 'pico1';
+        }
+
+        return null;
     }
 
     // ==================== Wire Categorization ====================
@@ -654,83 +428,147 @@ class ExplorerApp {
 
     /**
      * Detect functional groups from component metadata
+     * Groups include primary components (LED, button) and their support components (resistors)
+     * based on the 'requires' field in component JSON functionalGroup metadata
      * @param {Array} components - Circuit components
      * @param {Array} wires - Circuit wires
      */
     detectFunctionalGroups(components, wires) {
         this.functionalGroups = [];
+        this.componentToGroup = new Map();  // Maps any component ID to its group
 
-        // Build a wire lookup by endpoints
-        const wiresByEndpoint = new Map();
-        for (const wire of wires) {
-            if (!wiresByEndpoint.has(wire.from)) wiresByEndpoint.set(wire.from, []);
-            if (!wiresByEndpoint.has(wire.to)) wiresByEndpoint.set(wire.to, []);
-            wiresByEndpoint.get(wire.from).push(wire);
-            wiresByEndpoint.get(wire.to).push(wire);
+        // Build bus connectivity map for finding support components
+        const holeToBus = new Map();
+        for (const hole of this.holes) {
+            if (hole.bus) {
+                holeToBus.set(hole.id.toUpperCase(), hole.bus);
+            }
         }
 
-        // For each component, check if it has functionalGroup metadata
+        // Build component placement lookup - which holes each component occupies (including bus-connected)
+        const componentHoles = new Map();  // componentId -> Set of hole IDs
+        for (const comp of components) {
+            const holes = new Set();
+            if (comp.placement) {
+                for (const [pinName, holeId] of Object.entries(comp.placement)) {
+                    if (holeId && typeof holeId === 'string') {
+                        const normalizedHole = holeId.toUpperCase();
+                        holes.add(normalizedHole);
+                        // Add all holes on same bus
+                        const bus = holeToBus.get(normalizedHole);
+                        if (bus) {
+                            for (const [h, b] of holeToBus) {
+                                if (b === bus) holes.add(h);
+                            }
+                        }
+                    }
+                }
+            }
+            componentHoles.set(comp.id, holes);
+        }
+
+        // For each component with functionalGroup metadata, build the group
         for (const component of components) {
             const metadata = this.circuitLoader?.renderedComponents?.get(component.id)?.metadata;
 
             if (metadata?.functionalGroup) {
                 const group = {
                     id: `${component.id}-group`,
+                    label: metadata.functionalGroup.groupLabel || component.id,
                     primaryComponent: component.id,
                     primaryMetadata: metadata,
+                    allComponents: [component.id],  // All components in this group
                     supportComponents: [],
                     wires: [],
-                    labels: {}
+                    wireLabels: metadata.functionalGroup.wireLabels || {}
                 };
 
-                // Find all wires connected to this component
-                const componentPins = Object.keys(component.placement || {}).filter(k => k !== 'position');
-                for (const pin of componentPins) {
-                    const pinLocation = component.placement[pin];
-                    const endpoint = `${component.id}.${pin}`;
+                // Find support components based on 'requires' in metadata
+                const requires = metadata.functionalGroup.requires || [];
+                for (const req of requires) {
+                    // Find resistors (or other support components) that share a bus with primary
+                    const primaryHoles = componentHoles.get(component.id);
 
-                    // Find wires that reference this component's pins or placement locations
-                    for (const wire of wires) {
-                        const fromMatches = wire.from === endpoint ||
-                                           wire.from === pinLocation ||
-                                           wire.from?.toLowerCase() === endpoint.toLowerCase();
-                        const toMatches = wire.to === endpoint ||
-                                         wire.to === pinLocation ||
-                                         wire.to?.toLowerCase() === endpoint.toLowerCase();
+                    for (const otherComp of components) {
+                        if (otherComp.id === component.id) continue;
 
-                        if ((fromMatches || toMatches) && !group.wires.includes(wire.id)) {
-                            group.wires.push(wire.id);
+                        // Check if this component matches the required type
+                        const otherType = otherComp.type?.toLowerCase() || '';
+                        if (req.type === 'resistor' && otherType.includes('resistor')) {
+                            // Check if it shares a bus with the primary component
+                            const otherHoles = componentHoles.get(otherComp.id);
+                            const sharesConnection = [...primaryHoles].some(h => otherHoles.has(h));
+
+                            if (sharesConnection) {
+                                group.supportComponents.push(otherComp.id);
+                                group.allComponents.push(otherComp.id);
+                                console.log(`[Explorer] Found support component ${otherComp.id} for ${component.id}`);
+                            }
                         }
                     }
                 }
 
-                // Also find wires on the same bus as component pins
-                for (const pin of componentPins) {
-                    const pinLocation = component.placement[pin];
-                    if (pinLocation) {
-                        const hole = this.holes.find(h => h.id.toLowerCase() === pinLocation.toLowerCase());
-                        if (hole?.bus) {
-                            for (const wire of wires) {
-                                const fromHole = this.holes.find(h => h.id.toLowerCase() === wire.from?.toLowerCase());
-                                const toHole = this.holes.find(h => h.id.toLowerCase() === wire.to?.toLowerCase());
+                // Find all wires connected to ANY component in this group
+                for (const compId of group.allComponents) {
+                    const compData = components.find(c => c.id === compId);
+                    if (!compData?.placement) continue;
 
-                                if ((fromHole?.bus === hole.bus || toHole?.bus === hole.bus) &&
-                                    !group.wires.includes(wire.id)) {
-                                    group.wires.push(wire.id);
-                                }
-                            }
+                    const compHoles = componentHoles.get(compId);
+
+                    for (const wire of wires) {
+                        // Check if wire connects to this component's holes/buses
+                        const fromNorm = wire.from?.toUpperCase();
+                        const toNorm = wire.to?.toUpperCase();
+
+                        const fromConnects = compHoles.has(fromNorm) || this.wireEndpointOnBus(wire.from, compHoles, holeToBus);
+                        const toConnects = compHoles.has(toNorm) || this.wireEndpointOnBus(wire.to, compHoles, holeToBus);
+
+                        if ((fromConnects || toConnects) && !group.wires.includes(wire.id)) {
+                            group.wires.push(wire.id);
                         }
                     }
                 }
 
                 if (group.wires.length > 0) {
                     this.functionalGroups.push(group);
-                    console.log('[Explorer] Functional group detected:', group.id, 'with', group.wires.length, 'wires');
+
+                    // Map all components in group back to the group
+                    for (const compId of group.allComponents) {
+                        this.componentToGroup.set(compId, group);
+                    }
+
+                    console.log(`[Explorer] Functional group "${group.label}":`,
+                               group.allComponents.join(', '),
+                               `| ${group.wires.length} wires`);
                 }
             }
         }
 
         console.log('[Explorer] Total functional groups:', this.functionalGroups.length);
+    }
+
+    /**
+     * Check if a wire endpoint is on a bus that connects to component holes
+     */
+    wireEndpointOnBus(endpoint, compHoles, holeToBus) {
+        if (!endpoint || this.isPicoPin(endpoint)) return false;
+        const norm = endpoint.toUpperCase();
+        const bus = holeToBus.get(norm);
+        if (!bus) return false;
+        // Check if any compHole shares this bus
+        for (const h of compHoles) {
+            if (holeToBus.get(h) === bus) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Find which functional group a component belongs to
+     * @param {string} componentId - Component identifier
+     * @returns {Object|null} Functional group or null
+     */
+    findGroupForComponent(componentId) {
+        return this.componentToGroup.get(componentId) || null;
     }
 
     /**
@@ -794,74 +632,90 @@ class ExplorerApp {
         }
     }
 
-    // ==================== Wire Labels (Wire Groups View) ====================
+    // ==================== Wire Labels (Always visible near Pico) ====================
 
     renderWireLabels() {
         this.clearWireLabels();
 
         if (!this.wireLabelsLayer || !this.circuitData) return;
 
-        for (const group of this.functionalGroups) {
-            const metadata = group.primaryMetadata;
-            const wireLabels = metadata?.functionalGroup?.wireLabels;
+        const wires = this.circuitData.circuit.wires || [];
 
-            if (!wireLabels) continue;
+        // Render labels for all wires that connect to Pico
+        for (const wire of wires) {
+            // Only label wires that have a Pico endpoint
+            const picoEndpoint = this.isPicoPin(wire.from) ? wire.from :
+                                this.isPicoPin(wire.to) ? wire.to : null;
 
-            // For each wire in the group, try to add a label
-            for (const wireId of group.wires) {
-                const wireElement = document.querySelector(`[data-wire-id="${wireId}"]`);
-                if (!wireElement) continue;
+            if (!picoEndpoint) continue;
 
-                const wire = this.circuitData.circuit.wires.find(w => w.id === wireId);
-                if (!wire) continue;
+            const wireElement = document.querySelector(`[data-wire-id="${wire.id}"]`);
+            if (!wireElement) continue;
 
-                // Determine label based on wire endpoints
-                let labelText = this.determineLabelForWire(wire, wireLabels);
-                if (!labelText) continue;
+            // Determine label text
+            const labelText = this.determineLabelForWire(wire, {});
+            if (!labelText) continue;
 
-                // Get wire endpoint for label position
-                const position = this.getWireEndpointPosition(wireElement);
-                if (!position) continue;
+            // Position label near the Pico pin (not at wire endpoint)
+            const position = this.getLabelPositionNearPico(wire, picoEndpoint);
+            if (!position) continue;
 
-                // Create label group
-                const labelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                labelGroup.classList.add('wire-label-group');
-                labelGroup.setAttribute('data-wire-id', wireId);
+            // Create label group
+            const labelGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            labelGroup.classList.add('wire-label-group');
+            labelGroup.setAttribute('data-wire-id', wire.id);
 
-                // Create background
-                const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                bg.classList.add('wire-label-bg');
+            // Create background
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bg.classList.add('wire-label-bg');
 
-                // Create text
-                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.classList.add('wire-label');
-                text.setAttribute('x', position.x);
-                text.setAttribute('y', position.y);
-                text.textContent = labelText;
+            // Create text
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.classList.add('wire-label');
+            text.setAttribute('x', position.x);
+            text.setAttribute('y', position.y);
+            text.textContent = labelText;
 
-                // Add signal/ground/power class for coloring
-                if (labelText.toLowerCase().includes('signal')) {
-                    text.classList.add('signal');
-                } else if (labelText.toLowerCase().includes('ground')) {
-                    text.classList.add('ground');
-                } else if (labelText.toLowerCase().includes('power') || labelText.toLowerCase().includes('3v')) {
-                    text.classList.add('power');
-                }
-
-                labelGroup.appendChild(bg);
-                labelGroup.appendChild(text);
-                this.wireLabelsLayer.appendChild(labelGroup);
-
-                // Size background to fit text
-                requestAnimationFrame(() => {
-                    const bbox = text.getBBox();
-                    bg.setAttribute('x', bbox.x - 2);
-                    bg.setAttribute('y', bbox.y - 1);
-                    bg.setAttribute('width', bbox.width + 4);
-                    bg.setAttribute('height', bbox.height + 2);
-                });
+            // Add signal/ground/power class for coloring
+            if (labelText.toLowerCase().includes('signal')) {
+                text.classList.add('signal');
+            } else if (labelText.toLowerCase().includes('ground')) {
+                text.classList.add('ground');
+            } else if (labelText.toLowerCase().includes('power') || labelText.toLowerCase().includes('3v')) {
+                text.classList.add('power');
             }
+
+            labelGroup.appendChild(bg);
+            labelGroup.appendChild(text);
+            this.wireLabelsLayer.appendChild(labelGroup);
+
+            // Size background to fit text
+            requestAnimationFrame(() => {
+                const bbox = text.getBBox();
+                bg.setAttribute('x', bbox.x - 3);
+                bg.setAttribute('y', bbox.y - 2);
+                bg.setAttribute('width', bbox.width + 6);
+                bg.setAttribute('height', bbox.height + 4);
+            });
         }
+    }
+
+    /**
+     * Get position for label near the Pico pin
+     */
+    getLabelPositionNearPico(wire, picoEndpoint) {
+        const pinName = picoEndpoint.split('.')[1];
+
+        // Find the Pico pin coordinates
+        const picoPin = this.picoPins.find(p => p.pinKey === pinName);
+        if (!picoPin) return null;
+
+        // Position label slightly offset from Pico pin
+        // Labels go to the left of the Pico (since Pico is on the left side)
+        return {
+            x: picoPin.x - 8,  // Offset to left of pin
+            y: picoPin.y + 2   // Slightly below center for readability
+        };
     }
 
     /**
@@ -947,15 +801,17 @@ class ExplorerApp {
 
         console.log('[Explorer] Wire clicked:', wireId);
 
-        if (this.currentView === 'wire-groups') {
-            this.handleWireGroupClick(wireId);
-        } else {
-            this.handleSingleWireClick(wireId);
+        // Clear any component highlight first
+        if (this.highlightedComponent) {
+            this.unhighlightComponent(this.highlightedComponent);
+            this.highlightedComponent = null;
         }
+
+        this.handleSingleWireClick(wireId);
     }
 
     handleSingleWireClick(wireId) {
-        // Unhighlight previous
+        // Unhighlight previous wire
         if (this.highlightedWire && this.highlightedWire !== wireId) {
             this.unhighlightWire(this.highlightedWire);
         }
@@ -965,38 +821,235 @@ class ExplorerApp {
             this.unhighlightWire(wireId);
             this.highlightedWire = null;
             this.hideTooltip();
-            this.updateSelectedInfo(null);
         } else {
             this.highlightWire(wireId);
             this.highlightedWire = wireId;
-            this.updateSelectedInfo(wireId);
         }
     }
 
-    handleWireGroupClick(wireId) {
-        const group = this.findGroupForWire(wireId);
+    // ==================== Component Interaction ====================
 
-        if (!group) {
-            // No group - behave like single wire click
-            this.handleSingleWireClick(wireId);
-            return;
+    enableComponentInteraction() {
+        if (this.componentsLayer) {
+            this.componentsLayer.addEventListener('click', this.boundHandleComponentClick);
+        }
+    }
+
+    disableComponentInteraction() {
+        if (this.componentsLayer) {
+            this.componentsLayer.removeEventListener('click', this.boundHandleComponentClick);
+        }
+    }
+
+    handleComponentClick(event) {
+        const componentElement = event.target.closest('.component');
+        if (!componentElement) return;
+
+        const componentId = componentElement.getAttribute('data-component-id');
+        if (!componentId) return;
+
+        console.log('[Explorer] Component clicked:', componentId);
+
+        // Clear any wire-only highlight first
+        if (this.highlightedWire) {
+            this.unhighlightWire(this.highlightedWire);
+            this.highlightedWire = null;
+            this.hideTooltip();
         }
 
-        // Unhighlight previous group
-        if (this.highlightedGroup && this.highlightedGroup !== group.id) {
-            this.unhighlightGroup(this.highlightedGroup);
-        }
-
-        // Toggle group highlight
-        if (this.highlightedGroup === group.id) {
-            this.unhighlightGroup(group.id);
-            this.highlightedGroup = null;
-            this.hideGroupInfo();
+        // Toggle component highlight
+        if (this.highlightedComponent === componentId) {
+            this.unhighlightComponent(componentId);
+            this.highlightedComponent = null;
         } else {
-            this.highlightGroup(group.id);
-            this.highlightedGroup = group.id;
-            this.showGroupInfo(group);
+            // Unhighlight previous component
+            if (this.highlightedComponent) {
+                this.unhighlightComponent(this.highlightedComponent);
+            }
+            this.highlightComponent(componentId);
+            this.highlightedComponent = componentId;
         }
+    }
+
+    /**
+     * Highlight a component and its entire functional group
+     * (all components in group, all wires, all Pico pins)
+     */
+    highlightComponent(componentId) {
+        console.log('[Explorer] Highlighting component:', componentId);
+
+        // Check if this component belongs to a functional group
+        const group = this.findGroupForComponent(componentId);
+
+        if (group) {
+            // Highlight the entire functional group
+            console.log(`[Explorer] Highlighting functional group "${group.label}":`, group.allComponents);
+
+            // Highlight all components in the group
+            for (const compId of group.allComponents) {
+                const compElement = document.querySelector(`[data-component-id="${compId}"]`);
+                if (compElement) {
+                    compElement.classList.add('component-highlighted');
+                }
+            }
+
+            // Highlight all wires in the group
+            for (const wireId of group.wires) {
+                this.highlightWire(wireId);
+                this.highlightWireLabel(wireId);
+            }
+
+            // Highlight connected Pico pins
+            this.highlightConnectedPicoPins(group.wires);
+
+            // Update info panel with group info
+            if (this.infoPanel) {
+                const componentNames = group.allComponents.map(id => this.getComponentDisplayName(id)).join(' + ');
+                this.infoPanel.textContent = `${group.label}: ${componentNames} | ${group.wires.length} wires`;
+            }
+        } else {
+            // No functional group - just highlight this component's wires
+            const wireIds = this.componentToWires.get(componentId) || [];
+
+            // Highlight all connected wires
+            for (const wireId of wireIds) {
+                this.highlightWire(wireId);
+                this.highlightWireLabel(wireId);
+            }
+
+            // Highlight the component itself
+            const componentElement = document.querySelector(`[data-component-id="${componentId}"]`);
+            if (componentElement) {
+                componentElement.classList.add('component-highlighted');
+            }
+
+            // Highlight connected Pico pins
+            this.highlightConnectedPicoPins(wireIds);
+
+            // Update info panel
+            if (this.infoPanel) {
+                const compName = this.getComponentDisplayName(componentId);
+                this.infoPanel.textContent = `${compName}: ${wireIds.length} connected wires`;
+            }
+        }
+    }
+
+    /**
+     * Remove highlight from a component and its entire functional group
+     */
+    unhighlightComponent(componentId) {
+        console.log('[Explorer] Unhighlighting component:', componentId);
+
+        // Check if this component belongs to a functional group
+        const group = this.findGroupForComponent(componentId);
+
+        if (group) {
+            // Unhighlight the entire functional group
+            for (const compId of group.allComponents) {
+                const compElement = document.querySelector(`[data-component-id="${compId}"]`);
+                if (compElement) {
+                    compElement.classList.remove('component-highlighted');
+                }
+            }
+
+            // Unhighlight all wires in the group
+            for (const wireId of group.wires) {
+                this.unhighlightWire(wireId);
+                this.unhighlightWireLabel(wireId);
+            }
+        } else {
+            // No functional group - just unhighlight this component's wires
+            const wireIds = this.componentToWires.get(componentId) || [];
+
+            for (const wireId of wireIds) {
+                this.unhighlightWire(wireId);
+                this.unhighlightWireLabel(wireId);
+            }
+
+            const componentElement = document.querySelector(`[data-component-id="${componentId}"]`);
+            if (componentElement) {
+                componentElement.classList.remove('component-highlighted');
+            }
+        }
+
+        // Unhighlight all Pico pins
+        this.unhighlightAllPicoPins();
+
+        // Reset info panel
+        if (this.infoPanel) {
+            this.infoPanel.textContent = 'Click on components or wires to explore connections';
+        }
+    }
+
+    /**
+     * Highlight wire label (make it bright)
+     */
+    highlightWireLabel(wireId) {
+        const labelGroup = document.querySelector(`.wire-label-group[data-wire-id="${wireId}"]`);
+        if (labelGroup) {
+            labelGroup.classList.add('label-highlighted');
+        }
+    }
+
+    /**
+     * Unhighlight wire label (make it faded)
+     */
+    unhighlightWireLabel(wireId) {
+        const labelGroup = document.querySelector(`.wire-label-group[data-wire-id="${wireId}"]`);
+        if (labelGroup) {
+            labelGroup.classList.remove('label-highlighted');
+        }
+    }
+
+    /**
+     * Highlight Pico pins connected to given wires
+     */
+    highlightConnectedPicoPins(wireIds) {
+        const wires = this.circuitData?.circuit?.wires || [];
+
+        for (const wireId of wireIds) {
+            const wire = wires.find(w => w.id === wireId);
+            if (!wire) continue;
+
+            // Check both endpoints for Pico pins
+            for (const endpoint of [wire.from, wire.to]) {
+                if (this.isPicoPin(endpoint)) {
+                    const pinName = endpoint.split('.')[1];
+                    this.highlightPicoPin(pinName);
+                }
+            }
+        }
+    }
+
+    /**
+     * Highlight a specific Pico pin
+     */
+    highlightPicoPin(pinName) {
+        // Find the pin element in pico-pins-layer
+        const pinElement = document.querySelector(`[data-pin-id="pico1.${pinName}"]`);
+        if (pinElement) {
+            pinElement.classList.add('pin-highlighted');
+        }
+    }
+
+    /**
+     * Unhighlight all Pico pins
+     */
+    unhighlightAllPicoPins() {
+        const highlightedPins = document.querySelectorAll('.pin-highlighted');
+        highlightedPins.forEach(pin => pin.classList.remove('pin-highlighted'));
+    }
+
+    /**
+     * Get a display-friendly name for a component
+     */
+    getComponentDisplayName(componentId) {
+        const metadata = this.circuitLoader?.renderedComponents?.get(componentId)?.metadata;
+        if (metadata?.metadata?.name) {
+            return metadata.metadata.name;
+        }
+        // Fallback to formatted ID
+        return componentId.replace(/(\d+)/, ' $1').replace(/^./, s => s.toUpperCase());
     }
 
     highlightWire(wireId) {

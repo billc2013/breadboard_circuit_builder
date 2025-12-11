@@ -174,29 +174,35 @@
     filter: drop-shadow(0 0 4px currentColor);
 }
 
-/* Wire Labels - Only visible in Wire Groups view */
-.wire-label {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 8px;
-    fill: #ffffff;
+/* ==================== Wire Labels (Always visible, faded by default) ==================== */
+
+.wire-label-group {
     pointer-events: none;
-    user-select: none;
-    opacity: 0;
+    opacity: 0.4;  /* Faded by default */
     transition: opacity 0.3s ease;
 }
 
-.wire-groups-view .wire-label {
+/* Highlighted state - bright and prominent */
+.wire-label-group.label-highlighted {
     opacity: 1;
 }
 
+.wire-label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 7px;
+    fill: #ffffff;
+    user-select: none;
+    text-anchor: end;  /* Right-align since labels are to left of Pico */
+}
+
 .wire-label-bg {
-    fill: rgba(26, 26, 26, 0.85);
-    rx: 3;
-    ry: 3;
+    fill: rgba(26, 26, 26, 0.9);
+    rx: 2;
+    ry: 2;
 }
 
 .wire-label.signal {
-    fill: var(--wire-pico-component-color);
+    fill: var(--wire-pico-component-color, #00ccff);
 }
 
 .wire-label.ground {
@@ -204,7 +210,41 @@
 }
 
 .wire-label.power {
-    fill: var(--wire-power-ground-color);
+    fill: var(--wire-power-ground-color, #ff6b6b);
+}
+
+/* ==================== Component Highlighting ==================== */
+
+/* Component highlight on click */
+.explorer-mode .component {
+    cursor: pointer;
+    transition: filter 0.2s ease;
+}
+
+.explorer-mode .component:hover {
+    filter: drop-shadow(0 0 3px rgba(0, 204, 255, 0.5));
+}
+
+.explorer-mode .component.component-highlighted {
+    filter: drop-shadow(0 0 6px rgba(0, 204, 255, 0.8));
+}
+
+/* ==================== Pico Pin Highlighting ==================== */
+
+/* Pico pins - faded by default when something is highlighted */
+.explorer-mode .pin {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Highlighted Pico pin - bright and scaled up */
+.explorer-mode .pin.pin-highlighted rect {
+    stroke: #00ccff;
+    stroke-width: 1;
+    filter: drop-shadow(0 0 3px #00ccff);
+}
+
+.explorer-mode .pin.pin-highlighted {
+    transform-origin: center;
 }
 
 /* Explorer Educational Tooltip */

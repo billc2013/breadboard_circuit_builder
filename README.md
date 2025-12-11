@@ -6,9 +6,19 @@
 
 The Breadboard Circuit Builder is a proof-of-concept educational tool that renders physical breadboard circuits from JSON descriptions. Students can receive circuit designs from Large Language Models (like Claude or GPT-4) and immediately see them visualized on an interactive breadboard with the Raspberry Pi Pico microcontroller.
 
+**Two Complementary Modes:**
+1. **Guided Wiring** (`index.html`) - Step-by-step wire placement for building circuits
+2. **Circuit Explorer** (`circuit-explorer.html`) - Conceptual exploration of circuit topology
+
 **Key Features:**
 - Interactive breadboard visualization (400 holes with accurate positioning)
 - Component rendering (LEDs, resistors, Raspberry Pi Pico, photocells, buttons)
+- **Circuit Explorer Mode** (NEW - December 2025):
+  - **Functional group highlighting** - Click LED to highlight entire LED Circuit (LED + resistor + wires + Pico pins)
+  - **Always-visible wire labels** near Pico pins (Signal GP14, Ground, Power 3.3V)
+  - **Faded/bright transitions** - Labels dim by default, brighten when group selected
+  - Support components (resistors) auto-detected from component JSON metadata
+  - Educational info panel showing group relationships
 - **Hover-based component information** - Interactive info boxes with full component details
 - **Bus-aware wire routing** - LLMs specify buses instead of exact holes for flexible placement
 - **Fully case-insensitive** - Handles any capitalization in component types, holes, and buses
@@ -434,16 +444,23 @@ python3 -m http.server 8000
 See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 
 **Recently Completed (December 2025):**
+- ✅ **Unified Circuit Explorer** with functional group highlighting
+- ✅ **Functional group awareness** - Click any component to highlight entire group (LED + resistor, Button + resistor)
+- ✅ **Always-visible wire labels** near Pico pins with faded/bright states
+- ✅ **Pico pin highlighting** when connected wires are selected
 - ✅ Component hover information system
 - ✅ Bus reference system for wire endpoints
 - ✅ Case-insensitive component types, holes, and buses
 - ✅ JSON text input functionality
 - ✅ Contextual floating wire instruction box with progressive disclosure
 - ✅ Smart bidirectional guided wiring (adapts to student's starting point)
-- ✅ Arrow key repositioning for instruction box
-- ✅ Multi-circuit panel management system
-- ✅ Automatic wire progress saving
-- ✅ Wire completion indicators in circuit panels
+- ✅ Multi-circuit panel management system with auto-save
+
+**Archived for Future Use:**
+- Layout engine architecture (pluggable system for alternative visualizations)
+- Hierarchical layout algorithm (Pico at center, groups branching outward)
+- Abstract Pico renderer (simplified box representation)
+- Bezier curve wire routing
 
 **High Priority:**
 - Component rendering refinements (alignment, stub length, consistency)
@@ -463,7 +480,7 @@ See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 - Circuit simulation (LED brightness, motor speed)
 - Code generation (MicroPython/CircuitPython)
 - Bill of materials export
-- Collision-aware label positioning (optional alternative to hover)
+- Alternative layout modes (schematic view, signal flow view)
 
 ## Contact and Support
 
@@ -471,6 +488,6 @@ For questions, issues, or contributions, please refer to the project repository 
 
 ---
 
-**Last Updated**: December 8, 2025
-**Status**: Enhanced POC - Contextual Guided Wiring, Multi-Circuit Management, Auto-Save
-**Version**: 1.2-POC
+**Last Updated**: December 10, 2025
+**Status**: Enhanced POC - Unified Circuit Explorer, Functional Group Highlighting
+**Version**: 1.3-POC

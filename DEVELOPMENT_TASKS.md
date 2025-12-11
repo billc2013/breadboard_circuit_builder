@@ -2,12 +2,56 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: December 8, 2025
-**Current Phase**: Enhanced POC - Contextual Guided Wiring, Multi-Circuit Management, Auto-Save
+**Last Updated**: December 10, 2025
+**Current Phase**: Enhanced POC - Unified Circuit Explorer, Functional Group Highlighting
 
 ---
 
 ## Recently Completed (December 2025 Sessions)
+
+### ✅ Unified Circuit Explorer View
+**Completed**: December 10, 2025
+
+**What was delivered**:
+- **Unified view** combining best elements: physical Pico with real pins, faded breadboard, always-visible wire labels
+- **Functional group highlighting** - Click any component to highlight its entire functional group:
+  - LED click → highlights LED + current-limiting resistor + all their wires + Pico pins
+  - Button click → highlights button + pull-down resistor + all their wires + Pico pins
+  - Support components (resistors) automatically detected via `functionalGroup.requires` metadata in component JSON
+- **Always-visible wire labels** positioned near Pico pins (faded by default, bright when group highlighted)
+- **Component click interaction** with visual feedback (glow effects, transitions)
+- **Pico pin highlighting** when connected wires are selected
+- **Info panel** showing functional group label and all components in group
+
+**Key Implementation Details**:
+- `detectFunctionalGroups()` reads `functionalGroup.requires` from component JSON metadata
+- `componentToGroup` map enables any component in a group to highlight the whole group
+- Bus connectivity detection finds support components sharing electrical connections with primary
+- CSS transitions for smooth faded/bright label states
+
+**Files modified**: `explorer-app.js`, `styles/circuit-explorer.css`
+
+**Impact**: Students see circuits as conceptual units (LED Circuit, Button Input) rather than individual components, building better mental models
+
+---
+
+### ✅ Layout Engine Architecture (Archived for Future Use)
+**Completed**: December 10, 2025 (then archived in favor of unified view)
+
+**What was built**:
+- Pluggable layout engine system with base class and registry
+- `PhysicalLayoutEngine` - wrapper for breadboard-based positioning
+- `HierarchicalLayoutEngine` - tree layout with Pico at center, functional groups branching outward
+- `PicoAbstractRenderer` - simplified Pico representation for abstract view
+- Bezier curve wire routing calculations
+- Layout toggle UI (Physical | Abstract)
+- View toggle UI (All Wires | Wire Groups)
+
+**Decision**: Archived multi-view approach in favor of unified view that combines bezier wires + physical Pico + faded breadboard + always-visible labels. The layout engine code remains in `layouts/` directory for future exploration.
+
+**Files created**: `layouts/layout-engine.js`, `layouts/layout-registry.js`, `layouts/physical-layout.js`, `layouts/hierarchical-layout.js`, `components/abstract/pico-abstract.js`
+
+---
 
 ### ✅ Contextual Floating Wire Instruction Box
 **Completed**: December 8, 2025
