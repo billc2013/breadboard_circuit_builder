@@ -72,6 +72,11 @@ class ExplorerApp {
         // Tooltip state
         this.tooltipElement = null;
 
+        // Layout mode state: 'physical' or 'abstract'
+        this.layoutMode = 'physical';
+        this.layoutEngine = null;
+        this.picoAbstractRenderer = null;
+
         // Event handler references (for cleanup)
         this.boundHandleWireClick = this.handleWireClick.bind(this);
         this.boundHandleKeydown = this.handleKeydown.bind(this);
@@ -88,10 +93,277 @@ class ExplorerApp {
         this.renderPicoPins();
         this.attachEventListeners();
         this.setupViewToggle();
+        this.setupLayoutToggle();
         this.setupFilterListeners();
         this.setupKeyboardListeners();
 
+        // Initialize layout system
+        this.initializeLayoutSystem();
+
         console.log('Explorer app initialized');
+    }
+
+    // ==================== Layout Mode System ====================
+
+    /**
+     * Initialize the layout engine system
+     */
+    initializeLayoutSystem() {
+        // Default to physical layout (current behavior)
+        if (window.layoutRegistry) {
+            this.layoutEngine = window.layoutRegistry.setActive('physical');
+        }
+
+        // Initialize abstract Pico renderer
+        if (window.PicoAbstractRenderer) {
+            this.picoAbstractRenderer = new PicoAbstractRenderer();
+        }
+
+        console.log('[Explorer] Layout system initialized');
+    }
+
+    /**
+     * Setup the layout toggle button
+     */
+    setupLayoutToggle() {
+        const layoutToggle = document.getElementById('layout-toggle');
+        if (!layoutToggle) return;
+
+        layoutToggle.addEventListener('click', () => {
+            this.toggleLayoutMode();
+        });
+    }
+
+    /**
+     * Toggle between physical and abstract layout modes
+     */
+    toggleLayoutMode() {
+        const newMode = this.layoutMode === 'physical' ? 'abstract' : 'physical';
+        this.setLayoutMode(newMode);
+    }
+
+    /**
+     * Set the layout mode
+     * @param {string} mode - 'physical' or 'abstract'
+     */
+    setLayoutMode(mode) {
+        if (mode === this.layoutMode) return;
+
+        console.log(`[Explorer] Switching layout mode: ${this.layoutMode} → ${mode}`);
+
+        this.layoutMode = mode;
+
+        // Update layout engine
+        if (window.layoutRegistry) {
+            const engineName = mode === 'abstract' ? 'hierarchical' : 'physical';
+            this.layoutEngine = window.layoutRegistry.setActive(engineName);
+        }
+
+        // Update UI toggle
+        this.updateLayoutToggleUI();
+
+        // Switch visual mode
+        if (mode === 'abstract') {
+            this.showAbstractView();
+        } else {
+            this.showPhysicalView();
+        }
+
+        // Re-render current circuit if one is loaded
+        if (this.circuitData) {
+            this.reRenderCircuit();
+        }
+    }
+
+    /**
+     * Update the layout toggle button UI
+     */
+    updateLayoutToggleUI() {
+        const physicalOption = document.querySelector('[data-layout="physical"]');
+        const abstractOption = document.querySelector('[data-layout="abstract"]');
+
+        if (physicalOption && abstractOption) {
+            physicalOption.classList.toggle('active', this.layoutMode === 'physical');
+            abstractOption.classList.toggle('active', this.layoutMode === 'abstract');
+        }
+    }
+
+    /**
+     * Show abstract view - hide breadboard, show conceptual layout
+     */
+    showAbstractView() {
+        console.log('[Explorer] Showing abstract view');
+
+        // Hide physical elements
+        const breadboardImage = document.getElementById('breadboard-image');
+        const picoBoard = document.getElementById('pico-board');
+        const holesLayer = document.getElementById('holes-layer');
+        const fadeOverlay = document.getElementById('breadboard-fade-overlay');
+        const picoPinsLayer = document.getElementById('pico-pins-layer');
+
+        if (breadboardImage) breadboardImage.style.display = 'none';
+        if (picoBoard) picoBoard.style.display = 'none';
+        if (holesLayer) holesLayer.style.display = 'none';
+        if (fadeOverlay) fadeOverlay.style.display = 'none';
+        if (picoPinsLayer) picoPinsLayer.style.display = 'none';
+
+        // Add abstract mode class
+        this.svg.classList.add('abstract-mode');
+        document.body.classList.add('abstract-layout');
+
+        // Update SVG viewBox for larger abstract canvas
+        this.svg.setAttribute('viewBox', '0 0 600 500');
+    }
+
+    /**
+     * Show physical view - restore breadboard layout
+     */
+    showPhysicalView() {
+        console.log('[Explorer] Showing physical view');
+
+        // Show physical elements
+        const breadboardImage = document.getElementById('breadboard-image');
+        const picoBoard = document.getElementById('pico-board');
+        const holesLayer = document.getElementById('holes-layer');
+        const picoPinsLayer = document.getElementById('pico-pins-layer');
+
+        if (breadboardImage) breadboardImage.style.display = '';
+        if (picoBoard) picoBoard.style.display = '';
+        if (holesLayer) holesLayer.style.display = '';
+        if (picoPinsLayer) picoPinsLayer.style.display = '';
+
+        // Remove abstract mode class
+        this.svg.classList.remove('abstract-mode');
+        document.body.classList.remove('abstract-layout');
+
+        // Restore original SVG viewBox
+        this.svg.setAttribute('viewBox', '0 0 400 200');
+    }
+
+    /**
+     * Re-render the current circuit with the active layout
+     */
+    async reRenderCircuit() {
+        if (!this.circuitData) return;
+
+        console.log('[Explorer] Re-rendering circuit with', this.layoutMode, 'layout');
+
+        // Clear current rendering
+        this.clearComponents();
+        this.clearAllWires();
+
+        if (this.layoutMode === 'abstract') {
+            await this.renderAbstractCircuit();
+        } else {
+            // Use existing CircuitLoader for physical view
+            await this.circuitLoader.loadCircuit(this.circuitData);
+            this.loadCircuit(this.circuitData);
+        }
+    }
+
+    /**
+     * Clear all rendered components
+     */
+    clearComponents() {
+        if (this.componentsLayer) {
+            this.componentsLayer.innerHTML = '';
+        }
+    }
+
+    /**
+     * Render circuit in abstract layout mode
+     */
+    async renderAbstractCircuit() {
+        if (!this.circuitData || !this.layoutEngine) {
+            console.error('[Explorer] Cannot render abstract circuit: missing data or layout engine');
+            return;
+        }
+
+        console.log('[Explorer] Rendering abstract circuit');
+
+        const components = this.circuitData.circuit?.components || [];
+        const wires = this.circuitData.circuit?.wires || [];
+
+        // 1. Calculate layout
+        this.layoutEngine.calculateLayout(this.circuitData, this.functionalGroups);
+
+        // 2. Render abstract Pico
+        if (this.picoAbstractRenderer && this.layoutEngine.picoPosition) {
+            this.picoAbstractRenderer.render(
+                this.layoutEngine.picoPosition,
+                this.componentsLayer,
+                this.layoutEngine.connectedPicoPins,
+                this.picoMetadata
+            );
+        }
+
+        // 3. Render components using existing adapters with layout-computed positions
+        for (const comp of components) {
+            const position = this.layoutEngine.getComponentPosition(comp.id);
+            if (position) {
+                await this.renderComponentAtPosition(comp, position);
+            }
+        }
+
+        // 4. Render wires with bezier curves
+        for (const wire of wires) {
+            const route = this.layoutEngine.getWireRoute(wire.id);
+            if (route) {
+                this.renderBezierWire(wire, route);
+            }
+        }
+
+        // 5. Apply wire categories and interaction
+        this.categorizeWires(wires, components);
+        this.applyWireCategories();
+        this.updateWireVisibility();
+        this.enableWireInteraction();
+        this.updateWireCount();
+    }
+
+    /**
+     * Render a component at a layout-computed position using existing adapters
+     * @param {Object} componentData - Component from circuit JSON
+     * @param {Object} position - Position from layout engine
+     */
+    async renderComponentAtPosition(componentData, position) {
+        const { id, type } = componentData;
+
+        try {
+            // Load the adapter for this component type
+            const adapter = await this.circuitLoader.loadAdapter(type);
+            const metadata = await this.circuitLoader.loadComponentMetadata(type);
+
+            if (adapter && adapter.render) {
+                // Call the adapter's render method with the layout-computed position
+                await adapter.render(id, position, metadata);
+                console.log(`[Explorer] Rendered ${id} at abstract position`);
+            }
+        } catch (error) {
+            console.error(`[Explorer] Failed to render component ${id}:`, error);
+        }
+    }
+
+    /**
+     * Render a wire as a bezier curve
+     * @param {Object} wire - Wire data from circuit JSON
+     * @param {Object} route - Route from layout engine
+     */
+    renderBezierWire(wire, route) {
+        if (!route || !route.path) return;
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.classList.add('wire', 'abstract-wire');
+        path.setAttribute('data-wire-id', wire.id);
+
+        // Generate SVG path data
+        const d = HierarchicalLayoutEngine.getPathData(route);
+        path.setAttribute('d', d);
+
+        // Store wire data for interaction
+        path._wireData = wire;
+
+        this.wiresLayer.appendChild(path);
     }
 
     async loadComponentMetadata() {

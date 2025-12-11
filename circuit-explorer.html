@@ -13,6 +13,16 @@
             <h1>Circuit Explorer</h1>
             <a href="index.html" style="color: #888; font-size: 12px; margin-left: 20px;">← Back to mode selection</a>
 
+            <!-- Layout Toggle -->
+            <div id="layout-toggle-container">
+                <span class="layout-label">Layout:</span>
+                <button id="layout-toggle">
+                    <span class="layout-option active" data-layout="physical">Physical</span>
+                    <span class="layout-divider">|</span>
+                    <span class="layout-option" data-layout="abstract">Abstract</span>
+                </button>
+            </div>
+
             <!-- View Toggle -->
             <div id="view-toggle-container">
                 <span class="view-label">View:</span>
@@ -143,6 +153,16 @@
     <script src="components/microcontrollers/pico-geometry.js"></script>
     <script src="circuit-loader.js"></script>
     <script src="circuit-explorer.js"></script>
+
+    <!-- Layout Engine System -->
+    <script src="layouts/layout-engine.js"></script>
+    <script src="layouts/layout-registry.js"></script>
+    <script src="layouts/physical-layout.js"></script>
+    <script src="layouts/hierarchical-layout.js"></script>
+
+    <!-- Abstract Mode Renderers -->
+    <script src="components/abstract/pico-abstract.js"></script>
+
     <script src="explorer-app.js"></script>
     <script src="circuits-manager.js"></script>
 

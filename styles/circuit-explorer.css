@@ -357,3 +357,192 @@
 .explorer-header h1 {
     margin-bottom: 0;
 }
+
+/* ==================== Layout Toggle UI ==================== */
+
+#layout-toggle-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.layout-label {
+    color: #888;
+    font-size: 13px;
+}
+
+#layout-toggle {
+    background: #2a2a2a;
+    border: 2px solid #9b59b6;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#layout-toggle:hover {
+    background: #3a3a3a;
+    border-color: #a76bc4;
+}
+
+.layout-option {
+    color: #888;
+    font-size: 13px;
+    transition: color 0.3s;
+}
+
+.layout-option.active {
+    color: #9b59b6;
+    font-weight: bold;
+}
+
+.layout-divider {
+    color: #555;
+}
+
+/* ==================== Abstract Layout Mode ==================== */
+
+/* Abstract mode SVG background */
+.abstract-mode {
+    background: radial-gradient(ellipse at center, #1a1a1a 0%, #0d0d0d 100%);
+}
+
+/* Hide breadboard elements in abstract mode */
+.abstract-layout #breadboard-image,
+.abstract-layout #pico-board,
+.abstract-layout #holes-layer,
+.abstract-layout #pico-pins-layer,
+.abstract-layout #breadboard-fade-overlay {
+    display: none !important;
+}
+
+/* Abstract Pico Representation */
+.pico-abstract {
+    cursor: default;
+}
+
+.pico-abstract-body {
+    fill: #2d5a27;
+    stroke: #4CAF50;
+    stroke-width: 2;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.pico-abstract-title {
+    fill: #ffffff;
+    font-size: 11px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    text-anchor: middle;
+}
+
+.pico-abstract-pin {
+    stroke: #30312e;
+    stroke-width: 1;
+    transition: transform 0.2s;
+}
+
+.pico-abstract-pin:hover {
+    transform: scale(1.3);
+}
+
+.pico-abstract-pin.pin-type-gpio {
+    fill: #00ccff;
+}
+
+.pico-abstract-pin.pin-type-ground {
+    fill: #666666;
+}
+
+.pico-abstract-pin.pin-type-power {
+    fill: #ff6b6b;
+}
+
+.pico-abstract-pin.pin-type-other {
+    fill: #9a916c;
+}
+
+.pico-abstract-pin-label {
+    fill: #d4d4d4;
+    font-size: 8px;
+    font-family: monospace;
+}
+
+/* Abstract Wire Styles */
+.abstract-wire {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: stroke-width 0.2s, opacity 0.2s;
+}
+
+.abstract-wire:hover {
+    stroke-width: 3;
+    opacity: 0.8;
+}
+
+.abstract-wire.highlighted {
+    stroke-width: 4 !important;
+    opacity: 1 !important;
+    filter: drop-shadow(0 0 6px currentColor);
+}
+
+/* Abstract Component Styling */
+.abstract-layout .component {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.abstract-layout .component:hover {
+    filter: drop-shadow(0 2px 8px rgba(0, 204, 255, 0.4));
+}
+
+/* Functional Group Boxes (optional visual grouping) */
+.functional-group-box {
+    fill: rgba(42, 42, 42, 0.3);
+    stroke: #00ccff;
+    stroke-width: 1;
+    stroke-dasharray: 6, 3;
+    rx: 12;
+    ry: 12;
+    pointer-events: none;
+}
+
+.functional-group-label {
+    fill: #00ccff;
+    font-size: 10px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+}
+
+/* Abstract mode component labels */
+.abstract-layout .component-label {
+    fill: #d4d4d4;
+    font-size: 10px;
+    text-anchor: middle;
+    font-family: Arial, sans-serif;
+}
+
+/* Smooth transitions when switching layouts */
+#breadboard-svg {
+    transition: all 0.3s ease;
+}
+
+/* Abstract layout info panel adjustments */
+.abstract-layout #info-panel {
+    background: rgba(26, 26, 26, 0.9);
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+
+/* Hide stub legs in abstract mode (cleaner look) */
+.abstract-layout .led-stub,
+.abstract-layout .cathode-stub,
+.abstract-layout .anode-stub,
+.abstract-layout .component-stub {
+    display: none;
+}
