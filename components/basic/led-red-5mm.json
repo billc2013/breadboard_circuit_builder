@@ -120,6 +120,11 @@
     },
     "functionalGroup": {
       "groupLabel": "LED Circuit",
+      "category": "output",
+      "wireOrder": [
+        { "role": "signal", "color": "#ffcc00", "label": "Signal" },
+        { "role": "ground", "color": "#333333", "label": "Ground" }
+      ],
       "requires": [
         {
           "type": "resistor",

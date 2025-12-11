@@ -1,0 +1,165 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Complete Traffic Light System",
+      "description": "Traffic light with red, yellow, green LEDs, pedestrian pushbutton, and photoresistor car detector",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "r_red",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "1I",
+          "pin1": "5I"
+        }
+      },
+      {
+        "id": "led_red",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "5H",
+          "cathode": "6H"
+        }
+      },
+      {
+        "id": "r_yellow",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "8I",
+          "pin1": "12I"
+        }
+      },
+      {
+        "id": "led_yellow",
+        "type": "led-yellow-5mm",
+        "placement": {
+          "anode": "12H",
+          "cathode": "13H"
+        }
+      },
+      {
+        "id": "r_green",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "15I",
+          "pin1": "19I"
+        }
+      },
+      {
+        "id": "led_green",
+        "type": "led-green-5mm",
+        "placement": {
+          "anode": "19H",
+          "cathode": "20H"
+        }
+      },
+      {
+        "id": "button_ped",
+        "type": "button-tactile-6mm",
+        "placement": {
+          "leg0": "2B",
+          "leg1": "3B"
+        }
+      },
+      {
+        "id": "r_button",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "3C",
+          "pin1": "7C"
+        }
+      },
+      {
+        "id": "photo_car",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "10B",
+          "pin1": "13B"
+        }
+      },
+      {
+        "id": "r_photo",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "13C",
+          "pin1": "17C"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w_red_signal",
+        "from": "pico1.GP15",
+        "to": "Bus1J-F",
+        "description": "Wire from Pico GPIO15 to breadboard Bus1J-F (hole 1J). Controls red LED."
+      },
+      {
+        "id": "w_red_gnd",
+        "from": "pico1.GND_3",
+        "to": "Bus6J-F",
+        "description": "Wire from Pico ground to breadboard Bus6J-F (hole 6J). Completes red LED circuit."
+      },
+      {
+        "id": "w_yellow_signal",
+        "from": "pico1.GP16",
+        "to": "Bus8J-F",
+        "description": "Wire from Pico GPIO16 to breadboard Bus8J-F (hole 8J). Controls yellow LED."
+      },
+      {
+        "id": "w_yellow_gnd",
+        "from": "pico1.GND_8",
+        "to": "Bus13J-F",
+        "description": "Wire from Pico ground to breadboard Bus13J-F (hole 13J). Completes yellow LED circuit."
+      },
+      {
+        "id": "w_green_signal",
+        "from": "pico1.GP17",
+        "to": "Bus15J-F",
+        "description": "Wire from Pico GPIO17 to breadboard Bus15J-F (hole 15J). Controls green LED."
+      },
+      {
+        "id": "w_green_gnd",
+        "from": "pico1.GND_13",
+        "to": "Bus20J-F",
+        "description": "Wire from Pico ground to breadboard Bus20J-F (hole 20J). Completes green LED circuit."
+      },
+      {
+        "id": "w_button_power",
+        "from": "pico1.3V3_OUT",
+        "to": "Bus2A-E",
+        "description": "Wire from Pico 3.3V to breadboard Bus2A-E (hole 2A). Provides power to pushbutton."
+      },
+      {
+        "id": "w_button_signal",
+        "from": "pico1.GP14",
+        "to": "Bus3A-E",
+        "description": "Wire from Pico GPIO14 to breadboard Bus3A-E (hole 3D). Reads pushbutton state."
+      },
+      {
+        "id": "w_button_gnd",
+        "from": "pico1.GND_18",
+        "to": "Bus7A-E",
+        "description": "Wire from Pico ground to breadboard Bus7A-E (hole 7A). Completes pushbutton pull-down circuit."
+      },
+      {
+        "id": "w_photo_power",
+        "from": "pico1.3V3_OUT",
+        "to": "Bus10A-E",
+        "description": "Wire from Pico 3.3V to breadboard Bus10A-E (hole 10A). Provides power to photoresistor voltage divider."
+      },
+      {
+        "id": "w_photo_signal",
+        "from": "pico1.GP26_ADC0",
+        "to": "Bus13A-E",
+        "description": "Wire from Pico GPIO26 (ADC0) to breadboard Bus13A-E (hole 13D). Reads analog voltage from photoresistor."
+      },
+      {
+        "id": "w_photo_gnd",
+        "from": "pico1.GND_23",
+        "to": "Bus17A-E",
+        "description": "Wire from Pico ground to breadboard Bus17A-E (hole 17A). Completes photoresistor voltage divider circuit."
+      }
+    ]
+  }
+}

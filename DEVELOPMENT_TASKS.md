@@ -2,12 +2,62 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: December 10, 2025
-**Current Phase**: Enhanced POC - Unified Circuit Explorer, Functional Group Highlighting
+**Last Updated**: December 11, 2025
+**Current Phase**: Enhanced POC - Abstract Layout System, Bus Format Parsing
 
 ---
 
 ## Recently Completed (December 2025 Sessions)
+
+### ✅ Abstract Layout System & Bus Format Parsing
+**Completed**: December 11, 2025
+
+**What was delivered**:
+- **Abstract slot-based layout** (`abstract-layout.js`) for Circuit Explorer:
+  - Canvas divided into sensor region (top) and output region (bottom)
+  - Dynamic slot sizing based on group count (1 group: large centered, 2: side-by-side, 3+: smaller distributed)
+  - Categories pulled from component library JSON metadata (`functionalGroup.category`)
+  - Group-to-slot mapping for component positioning
+- **Bus format wire parsing** in `explorer-app.js`:
+  - Added `parseBusFormat()` to handle `Bus{column}{rowStart}-{rowEnd}` format (e.g., `Bus1J-F` → `1J`)
+  - Added `normalizeEndpoint()` to unify both standard (`5C`) and Bus formats
+  - Updated `findComponentForEndpoint()` and `wireEndpointOnBus()` to use normalization
+- **Wire opacity fix**:
+  - Removed inline `opacity: 0.9` that was overriding CSS classes
+  - CSS now correctly controls opacity (`.bundled-wire` = 0.5, `.wire-active` = 1.0)
+  - Group selection highlighting works properly
+- **Debug logging cleanup**:
+  - Removed excessive per-component traces from `parseBusFormat()`
+  - Removed slot mapping and categorization logs from `abstract-layout.js`
+  - Clean console output for production use
+
+**Key Implementation Details**:
+```javascript
+parseBusFormat(endpoint) {
+    const busMatch = endpoint.match(/^Bus(\d+)([A-J])-([A-J])$/i);
+    if (!busMatch) return null;
+    return `${busMatch[1]}${busMatch[2].toUpperCase()}`;
+}
+
+normalizeEndpoint(endpoint) {
+    const busHole = this.parseBusFormat(endpoint);
+    if (busHole) return busHole;
+    if (/^\d+[A-J]$/i.test(endpoint)) return endpoint.toUpperCase();
+    return null;
+}
+```
+
+**Test Results**:
+- Button-LED circuit: 2 functional groups (1 sensor, 1 output) ✓
+- Traffic Light circuit: 5 functional groups (2 sensors, 3 outputs) ✓
+- Sensors positioned at y=35, outputs at y=120 ✓
+- Wire opacity correctly dims/brightens on group selection ✓
+
+**Files modified**: `explorer-app.js`, `abstract-layout.js`
+
+**Impact**: Complex circuits with Bus-format wire endpoints now render correctly in Circuit Explorer mode with proper functional group detection and visual feedback.
+
+---
 
 ### ✅ Unified Circuit Explorer View
 **Completed**: December 10, 2025

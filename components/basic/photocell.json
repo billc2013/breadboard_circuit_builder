@@ -128,6 +128,12 @@
     },
     "functionalGroup": {
       "groupLabel": "Light Sensor",
+      "category": "sensor",
+      "wireOrder": [
+        { "role": "power", "color": "#ff4444", "label": "Power 3.3V" },
+        { "role": "signal", "color": "#33cc33", "label": "Analog Signal" },
+        { "role": "ground", "color": "#333333", "label": "Ground" }
+      ],
       "requires": [
         {
           "type": "resistor",

@@ -14,9 +14,11 @@ The Breadboard Circuit Builder is a proof-of-concept educational tool that rende
 - Interactive breadboard visualization (400 holes with accurate positioning)
 - Component rendering (LEDs, resistors, Raspberry Pi Pico, photocells, buttons)
 - **Circuit Explorer Mode** (NEW - December 2025):
+  - **Abstract slot-based layout** - Sensors at top, outputs at bottom, dynamically sized slots
   - **Functional group highlighting** - Click LED to highlight entire LED Circuit (LED + resistor + wires + Pico pins)
   - **Always-visible wire labels** near Pico pins (Signal GP14, Ground, Power 3.3V)
   - **Faded/bright transitions** - Labels dim by default, brighten when group selected
+  - **Bus format wire support** - Parses both `5C` and `Bus1J-F` endpoint formats
   - Support components (resistors) auto-detected from component JSON metadata
   - Educational info panel showing group relationships
 - **Hover-based component information** - Interactive info boxes with full component details
@@ -444,6 +446,8 @@ python3 -m http.server 8000
 See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 
 **Recently Completed (December 2025):**
+- ✅ **Abstract slot-based layout** for Circuit Explorer with sensor/output regions
+- ✅ **Bus format wire parsing** - Supports both `5C` and `Bus1J-F` wire endpoint formats
 - ✅ **Unified Circuit Explorer** with functional group highlighting
 - ✅ **Functional group awareness** - Click any component to highlight entire group (LED + resistor, Button + resistor)
 - ✅ **Always-visible wire labels** near Pico pins with faded/bright states
@@ -488,6 +492,6 @@ For questions, issues, or contributions, please refer to the project repository 
 
 ---
 
-**Last Updated**: December 10, 2025
-**Status**: Enhanced POC - Unified Circuit Explorer, Functional Group Highlighting
-**Version**: 1.3-POC
+**Last Updated**: December 11, 2025
+**Status**: Enhanced POC - Abstract Layout System, Bus Format Parsing
+**Version**: 1.4-POC

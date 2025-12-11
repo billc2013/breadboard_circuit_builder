@@ -120,6 +120,12 @@
     },
     "functionalGroup": {
       "groupLabel": "Button Input",
+      "category": "sensor",
+      "wireOrder": [
+        { "role": "power", "color": "#ff4444", "label": "Power 3.3V" },
+        { "role": "signal", "color": "#ffcc00", "label": "Signal" },
+        { "role": "ground", "color": "#333333", "label": "Ground" }
+      ],
       "requires": [
         {
           "type": "resistor",

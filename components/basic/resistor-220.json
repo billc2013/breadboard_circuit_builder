@@ -2,7 +2,7 @@
   "component": {
     "metadata": {
       "id": null,
-      "name": "220 &#8486; Resistor",
+      "name": "220Ω Resistor",
       "description": "A generic resistor (0.25W)",
       "author": "Brendan Howell",
       "tags": [
@@ -60,7 +60,7 @@
       "pinSpacing": "400 mil",
       "package": "THT",
       "bands": 4,
-      "tolerance": "&#177;5%"
+      "tolerance": "±5%"
     },
     "physical": {
       "pinSpacing": "400 mil",
@@ -68,7 +68,7 @@
     },
     "rendering": {
       "breadboard": {
-        "svg": "breadboard/resistor_220.svg",
+        "svg": "components_svg/resistor_220.svg",
         "width": 45,
         "height": 12,
         "unit": "px",

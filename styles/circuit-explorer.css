@@ -124,11 +124,26 @@
     vertical-align: middle;
 }
 
-/* Breadboard Fade Overlay */
+/* Breadboard Fade Overlay - more faded for information clarity */
 .breadboard-fade-overlay {
-    fill: var(--explorer-overlay-color);
-    opacity: var(--explorer-breadboard-fade);
+    fill: var(--explorer-overlay-color, rgba(26, 26, 26, 0.7));
+    opacity: 0.75;
     pointer-events: none;
+}
+
+/* Extra faded breadboard for bundled wire mode */
+.explorer-mode.bundled-wire-mode .breadboard-fade-overlay {
+    opacity: 0.85;
+}
+
+/* Fade the breadboard image itself */
+.explorer-mode #breadboard-image {
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+
+.explorer-mode.bundled-wire-mode #breadboard-image {
+    opacity: 0.25;
 }
 
 /* Explorer Wire Styles - Applied when explorer mode is active */
@@ -541,7 +556,137 @@
     filter: drop-shadow(0 2px 8px rgba(0, 204, 255, 0.4));
 }
 
-/* Functional Group Boxes (optional visual grouping) */
+/* ==================== Functional Group Boundaries ==================== */
+
+/* Group boundary - rounded rectangle behind each functional group */
+.group-boundary {
+    fill: rgba(60, 60, 70, 0.85);
+    stroke: #555;
+    stroke-width: 0.5;
+    rx: 8;
+    ry: 8;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+}
+
+/* When group is highlighted/selected */
+.group-boundary.group-active {
+    opacity: 1;
+    stroke: #00ccff;
+    stroke-width: 1;
+    filter: drop-shadow(0 2px 8px rgba(0, 204, 255, 0.3));
+}
+
+/* Subtle "rise" effect when active */
+.group-boundary.group-active {
+    transform: translateY(-2px);
+}
+
+/* Group label (shown when active) */
+.group-boundary-label {
+    fill: #00ccff;
+    font-size: 8px;
+    font-weight: bold;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    text-anchor: middle;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.group-boundary-label.label-active {
+    opacity: 1;
+}
+
+/* ==================== Bundled Wire Styles ==================== */
+
+/* Bundled wires use bezier paths */
+.bundled-wire {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    opacity: 0.5;
+    transition: opacity 0.3s ease, stroke-width 0.3s ease;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* When wire's group is active, make it bright */
+.bundled-wire.wire-active {
+    opacity: 1;
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 3px currentColor);
+}
+
+/* Faded state for non-active wires when something is selected */
+.bundled-wire.wire-faded {
+    opacity: 0.2;
+}
+
+/* Wire color classes */
+.bundled-wire.wire-power {
+    stroke: #ff4444;
+}
+
+.bundled-wire.wire-ground {
+    stroke: #333333;
+}
+
+.bundled-wire.wire-signal-digital {
+    stroke: #ffcc00;
+}
+
+.bundled-wire.wire-signal-pwm {
+    stroke: #ff9900;
+}
+
+.bundled-wire.wire-signal-analog {
+    stroke: #33cc33;
+}
+
+.bundled-wire.wire-signal-i2c-sda {
+    stroke: #3399ff;
+}
+
+.bundled-wire.wire-signal-i2c-scl {
+    stroke: #9966ff;
+}
+
+.bundled-wire.wire-signal-spi {
+    stroke: #00cccc;
+}
+
+.bundled-wire.wire-signal-uart {
+    stroke: #cccccc;
+}
+
+/* Wire endpoint dots at group boundary */
+.wire-endpoint {
+    fill: currentColor;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.wire-endpoint.endpoint-active {
+    opacity: 1;
+}
+
+/* Wire labels at group boundary */
+.bundled-wire-label {
+    font-size: 6px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    fill: #ffffff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.bundled-wire-label.label-active {
+    opacity: 1;
+}
+
+/* Functional Group Boxes (legacy - keeping for compatibility) */
 .functional-group-box {
     fill: rgba(42, 42, 42, 0.3);
     stroke: #00ccff;
@@ -585,4 +730,82 @@
 .abstract-layout .anode-stub,
 .abstract-layout .component-stub {
     display: none;
+}
+
+/* ==================== Abstract Slot-Based Layout ==================== */
+
+/* Abstract components - rendered in slots */
+.abstract-component {
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.abstract-component:hover {
+    filter: drop-shadow(0 0 4px rgba(0, 204, 255, 0.6));
+}
+
+.abstract-component.component-highlighted {
+    filter: drop-shadow(0 0 8px rgba(0, 204, 255, 0.9));
+}
+
+/* Abstract component labels */
+.abstract-label {
+    fill: #b0b0b0;
+    font-size: 5px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    pointer-events: none;
+}
+
+/* Abstract boundary styling - make them visible by default */
+.abstract-boundary .group-boundary {
+    opacity: 0.6;  /* Visible by default in abstract mode */
+    fill: rgba(50, 50, 60, 0.7);
+}
+
+.abstract-boundary .group-boundary-label {
+    opacity: 0.8;  /* Labels visible in abstract mode */
+}
+
+/* Abstract wires - from Pico to slot boundaries */
+.abstract-wire {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    opacity: 0.6;
+    transition: opacity 0.3s ease, stroke-width 0.3s ease;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.abstract-wire:hover {
+    opacity: 0.85;
+    stroke-width: 2.5;
+}
+
+.abstract-wire.wire-active {
+    opacity: 1;
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 4px currentColor);
+}
+
+.abstract-wire.wire-faded {
+    opacity: 0.15;
+}
+
+/* Category indicator regions (optional visual guides) */
+.slot-region-indicator {
+    fill: none;
+    stroke: #333;
+    stroke-width: 0.5;
+    stroke-dasharray: 4, 4;
+    rx: 5;
+    ry: 5;
+    opacity: 0.3;
+}
+
+.slot-region-label {
+    fill: #555;
+    font-size: 7px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    text-anchor: start;
 }

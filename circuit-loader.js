@@ -386,7 +386,7 @@ class CircuitLoader {
         // Render component
         console.log(`  🎨 Rendering...`);
         await adapter.render(id, position, metadata);
-        
+
         // Track it
         this.renderedComponents.set(id, {
             type,
@@ -395,6 +395,11 @@ class CircuitLoader {
             adapter,
             position
         });
+
+        // Register component position for explorer mode (if method exists)
+        if (this.app.registerComponentPosition) {
+            this.app.registerComponentPosition(id, position);
+        }
 
         console.log(`  ✅ ${id} rendered successfully`);
     }
@@ -508,6 +513,12 @@ class CircuitLoader {
         }
         
         this.renderedComponents.clear();
+
+        // Clear component positions cache (for explorer mode)
+        if (this.app.clearComponentPositions) {
+            this.app.clearComponentPositions();
+        }
+
         console.log('  Circuit cleared');
     }
     

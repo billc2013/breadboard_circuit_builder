@@ -92,6 +92,22 @@
         "Connect anode to signal/power, cathode to ground",
         "Blue LEDs have higher forward voltage (3.0V) - verify GPIO voltage compatibility"
       ]
+    },
+    "functionalGroup": {
+      "groupLabel": "LED Circuit",
+      "category": "output",
+      "wireOrder": [
+        { "role": "signal", "color": "#ffcc00", "label": "Signal" },
+        { "role": "ground", "color": "#333333", "label": "Ground" }
+      ],
+      "requires": [
+        {
+          "type": "resistor",
+          "role": "current-limiting",
+          "typicalValue": "220R",
+          "typicalResistance": 220
+        }
+      ]
     }
   }
 }
