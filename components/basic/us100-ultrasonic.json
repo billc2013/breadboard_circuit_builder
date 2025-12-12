@@ -1,0 +1,214 @@
+{
+  "component": {
+    "metadata": {
+      "id": "us100-ultrasonic",
+      "name": "US-100 Ultrasonic Distance Sensor",
+      "description": "Ultrasonic distance sensor with detection range of 2cm to 450cm, supports Trigger/Echo and UART modes",
+      "author": "Moritz Kanemeier",
+      "tags": [
+        "US-100",
+        "ultrasonic",
+        "distance sensor",
+        "range",
+        "sensor",
+        "sonar"
+      ],
+      "version": "1",
+      "created": "2021-05-06",
+      "category": "basic"
+    },
+    "pins": {
+      "vcc": {
+        "number": 1,
+        "name": "VCC",
+        "description": "Power supply (2.4V - 5V)",
+        "connectorId": "connector0",
+        "electricalType": "power",
+        "connectionGuide": {
+          "purpose": "Power input for the sensor. Accepts 2.4V to 5V, typically connected to 3.3V or 5V from Pico.",
+          "warnings": [
+            "Can use 3.3V or 5V power",
+            "Current consumption is approximately 2mA idle, 15mA during measurement"
+          ],
+          "troubleshooting": [
+            "If sensor doesn't respond: check power connection",
+            "If readings are erratic: ensure stable power supply"
+          ]
+        }
+      },
+      "trig": {
+        "number": 2,
+        "name": "TRIG/TX",
+        "description": "Trigger input (Echo mode) or UART TX (Serial mode)",
+        "connectorId": "connector1",
+        "electricalType": "input",
+        "connectionGuide": {
+          "purpose": "In Trigger/Echo mode: send a 10µs HIGH pulse to trigger measurement. In UART mode: serial transmit pin.",
+          "warnings": [
+            "In Echo mode: requires 10µs pulse to trigger",
+            "In UART mode: connect to Pico RX pin, set jumper on back of sensor"
+          ],
+          "troubleshooting": [
+            "Echo mode: ensure trigger pulse is at least 10µs",
+            "UART mode: check jumper is set and baud rate is 9600"
+          ]
+        }
+      },
+      "echo": {
+        "number": 3,
+        "name": "ECHO/RX",
+        "description": "Echo output (Echo mode) or UART RX (Serial mode)",
+        "connectorId": "connector2",
+        "electricalType": "output",
+        "connectionGuide": {
+          "purpose": "In Trigger/Echo mode: outputs pulse width proportional to distance. In UART mode: serial receive pin.",
+          "warnings": [
+            "Echo pulse can be up to 25ms for maximum range",
+            "Echo output is 5V when powered at 5V - may need voltage divider for 3.3V Pico GPIO"
+          ],
+          "troubleshooting": [
+            "If no echo: check trigger pulse timing",
+            "If echo always HIGH: object may be too close (<2cm)",
+            "For 3.3V GPIO: use voltage divider (2.2kΩ + 3.3kΩ) if powered at 5V"
+          ]
+        }
+      },
+      "gnd": {
+        "number": 4,
+        "name": "GND",
+        "description": "Ground connection",
+        "connectorId": "connector3",
+        "electricalType": "ground",
+        "connectionGuide": {
+          "purpose": "Ground reference, connect to Pico GND.",
+          "warnings": [
+            "Must share common ground with Pico"
+          ],
+          "troubleshooting": [
+            "If no response: verify ground connection"
+          ]
+        }
+      },
+      "gnd2": {
+        "number": 5,
+        "name": "GND-2",
+        "description": "Second ground connection (internally connected to GND)",
+        "connectorId": "connector4",
+        "electricalType": "ground",
+        "connectionGuide": {
+          "purpose": "Additional ground pin, internally connected to main GND. Can be left unconnected.",
+          "warnings": [],
+          "troubleshooting": []
+        }
+      }
+    },
+    "properties": {
+      "detectionRange": "2cm - 450cm",
+      "minRange": 0.02,
+      "maxRange": 4.5,
+      "rangeUnit": "meters",
+      "accuracy": "3mm",
+      "operatingVoltage": "2.4V - 5V",
+      "operatingCurrent": "2mA idle, 15mA measuring",
+      "frequency": "40kHz",
+      "effectiveAngle": "15°",
+      "triggerPulse": "10µs minimum",
+      "echoMode": true,
+      "uartMode": true,
+      "uartBaudRate": 9600
+    },
+    "physical": {
+      "type": "module",
+      "package": "PCB module with dual transducers",
+      "pinSpacing": "2.54mm",
+      "width": "44mm",
+      "height": "26mm"
+    },
+    "rendering": {
+      "breadboard": {
+        "svg": "components_svg/US-100_ultrasonic-distance-sensor.svg",
+        "width": 44,
+        "height": 26,
+        "unit": "mm",
+        "viewBox": "0 0 44 26",
+        "anchor": "center",
+        "pinOffsets": {
+          "vcc": {"x": -5.08, "y": 13},
+          "trig": {"x": -2.54, "y": 13},
+          "echo": {"x": 0, "y": 13},
+          "gnd": {"x": 2.54, "y": 13},
+          "gnd2": {"x": 5.08, "y": 13}
+        },
+        "renderMode": "on-breadboard",
+        "orientation": {
+          "default": "vertical",
+          "allowed": ["vertical"]
+        }
+      },
+      "schematic": {
+        "svg": "schematic/US-100_ultrasonic-distance-sensor_schematic.svg"
+      },
+      "pcb": {
+        "svg": "pcb/US-100_ultrasonic-distance-sensor_pcb.svg"
+      }
+    },
+    "validation": {
+      "electricalType": "sensor",
+      "polarity": "polarized",
+      "rules": {
+        "requiresPower": true,
+        "requiresGround": true,
+        "voltageRange": {
+          "min": 2.4,
+          "max": 5.0,
+          "unit": "V"
+        }
+      },
+      "warnings": [
+        "If using 5V power, Echo output is 5V - use voltage divider for 3.3V GPIO",
+        "Minimum detection distance is 2cm - closer objects may not be detected",
+        "Allow 60ms between measurements for accurate readings",
+        "Soft surfaces (fabric, foam) may absorb sound and reduce range"
+      ],
+      "usageNotes": [
+        "Trigger/Echo mode: Send 10µs pulse on TRIG, measure HIGH time on ECHO",
+        "Distance (cm) = Echo pulse time (µs) / 58",
+        "UART mode: Set jumper on back, send 0x55 to get 2-byte distance response",
+        "Built-in temperature compensation in UART mode"
+      ]
+    },
+    "functionalGroup": {
+      "groupLabel": "Distance Sensor",
+      "category": "sensor",
+      "wireOrder": [
+        { "role": "power", "color": "#ff4444", "label": "Power (VCC)" },
+        { "role": "signal", "color": "#ffcc00", "label": "Trigger" },
+        { "role": "signal", "color": "#33cc33", "label": "Echo" },
+        { "role": "ground", "color": "#333333", "label": "Ground" }
+      ],
+      "requires": [],
+      "wireLabels": {
+        "power": {
+          "label": "Power 3.3V/5V",
+          "colorHint": "red",
+          "pinConnection": "vcc"
+        },
+        "trigger": {
+          "label": "Trigger",
+          "colorHint": "yellow",
+          "pinConnection": "trig"
+        },
+        "echo": {
+          "label": "Echo",
+          "colorHint": "green",
+          "pinConnection": "echo"
+        },
+        "ground": {
+          "label": "Ground",
+          "colorHint": "black",
+          "pinConnection": "gnd"
+        }
+      }
+    }
+  }
+}

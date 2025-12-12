@@ -6,10 +6,18 @@
  *   button = Pin(14, Pin.IN, Pin.PULL_DOWN)  # button-tactile-6mm
  *   sensor = ADC(Pin(26))  # photocell-ldr
  *
+ * Enhanced annotation format for multi-pin components:
+ *   trig = Pin(14, Pin.OUT)  # us100-ultrasonic:trig
+ *   echo = Pin(15, Pin.IN)   # us100-ultrasonic:echo
+ *
+ *   ain1 = Pin(2, Pin.OUT)   # tb6612-motor-driver:ain1
+ *   pwma = PWM(Pin(4))       # tb6612-motor-driver:pwma
+ *
  * Uses the "One Truth" component library to:
  * - Resolve component types to full metadata
+ * - Group multiple pins into single multi-pin components
  * - Auto-generate support components (resistors)
- * - Generate wire definitions with roles and colors
+ * - Generate wire definitions with roles and colors from pin metadata
  */
 
 class MicroPythonParser {
@@ -52,10 +60,10 @@ class MicroPythonParser {
         }
 
         // Extract declarations from code
-        const declarations = this.extractDeclarations(micropythonCode);
-        console.log('[MicroPythonParser] Extracted declarations:', declarations);
+        const rawDeclarations = this.extractDeclarations(micropythonCode);
+        console.log('[MicroPythonParser] Extracted raw declarations:', rawDeclarations);
 
-        if (declarations.length === 0) {
+        if (rawDeclarations.length === 0) {
             console.warn('[MicroPythonParser] No declarations found!');
             this.errors.push({
                 type: 'no_declarations',
@@ -64,6 +72,10 @@ class MicroPythonParser {
             });
             return { success: false, circuitData: null, errors: this.errors, warnings: this.warnings };
         }
+
+        // Group multi-pin components (US-100, TB6612, etc.)
+        const declarations = this.groupMultiPinDeclarations(rawDeclarations);
+        console.log('[MicroPythonParser] Grouped declarations:', declarations);
 
         // Resolve component types and load metadata
         console.log('[MicroPythonParser] Resolving components...');
@@ -120,15 +132,19 @@ class MicroPythonParser {
 
         // Pattern for Pin(N, Pin.MODE) with optional pull resistor
         // Matches: led = Pin(15, Pin.OUT)  # led-red-5mm
-        const pinPattern = /(\w+)\s*=\s*Pin\s*\(\s*(\d+)\s*,\s*Pin\s*\.\s*(OUT|IN)(?:\s*,\s*Pin\s*\.\s*(PULL_DOWN|PULL_UP))?\s*\)\s*#\s*(\S+)/gi;
+        // Enhanced: trig = Pin(14, Pin.OUT)  # us100-ultrasonic:trig
+        // Capture group 5 is component-type, group 6 is optional :pinRole
+        const pinPattern = /(\w+)\s*=\s*Pin\s*\(\s*(\d+)\s*,\s*Pin\s*\.\s*(OUT|IN)(?:\s*,\s*Pin\s*\.\s*(PULL_DOWN|PULL_UP))?\s*\)\s*#\s*([\w-]+)(?::([\w]+))?/gi;
 
         // Pattern for PWM(Pin(N))
         // Matches: pwm_led = PWM(Pin(16))  # led-red-5mm
-        const pwmPattern = /(\w+)\s*=\s*PWM\s*\(\s*Pin\s*\(\s*(\d+)\s*\)\s*\)\s*#\s*(\S+)/gi;
+        // Enhanced: pwma = PWM(Pin(4))  # tb6612-motor-driver:pwma
+        const pwmPattern = /(\w+)\s*=\s*PWM\s*\(\s*Pin\s*\(\s*(\d+)\s*\)\s*\)\s*#\s*([\w-]+)(?::([\w]+))?/gi;
 
         // Pattern for ADC(Pin(N))
         // Matches: sensor = ADC(Pin(26))  # photocell-ldr
-        const adcPattern = /(\w+)\s*=\s*ADC\s*\(\s*Pin\s*\(\s*(\d+)\s*\)\s*\)\s*#\s*(\S+)/gi;
+        // Enhanced: light = ADC(Pin(26))  # photocell-ldr:signal
+        const adcPattern = /(\w+)\s*=\s*ADC\s*\(\s*Pin\s*\(\s*(\d+)\s*\)\s*\)\s*#\s*([\w-]+)(?::([\w]+))?/gi;
 
         // Extract Pin declarations
         let match;
@@ -141,6 +157,7 @@ class MicroPythonParser {
                 mode: match[3].toUpperCase(),
                 pullMode: match[4] ? match[4].toUpperCase() : null,
                 componentType: match[5].toLowerCase(),
+                pinRole: match[6] ? match[6].toLowerCase() : null,  // New: pin role
                 isPWM: false,
                 isADC: false,
                 lineText: match[0]
@@ -157,6 +174,7 @@ class MicroPythonParser {
                 mode: 'OUT',
                 pullMode: null,
                 componentType: match[3].toLowerCase(),
+                pinRole: match[4] ? match[4].toLowerCase() : null,  // New: pin role
                 isPWM: true,
                 isADC: false,
                 lineText: match[0]
@@ -173,6 +191,7 @@ class MicroPythonParser {
                 mode: 'IN',
                 pullMode: null,
                 componentType: match[3].toLowerCase(),
+                pinRole: match[4] ? match[4].toLowerCase() : null,  // New: pin role
                 isPWM: false,
                 isADC: true,
                 lineText: match[0]
@@ -195,6 +214,83 @@ class MicroPythonParser {
         }
 
         return declarations;
+    }
+
+    /**
+     * Group declarations by component type for multi-pin components
+     * Single-pin components (LED, button, photocell) remain as-is
+     * Multi-pin components (US-100, TB6612) are grouped into one entry
+     * @param {Array} declarations - Raw declarations from extractDeclarations
+     * @returns {Array} Grouped declarations
+     */
+    groupMultiPinDeclarations(declarations) {
+        // Components that need multiple pins (from our library knowledge)
+        const multiPinComponents = new Set([
+            'us100-ultrasonic',
+            'tb6612-motor-driver'
+        ]);
+
+        const grouped = [];
+        const multiPinGroups = new Map();  // componentType -> array of declarations
+
+        for (const decl of declarations) {
+            if (multiPinComponents.has(decl.componentType)) {
+                // Multi-pin component: group by type
+                if (!multiPinGroups.has(decl.componentType)) {
+                    multiPinGroups.set(decl.componentType, []);
+                }
+                multiPinGroups.get(decl.componentType).push(decl);
+            } else {
+                // Single-pin component: add directly
+                grouped.push(decl);
+            }
+        }
+
+        // Convert multi-pin groups into single declarations with pins array
+        for (const [componentType, decls] of multiPinGroups) {
+            // Generate an ID from the first variable name or the component type
+            const primaryVar = decls[0].variableName;
+            const componentId = primaryVar.replace(/_?(trig|echo|ain\d|bin\d|pwm[ab]|stby|vcc|gnd)$/i, '') || componentType.split('-')[0];
+
+            const pins = decls.map(d => ({
+                variableName: d.variableName,
+                gpioPin: d.gpioPin,
+                mode: d.mode,
+                pullMode: d.pullMode,
+                pinRole: d.pinRole,  // e.g., 'trig', 'echo', 'ain1', 'pwma'
+                isPWM: d.isPWM,
+                isADC: d.isADC
+            }));
+
+            // Validate that pin roles are specified for multi-pin components
+            const missingRoles = pins.filter(p => !p.pinRole);
+            if (missingRoles.length > 0) {
+                this.warnings.push({
+                    type: 'missing_pin_role',
+                    message: `Multi-pin component ${componentType} has pins without roles: ${missingRoles.map(p => p.variableName).join(', ')}`,
+                    suggestion: `Use format: var = Pin(N, Pin.MODE)  # ${componentType}:pinRole`
+                });
+            }
+
+            grouped.push({
+                variableName: componentId,
+                componentType: componentType,
+                isMultiPin: true,
+                pins: pins,
+                // Legacy fields for backward compatibility
+                gpioPin: pins[0]?.gpioPin,
+                mode: pins[0]?.mode,
+                pullMode: pins[0]?.pullMode,
+                isPWM: pins.some(p => p.isPWM),
+                isADC: pins.some(p => p.isADC),
+                lineText: decls.map(d => d.lineText).join('\n')
+            });
+        }
+
+        console.log('[MicroPythonParser] Grouped declarations:', grouped.length,
+            '(from', declarations.length, 'raw declarations)');
+
+        return grouped;
     }
 
     /**
@@ -278,7 +374,8 @@ class MicroPythonParser {
             return null;
         }
 
-        return {
+        // Build resolved component object
+        const resolved = {
             id: declaration.variableName,
             type: componentType,
             gpioPin: declaration.gpioPin,
@@ -288,6 +385,29 @@ class MicroPythonParser {
             isADC: declaration.isADC,
             metadata: metadata
         };
+
+        // For multi-pin components, include the pins array with roles
+        if (declaration.isMultiPin && declaration.pins) {
+            resolved.isMultiPin = true;
+            resolved.pins = declaration.pins;
+
+            // Validate pin roles against component metadata
+            const validPinNames = Object.keys(metadata.pins || {});
+            for (const pin of declaration.pins) {
+                if (pin.pinRole && !validPinNames.includes(pin.pinRole)) {
+                    this.warnings.push({
+                        type: 'invalid_pin_role',
+                        message: `Pin role '${pin.pinRole}' not found in ${componentType} definition`,
+                        suggestion: `Valid pin roles: ${validPinNames.join(', ')}`
+                    });
+                }
+            }
+        } else if (declaration.pinRole) {
+            // Single declaration with pin role (shouldn't happen for single-pin components, but handle it)
+            resolved.pinRole = declaration.pinRole;
+        }
+
+        return resolved;
     }
 
     /**
@@ -343,17 +463,24 @@ class MicroPythonParser {
         let gndPinIndex = 0;
         const gndPins = ['GND_3', 'GND_8', 'GND_13', 'GND_18', 'GND_23', 'GND_28', 'GND_33', 'GND_38'];
 
+        // Get next GND pin (rotate through available)
+        const getNextGnd = () => {
+            const pin = gndPins[gndPinIndex % gndPins.length];
+            gndPinIndex++;
+            return pin;
+        };
+
         for (const component of components) {
             const category = component.metadata.functionalGroup?.category;
             const wireOrder = component.metadata.functionalGroup?.wireOrder || [];
 
-            // Get next GND pin (rotate through available)
-            const getNextGnd = () => {
-                const pin = gndPins[gndPinIndex % gndPins.length];
-                gndPinIndex++;
-                return pin;
-            };
+            // Handle multi-pin components differently
+            if (component.isMultiPin && component.pins) {
+                this.generateMultiPinWires(component, wires, getNextGnd);
+                continue;
+            }
 
+            // Single-pin component wire generation (original logic)
             // Signal wire (GPIO to component)
             const signalWire = wireOrder.find(w => w.role === 'signal');
             if (signalWire) {
@@ -405,6 +532,182 @@ class MicroPythonParser {
     }
 
     /**
+     * Generate wires for multi-pin components (US-100, TB6612, etc.)
+     * @param {object} component - Resolved multi-pin component
+     * @param {Array} wires - Array to add wires to
+     * @param {Function} getNextGnd - Function to get next available GND pin
+     */
+    generateMultiPinWires(component, wires, getNextGnd) {
+        const wireOrder = component.metadata.functionalGroup?.wireOrder || [];
+        const wireLabels = component.metadata.functionalGroup?.wireLabels || {};
+        const pinDefinitions = component.metadata.pins || {};
+        const category = component.metadata.functionalGroup?.category;
+
+        console.log(`[MicroPythonParser] Generating wires for multi-pin component: ${component.id}`);
+
+        // Generate wires for each pin that was declared
+        for (const pin of component.pins) {
+            const pinRole = pin.pinRole;
+            if (!pinRole) {
+                console.warn(`[MicroPythonParser] Pin ${pin.variableName} has no role, skipping wire generation`);
+                continue;
+            }
+
+            // Look up pin definition in component metadata
+            const pinDef = pinDefinitions[pinRole];
+            if (!pinDef) {
+                console.warn(`[MicroPythonParser] No pin definition for role '${pinRole}' in ${component.type}`);
+                continue;
+            }
+
+            // Determine wire properties based on pin type
+            let wireRole = 'signal';
+            let wireColor = '#ffcc00';  // Default signal color
+            let wireLabel = pinDef.name || pinRole;
+
+            // Check pin electrical type
+            const electricalType = pinDef.electricalType;
+            if (electricalType === 'power') {
+                wireRole = 'power';
+                wireColor = '#ff4444';
+            } else if (electricalType === 'ground') {
+                wireRole = 'ground';
+                wireColor = '#333333';
+            } else if (electricalType === 'input' || electricalType === 'output') {
+                wireRole = 'signal';
+                // Try to get color from wireLabels or wireOrder
+                const labelInfo = wireLabels[pinRole] || wireLabels[wireLabel.toLowerCase()];
+                if (labelInfo?.colorHint) {
+                    wireColor = this.colorHintToHex(labelInfo.colorHint);
+                } else {
+                    // Assign colors based on pin role patterns
+                    wireColor = this.getPinRoleColor(pinRole, pin.isPWM);
+                }
+            }
+
+            // Build Pico pin name
+            let picoPinName = `GP${pin.gpioPin}`;
+            if (pin.isADC) {
+                const adcChannel = pin.gpioPin - 26;
+                picoPinName = `GP${pin.gpioPin}_ADC${adcChannel}`;
+            }
+
+            // Create wire
+            wires.push({
+                id: `${component.id}-${pinRole}`,
+                from: `pico1.${picoPinName}`,
+                to: `${component.id}.${pinRole}`,
+                description: `${wireLabel} (GP${pin.gpioPin}) for ${component.id}`,
+                role: wireRole,
+                color: wireColor,
+                pinRole: pinRole
+            });
+        }
+
+        // Add power wire if component needs it (sensors need 3.3V or 5V)
+        const powerWire = wireOrder.find(w => w.role === 'power');
+        if (powerWire && category === 'sensor') {
+            wires.push({
+                id: `${component.id}-power`,
+                from: 'pico1.3V3_OUT',
+                to: `${component.id}.vcc`,
+                description: `${powerWire.label || 'Power'} for ${component.id}`,
+                role: 'power',
+                color: powerWire.color || '#ff4444'
+            });
+        }
+
+        // Add ground wire
+        const groundWire = wireOrder.find(w => w.role === 'ground');
+        if (groundWire) {
+            wires.push({
+                id: `${component.id}-ground`,
+                from: `pico1.${getNextGnd()}`,
+                to: `${component.id}.gnd`,
+                description: `${groundWire.label || 'Ground'} for ${component.id}`,
+                role: 'ground',
+                color: groundWire.color || '#333333'
+            });
+        }
+
+        // For motor drivers, add logic power (VCC) if not already present
+        if (component.type === 'tb6612-motor-driver') {
+            const logicPowerWire = wireOrder.find(w => w.role === 'logic-power');
+            if (logicPowerWire) {
+                wires.push({
+                    id: `${component.id}-vcc`,
+                    from: 'pico1.3V3_OUT',
+                    to: `${component.id}.vcc`,
+                    description: `${logicPowerWire.label || 'Logic Power 3.3V'} for ${component.id}`,
+                    role: 'power',
+                    color: logicPowerWire.color || '#ff8800'
+                });
+            }
+        }
+    }
+
+    /**
+     * Convert color hint to hex color
+     * @param {string} hint - Color hint from component metadata
+     * @returns {string} Hex color code
+     */
+    colorHintToHex(hint) {
+        const colorMap = {
+            'red': '#ff4444',
+            'orange': '#ff8800',
+            'yellow': '#ffcc00',
+            'green': '#33cc33',
+            'blue': '#3388ff',
+            'purple': '#9944ff',
+            'black': '#333333',
+            'white': '#ffffff',
+            'any': '#ffcc00'
+        };
+        return colorMap[hint.toLowerCase()] || '#ffcc00';
+    }
+
+    /**
+     * Get wire color based on pin role pattern
+     * @param {string} pinRole - Pin role (e.g., 'trig', 'ain1', 'pwma')
+     * @param {boolean} isPWM - Whether this is a PWM pin
+     * @returns {string} Hex color code
+     */
+    getPinRoleColor(pinRole, isPWM) {
+        const role = pinRole.toLowerCase();
+
+        // PWM pins
+        if (isPWM || role.startsWith('pwm')) {
+            return '#9944ff';  // Purple for PWM
+        }
+
+        // Motor A control
+        if (role.startsWith('ain') || role === 'motora1' || role === 'motora2') {
+            return '#ffcc00';  // Yellow for Motor A
+        }
+
+        // Motor B control
+        if (role.startsWith('bin') || role === 'motorb1' || role === 'motorb2') {
+            return '#33cc33';  // Green for Motor B
+        }
+
+        // Ultrasonic trigger/echo
+        if (role === 'trig' || role === 'trigger') {
+            return '#ffcc00';  // Yellow for trigger
+        }
+        if (role === 'echo') {
+            return '#33cc33';  // Green for echo
+        }
+
+        // Standby
+        if (role === 'stby' || role === 'standby') {
+            return '#ff8800';  // Orange for standby
+        }
+
+        // Default signal color
+        return '#ffcc00';
+    }
+
+    /**
      * Build the final circuit data structure
      * @param {Array} primaryComponents - Primary components
      * @param {Array} supportComponents - Auto-generated support components
@@ -425,18 +728,37 @@ class MicroPythonParser {
 
         // Add primary components
         for (const comp of primaryComponents) {
-            components.push({
+            const componentData = {
                 id: comp.id,
                 type: comp.type,
-                placement: {}, // Empty - abstract layout handles positioning
-                picoConnection: {
+                placement: {} // Empty - abstract layout handles positioning
+            };
+
+            // Handle multi-pin components
+            if (comp.isMultiPin && comp.pins) {
+                componentData.isMultiPin = true;
+                componentData.picoConnections = comp.pins.map(pin => ({
+                    pinRole: pin.pinRole,
+                    gpioPin: pin.gpioPin,
+                    pin: `GP${pin.gpioPin}`,
+                    mode: pin.mode,
+                    isPWM: pin.isPWM,
+                    isADC: pin.isADC,
+                    pullMode: pin.pullMode,
+                    variableName: pin.variableName
+                }));
+            } else {
+                // Single-pin component
+                componentData.picoConnection = {
                     pin: `GP${comp.gpioPin}`,
                     mode: comp.mode,
                     isPWM: comp.isPWM,
                     isADC: comp.isADC,
                     pullMode: comp.pullMode
-                }
-            });
+                };
+            }
+
+            components.push(componentData);
         }
 
         // Add support components

@@ -16,9 +16,16 @@ The Breadboard Circuit Builder is a proof-of-concept educational tool that rende
 - **Circuit Explorer Mode** (NEW - December 2025):
   - **MicroPython Parser** - Paste annotated MicroPython code to visualize circuits:
     ```python
+    # Single-pin components
     led = Pin(15, Pin.OUT)  # led-red-5mm
     button = Pin(14, Pin.IN, Pin.PULL_DOWN)  # button-tactile-6mm
     sensor = ADC(Pin(26))  # photocell-ldr
+
+    # Multi-pin components (use :pinRole suffix)
+    trig = Pin(2, Pin.OUT)   # us100-ultrasonic:trig
+    echo = Pin(3, Pin.IN)    # us100-ultrasonic:echo
+    ain1 = Pin(4, Pin.OUT)   # tb6612-motor-driver:ain1
+    pwma = Pin(5, Pin.OUT)   # tb6612-motor-driver:pwma
     ```
   - **Abstract slot-based layout** - Sensors at top, outputs at bottom, dynamically sized slots
   - **Functional group highlighting** - Click LED to highlight entire LED Circuit (LED + resistor + wires + Pico pins)
@@ -80,6 +87,8 @@ python3 -m http.server 8000
 | **Resistor (220Ω, 10KΩ)** | Passive | Dynamic scaling, orientation-aware, color bands |
 | **Photocell (LDR)** | Sensor | Light-dependent resistor, 2-pin placement |
 | **Push Button (STSP)** | Sensor | Momentary - Single Throw Single Pole, 2-pin placement |
+| **US-100 Ultrasonic** | Sensor | Distance sensor with Trigger/Echo or UART modes, 5-pin |
+| **TB6612 Motor Driver** | Output | Dual H-bridge motor controller for 2 DC motors, 14 essential pins |
 
 ### Core Features
 
@@ -344,12 +353,10 @@ See `prompts/` directory for detailed instructions to give LLMs:
 
 ### Example Components to Add
 
-- **Button/Switch**: 2-pin momentary push button
-- **Ultrasonic Sensor (HC-SR04)**: 4-pin distance sensor
 - **Servo Motor**: 3-pin PWM-controlled servo
-- **Motor Controller (TB6612)**: H-bridge motor driver
 - **Temperature Sensor (DHT11)**: Digital temp/humidity sensor
 - **OLED Display**: I2C small display
+- **Potentiometer**: 3-pin analog input
 
 ## Technical Stack
 
@@ -452,6 +459,13 @@ python3 -m http.server 8000
 See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 
 **Recently Completed (December 2025):**
+- ✅ **US-100 Ultrasonic Sensor** - 5-pin distance sensor with Trigger/Echo and UART mode support
+- ✅ **TB6612 Motor Driver** - Dual H-bridge motor controller with 14 essential pins for 2-motor control
+- ✅ **Multi-Pin Component Support** in MicroPython Parser:
+  - Enhanced annotation format: `variable = Pin(N, Pin.MODE)  # component-type:pinRole`
+  - Groups multiple Pin declarations into single components automatically
+  - Generates correct wire colors based on pin role (trigger=yellow, echo=green, PWM=purple, etc.)
+  - See [circuits/micropython_examples/wall-follower.py](circuits/micropython_examples/wall-follower.py) for example
 - ✅ **MicroPython Parser** - Parse annotated MicroPython code to visualize circuits in Explorer mode
   - Supports `Pin()`, `PWM()`, `ADC()` declarations with inline component annotations
   - Auto-generates support components (resistors) from component library metadata
@@ -479,9 +493,9 @@ See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 **High Priority:**
 - Expanded MicroPython parser testing with more complex circuits
 - LLM prompt engineering for compliant MicroPython code generation
-- Component library expansion (TB6612 motor controller, US-100 ultrasonic sensor)
 - Component rendering refinements (alignment, stub length, consistency)
 - Wire deletion with occupation cleanup
+- Parser warning cleanup (consolidate deprecation warnings, remove unused code paths)
 
 **Medium Priority:**
 - Drag-and-drop component positioning
@@ -503,6 +517,6 @@ For questions, issues, or contributions, please refer to the project repository 
 
 ---
 
-**Last Updated**: December 12, 2025
-**Status**: Enhanced POC - MicroPython Parser, Abstract Layout System
-**Version**: 1.5-POC
+**Last Updated**: December 11, 2025
+**Status**: Enhanced POC - MicroPython Parser with Multi-Pin Components, US-100 & TB6612 Support
+**Version**: 1.6-POC

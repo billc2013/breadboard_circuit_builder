@@ -3,13 +3,13 @@
     "name": "Breadboard Circuit Builder Component Library",
     "version": "1.0.0",
     "description": "Component definitions for robotics and basic electronics projects",
-    "updated": "2025-11-01",
-    
+    "updated": "2025-12-11",
+
     "categories": {
       "basic": {
         "name": "Basic Components",
-        "description": "LEDs, resistors, capacitors, switches, and other fundamental parts",
-        "components": ["led-red-5mm", "led-green-5mm", "led-blue-5mm", "led-yellow-5mm", "resistor-220", "resistor-10k", "photocell-ldr", "button-tactile-6mm"]
+        "description": "LEDs, resistors, capacitors, switches, sensors, and motor drivers",
+        "components": ["led-red-5mm", "led-green-5mm", "led-blue-5mm", "led-yellow-5mm", "resistor-220", "resistor-10k", "photocell-ldr", "button-tactile-6mm", "us100-ultrasonic", "tb6612-motor-driver"]
       },
       "microcontrollers": {
         "name": "Microcontrollers",
@@ -66,6 +66,18 @@
         "geometry": "basic/button-geometry.js",
         "adapter": "basic/button-adapter.js",
         "adapterClass": "ButtonAdapter"
+      },
+      "us100-ultrasonic": {
+        "metadata": "basic/us100-ultrasonic.json",
+        "geometry": "basic/us100-geometry.js",
+        "adapter": "basic/us100-adapter.js",
+        "adapterClass": "US100Adapter"
+      },
+      "tb6612-motor-driver": {
+        "metadata": "basic/tb6612-motor-driver.json",
+        "geometry": "basic/tb6612-geometry.js",
+        "adapter": "basic/tb6612-adapter.js",
+        "adapterClass": "TB6612Adapter"
       },
       "raspberry-pi-pico": {
         "metadata": "microcontrollers/pico.json",

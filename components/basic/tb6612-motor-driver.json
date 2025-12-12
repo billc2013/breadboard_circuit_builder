@@ -1,0 +1,362 @@
+{
+  "component": {
+    "metadata": {
+      "id": "tb6612-motor-driver",
+      "name": "TB6612 Dual Motor Driver",
+      "description": "Dual H-bridge motor driver for controlling two DC motors or one stepper motor, 1.2A per channel",
+      "author": "Adafruit",
+      "tags": [
+        "TB6612",
+        "motor driver",
+        "H-bridge",
+        "DC motor",
+        "stepper",
+        "dual motor",
+        "Adafruit"
+      ],
+      "version": "4",
+      "created": "2016-08-09",
+      "category": "basic"
+    },
+    "pins": {
+      "vm": {
+        "number": 1,
+        "name": "VM",
+        "description": "Motor power supply (4.5V - 13.5V)",
+        "connectorId": "connector6",
+        "electricalType": "power",
+        "connectionGuide": {
+          "purpose": "Power supply for the motors. This should be your motor battery/power supply, NOT the Pico's 3.3V.",
+          "warnings": [
+            "Motor voltage range: 4.5V to 13.5V",
+            "Do NOT connect to Pico 3.3V - motors need separate power",
+            "Ensure adequate current capacity for your motors"
+          ],
+          "troubleshooting": [
+            "If motors don't spin: check VM power connection and voltage",
+            "If motors are weak: ensure power supply can provide enough current"
+          ]
+        }
+      },
+      "vcc": {
+        "number": 2,
+        "name": "VCC",
+        "description": "Logic power supply (2.7V - 5.5V)",
+        "connectorId": "connector9",
+        "electricalType": "power",
+        "connectionGuide": {
+          "purpose": "Logic level power for the driver chip. Connect to Pico 3.3V.",
+          "warnings": [
+            "Logic voltage range: 2.7V to 5.5V",
+            "Connect to Pico 3.3V for proper logic levels"
+          ],
+          "troubleshooting": [
+            "If control signals don't work: verify VCC connection to 3.3V"
+          ]
+        }
+      },
+      "gnd": {
+        "number": 3,
+        "name": "GND",
+        "description": "Ground (shared between logic and motor)",
+        "connectorId": "connector10",
+        "electricalType": "ground",
+        "connectionGuide": {
+          "purpose": "Common ground for both logic and motor power. Must connect to Pico GND AND motor power supply ground.",
+          "warnings": [
+            "Must share common ground between Pico and motor power supply",
+            "Multiple GND pins on board are internally connected"
+          ],
+          "troubleshooting": [
+            "If erratic behavior: ensure all grounds are connected together"
+          ]
+        }
+      },
+      "stby": {
+        "number": 4,
+        "name": "STBY",
+        "description": "Standby pin - pull HIGH to enable outputs",
+        "connectorId": "connector14",
+        "electricalType": "input",
+        "connectionGuide": {
+          "purpose": "Standby control. Must be HIGH for motors to operate. Can connect to VCC for always-on, or to a GPIO for power saving.",
+          "warnings": [
+            "Motors will NOT run if STBY is LOW",
+            "For simple use: connect directly to VCC (3.3V)"
+          ],
+          "troubleshooting": [
+            "If motors don't run: check STBY is pulled HIGH",
+            "Can use GPIO to enable/disable driver for power saving"
+          ]
+        }
+      },
+      "ain1": {
+        "number": 5,
+        "name": "AIN1",
+        "description": "Motor A direction input 1",
+        "connectorId": "connector15",
+        "electricalType": "input",
+        "connectionGuide": {
+          "purpose": "Direction control for Motor A. Combined with AIN2: (1,0)=forward, (0,1)=reverse, (0,0)=coast, (1,1)=brake",
+          "warnings": [
+            "Connect to any GPIO pin"
+          ],
+          "troubleshooting": [
+            "If motor spins wrong direction: swap AIN1 and AIN2 logic"
+          ]
+        }
+      },
+      "ain2": {
+        "number": 6,
+        "name": "AIN2",
+        "description": "Motor A direction input 2",
+        "connectorId": "connector16",
+        "electricalType": "input",
+        "connectionGuide": {
+          "purpose": "Direction control for Motor A. Used with AIN1 to set direction.",
+          "warnings": [
+            "Connect to any GPIO pin"
+          ],
+          "troubleshooting": []
+        }
+      },
+      "pwma": {
+        "number": 7,
+        "name": "PWMA",
+        "description": "Motor A speed control (PWM input)",
+        "connectorId": "connector17",
+        "electricalType": "input",
+        "connectionGuide": {
+          "purpose": "Speed control for Motor A. Use PWM signal to control motor speed (0-100% duty cycle).",
+          "warnings": [
+            "Connect to a PWM-capable GPIO pin",
+            "100% duty cycle = full speed, 0% = stopped"
+          ],
+          "troubleshooting": [
+            "If motor doesn't respond to speed changes: verify PWM signal with oscilloscope or LED"
+          ]
+        }
+      },
+      "bin1": {
+        "number": 8,
+        "name": "BIN1",
+        "description": "Motor B direction input 1",
+        "connectorId": "connector13",
+        "electricalType": "input",
+        "connectionGuide": {
+          "purpose": "Direction control for Motor B. Combined with BIN2: (1,0)=forward, (0,1)=reverse, (0,0)=coast, (1,1)=brake",
+          "warnings": [
+            "Connect to any GPIO pin"
+          ],
+          "troubleshooting": [
+            "If motor spins wrong direction: swap BIN1 and BIN2 logic"
+          ]
+        }
+      },
+      "bin2": {
+        "number": 9,
+        "name": "BIN2",
+        "description": "Motor B direction input 2",
+        "connectorId": "connector12",
+        "electricalType": "input",
+        "connectionGuide": {
+          "purpose": "Direction control for Motor B. Used with BIN1 to set direction.",
+          "warnings": [
+            "Connect to any GPIO pin"
+          ],
+          "troubleshooting": []
+        }
+      },
+      "pwmb": {
+        "number": 10,
+        "name": "PWMB",
+        "description": "Motor B speed control (PWM input)",
+        "connectorId": "connector11",
+        "electricalType": "input",
+        "connectionGuide": {
+          "purpose": "Speed control for Motor B. Use PWM signal to control motor speed.",
+          "warnings": [
+            "Connect to a PWM-capable GPIO pin"
+          ],
+          "troubleshooting": []
+        }
+      },
+      "motora1": {
+        "number": 11,
+        "name": "MOTORA1",
+        "description": "Motor A output terminal 1",
+        "connectorId": "connector18",
+        "electricalType": "output",
+        "connectionGuide": {
+          "purpose": "Connect to one terminal of Motor A.",
+          "warnings": [
+            "Maximum 1.2A continuous current per channel"
+          ],
+          "troubleshooting": []
+        }
+      },
+      "motora2": {
+        "number": 12,
+        "name": "MOTORA2",
+        "description": "Motor A output terminal 2",
+        "connectorId": "connector19",
+        "electricalType": "output",
+        "connectionGuide": {
+          "purpose": "Connect to other terminal of Motor A.",
+          "warnings": [],
+          "troubleshooting": []
+        }
+      },
+      "motorb1": {
+        "number": 13,
+        "name": "MOTORB1",
+        "description": "Motor B output terminal 1",
+        "connectorId": "connector23",
+        "electricalType": "output",
+        "connectionGuide": {
+          "purpose": "Connect to one terminal of Motor B.",
+          "warnings": [
+            "Maximum 1.2A continuous current per channel"
+          ],
+          "troubleshooting": []
+        }
+      },
+      "motorb2": {
+        "number": 14,
+        "name": "MOTORB2",
+        "description": "Motor B output terminal 2",
+        "connectorId": "connector22",
+        "electricalType": "output",
+        "connectionGuide": {
+          "purpose": "Connect to other terminal of Motor B.",
+          "warnings": [],
+          "troubleshooting": []
+        }
+      }
+    },
+    "properties": {
+      "motorVoltage": "4.5V - 13.5V",
+      "logicVoltage": "2.7V - 5.5V",
+      "outputCurrent": "1.2A continuous per channel",
+      "peakCurrent": "3A peak per channel",
+      "channels": 2,
+      "hBridge": true,
+      "pwmFrequency": "100kHz max",
+      "standbyControl": true
+    },
+    "physical": {
+      "type": "module",
+      "package": "Adafruit breakout board",
+      "pinSpacing": "2.54mm (0.1\")",
+      "width": "0.75in",
+      "height": "1.05in"
+    },
+    "rendering": {
+      "breadboard": {
+        "svg": "components_svg/tb6612-motor-driver.svg",
+        "width": 54,
+        "height": 75.725,
+        "unit": "px",
+        "viewBox": "0 0 54 75.725",
+        "anchor": "center",
+        "renderMode": "on-breadboard",
+        "orientation": {
+          "default": "vertical",
+          "allowed": ["vertical"]
+        }
+      },
+      "schematic": {
+        "svg": "schematic/adafruit_tb6612_schematic.svg"
+      },
+      "pcb": {
+        "svg": "pcb/adafruit_tb6612_pcb.svg"
+      }
+    },
+    "validation": {
+      "electricalType": "motor-driver",
+      "polarity": "polarized",
+      "rules": {
+        "requiresMotorPower": true,
+        "requiresLogicPower": true,
+        "requiresGround": true,
+        "motorVoltageRange": {
+          "min": 4.5,
+          "max": 13.5,
+          "unit": "V"
+        },
+        "logicVoltageRange": {
+          "min": 2.7,
+          "max": 5.5,
+          "unit": "V"
+        }
+      },
+      "warnings": [
+        "Motor power (VM) and logic power (VCC) are separate - don't mix them",
+        "STBY pin must be HIGH for motors to operate",
+        "Maximum 1.2A continuous per motor channel",
+        "Ensure motor power supply can provide adequate current",
+        "Share common ground between Pico and motor power supply"
+      ],
+      "usageNotes": [
+        "Direction control: AIN1/AIN2 (or BIN1/BIN2): (1,0)=CW, (0,1)=CCW, (0,0)=coast, (1,1)=brake",
+        "Speed control: PWM duty cycle on PWMA/PWMB (0-100%)",
+        "STBY: Connect to VCC for always-on, or use GPIO for power management",
+        "Can drive 2 DC motors or 1 bipolar/unipolar stepper motor"
+      ]
+    },
+    "functionalGroup": {
+      "groupLabel": "Motor Controller",
+      "category": "output",
+      "wireOrder": [
+        { "role": "motor-power", "color": "#ff4444", "label": "Motor Power (VM)" },
+        { "role": "logic-power", "color": "#ff8800", "label": "Logic Power (VCC)" },
+        { "role": "signal", "color": "#ffcc00", "label": "Motor A Control" },
+        { "role": "signal", "color": "#33cc33", "label": "Motor B Control" },
+        { "role": "ground", "color": "#333333", "label": "Ground" }
+      ],
+      "requires": [],
+      "wireLabels": {
+        "motor-power": {
+          "label": "Motor Power (4.5-13.5V)",
+          "colorHint": "red",
+          "pinConnection": "vm"
+        },
+        "logic-power": {
+          "label": "Logic Power (3.3V)",
+          "colorHint": "orange",
+          "pinConnection": "vcc"
+        },
+        "stby": {
+          "label": "Standby (to VCC or GPIO)",
+          "colorHint": "orange",
+          "pinConnection": "stby"
+        },
+        "motor-a-dir": {
+          "label": "Motor A Direction",
+          "colorHint": "yellow",
+          "pinConnection": ["ain1", "ain2"]
+        },
+        "motor-a-pwm": {
+          "label": "Motor A Speed (PWM)",
+          "colorHint": "yellow",
+          "pinConnection": "pwma"
+        },
+        "motor-b-dir": {
+          "label": "Motor B Direction",
+          "colorHint": "green",
+          "pinConnection": ["bin1", "bin2"]
+        },
+        "motor-b-pwm": {
+          "label": "Motor B Speed (PWM)",
+          "colorHint": "green",
+          "pinConnection": "pwmb"
+        },
+        "ground": {
+          "label": "Ground",
+          "colorHint": "black",
+          "pinConnection": "gnd"
+        }
+      }
+    }
+  }
+}

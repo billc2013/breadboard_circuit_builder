@@ -2,12 +2,73 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: December 12, 2025
-**Current Phase**: Enhanced POC - MicroPython Parser, Abstract Layout System
+**Last Updated**: December 11, 2025
+**Current Phase**: Enhanced POC - MicroPython Parser with Multi-Pin Components, US-100 & TB6612 Support
 
 ---
 
 ## Recently Completed (December 2025 Sessions)
+
+### ✅ US-100 Ultrasonic Sensor & TB6612 Motor Driver Components
+**Completed**: December 11, 2025
+
+**What was delivered**:
+- **US-100 Ultrasonic Sensor** (`us100-ultrasonic`):
+  - 5 pins: VCC, Trig, Echo, GND, GND2
+  - Supports both Trigger/Echo mode and UART mode
+  - Functional group category: "sensor" with groupLabel "Distance Sensor"
+  - Wire colors: Yellow (trigger), Green (echo)
+  - Files: `components/basic/us100-ultrasonic.json`, `us100-geometry.js`, `us100-adapter.js`
+  - SVG: `components_svg/US-100_ultrasonic-distance-sensor.svg`
+
+- **TB6612 Dual Motor Driver** (`tb6612-motor-driver`):
+  - 14 essential pins for 2-motor control: VM, VCC, GND, STBY, AIN1, AIN2, PWMA, BIN1, BIN2, PWMB, MotorA1/2, MotorB1/2
+  - Functional group category: "output" with groupLabel "Motor Controller"
+  - Wire colors: Yellow (Motor A signals), Green (Motor B signals), Purple (PWM), Orange (standby)
+  - Files: `components/basic/tb6612-motor-driver.json`, `tb6612-geometry.js`, `tb6612-adapter.js`
+  - SVG: `components_svg/tb6612-motor-driver.svg`
+
+- **Library Registration**: Both components added to `components/library.json`
+
+---
+
+### ✅ Multi-Pin Component Support in MicroPython Parser
+**Completed**: December 11, 2025
+
+**Goal**: Enable the MicroPython parser to handle complex components like US-100 and TB6612 that require multiple Pin declarations.
+
+**What was delivered**:
+- **Enhanced annotation format**: `variable = Pin(N, Pin.MODE)  # component-type:pinRole`
+  - The `:pinRole` suffix identifies which pin of a multi-pin component this declaration represents
+  - Example: `trig = Pin(2, Pin.OUT)  # us100-ultrasonic:trig`
+- **Pin grouping logic** (`groupMultiPinDeclarations()`):
+  - Groups multiple Pin declarations by component type
+  - Creates single component instances with all pins collected
+  - Maintains `multiPinComponents` Set for types that need grouping
+- **Wire generation for multi-pin components** (`generateMultiPinWires()`):
+  - Uses component metadata to determine wire properties
+  - Applies correct colors based on pin role (getPinRoleColor helper)
+  - Generates wires from Pico to each pin of the grouped component
+- **Color scheme by pin role**:
+  - Motor A signals (ain1, ain2, motora1, motora2): Yellow (#ffcc00)
+  - Motor B signals (bin1, bin2, motorb1, motorb2): Green (#33cc33)
+  - PWM signals (pwma, pwmb): Purple (#9933ff)
+  - Trigger: Yellow (#ffcc00)
+  - Echo: Green (#33cc33)
+  - Standby/Logic power: Orange (#ff8800)
+  - Power: Red (#ff4444)
+  - Ground: Dark gray (#333333)
+
+**Test Results** (wall-follower.py):
+- 9 raw Pin declarations → 2 grouped components (US-100 + TB6612)
+- 13 wires generated with correct colors
+- Functional groups detected: "Distance Sensor" (sensor), "Motor Controller" (output)
+
+**Example MicroPython Code**: `circuits/micropython_examples/wall-follower.py`
+
+**Files modified**: `micropython-parser.js`
+
+---
 
 ### ✅ MicroPython Parser for Circuit Explorer
 **Completed**: December 12, 2025
@@ -316,77 +377,43 @@ variable_name = Pin(gpio_number, Pin.MODE)  # component-type
 
 ---
 
-### 3. Component Library Expansion: TB6612 Motor Controller ⭐ NEXT
+### 3. Component Library Expansion: TB6612 Motor Controller (COMPLETED)
 
-**Description**: Add the TB6612 dual H-bridge motor controller to the component library.
+**Status**: ✅ **COMPLETED** - December 11, 2025
 
-**Component Details**:
-- **Type ID**: `motor-controller-tb6612`
-- **Pins**: 16 (VM, VCC, GND×3, AIN1, AIN2, PWMA, BIN1, BIN2, PWMB, STBY, A01, A02, B01, B02)
-- **Category**: `output` (motor driver)
-- **Fritzing SVG**: Available
-
-**Files to Create**:
-- `components/motors/tb6612.json` - Component metadata
-- `components/motors/tb6612-geometry.js` - Position calculations
-- `components/motors/tb6612-adapter.js` - Rendering adapter
-
-**functionalGroup Metadata**:
-```json
-{
-  "functionalGroup": {
-    "groupLabel": "Motor Controller",
-    "category": "output",
-    "wireOrder": [
-      { "role": "power", "color": "#ff4444", "label": "Motor Power (VM)" },
-      { "role": "logic-power", "color": "#ff8800", "label": "Logic Power (VCC)" },
-      { "role": "signal", "color": "#ffcc00", "label": "Control Signals" },
-      { "role": "ground", "color": "#333333", "label": "Ground" }
-    ]
-  }
-}
-```
-
-**Priority**: HIGH - Key robotics component
+See "Recently Completed" section above for full details.
 
 ---
 
-### 4. Component Library Expansion: US-100 Ultrasonic Sensor ⭐ NEXT
+### 4. Component Library Expansion: US-100 Ultrasonic Sensor (COMPLETED)
 
-**Description**: Add the US-100 ultrasonic distance sensor to the component library.
+**Status**: ✅ **COMPLETED** - December 11, 2025
 
-**Component Details**:
-- **Type ID**: `ultrasonic-us100`
-- **Pins**: 5 (VCC, Trig/TX, Echo/RX, GND, GND)
-- **Category**: `sensor` (distance)
-- **Modes**: Trigger/Echo mode OR UART mode
-
-**Files to Create**:
-- `components/sensors/us100.json` - Component metadata
-- `components/sensors/us100-geometry.js` - Position calculations
-- `components/sensors/us100-adapter.js` - Rendering adapter
-
-**functionalGroup Metadata**:
-```json
-{
-  "functionalGroup": {
-    "groupLabel": "Distance Sensor",
-    "category": "sensor",
-    "wireOrder": [
-      { "role": "power", "color": "#ff4444", "label": "Power 5V" },
-      { "role": "signal", "color": "#ffcc00", "label": "Trigger" },
-      { "role": "signal", "color": "#33cc33", "label": "Echo" },
-      { "role": "ground", "color": "#333333", "label": "Ground" }
-    ]
-  }
-}
-```
-
-**Priority**: HIGH - Key robotics component
+See "Recently Completed" section above for full details.
 
 ---
 
-### 5. JSON Text Input Feature (COMPLETED)
+### 5. MicroPython Parser Warning Cleanup ⭐ NEXT
+
+**Description**: Clean up console warnings and deprecation notices in the MicroPython parser.
+
+**Current Issues**:
+- Multiple console.warn() calls for debugging that should be removed or consolidated
+- Some unused code paths from development iterations
+- Verbose logging that could be reduced for production use
+
+**Tasks**:
+- [ ] Review all console.warn() calls in `micropython-parser.js`
+- [ ] Remove or consolidate redundant warnings
+- [ ] Add a debug mode flag to control verbose logging
+- [ ] Remove any unused helper functions or code paths
+- [ ] Test parser still works correctly after cleanup
+
+**Priority**: HIGH - Code cleanup for maintainability
+
+---
+
+### 6. JSON Text Input Feature (COMPLETED)
 
 **Description**: Add a text box/text area where users can paste circuit JSON directly from LLMs, eliminating the need to save as a file first.
 
@@ -583,23 +610,27 @@ Full Circuit JSON (compatible with CircuitLoader + Guided Wiring)
 
 **Candidates for Next Components**:
 
-#### 3.1 Ultrasonic Sensor (HC-SR04)
-- **Fritzing available**: Yes
-- **Pins**: 4 (VCC, Trig, Echo, GND)
-- **Complexity**: Medium (4-pin + larger physical size)
-- **Use case**: Distance measurement, robotics
-
-#### 3.2 Two Motor Controller (TB6612 - Adafruit)
-- **Fritzing available**: Yes
-- **Pins**: 16 (Power: VM, VCC, 3×GND | Signal: AIN1, AIN2, PWMA, BIN1, BIN2, PWMB, STBY | Motor Out: A01, A02, B01, B02)
-- **Complexity**: Medium++ (16-pin + larger physical size)
-- **Use case**: Dual H-Bridge for powering and controlling speed and direction of two DC motors independently
-
-#### 3.3 Potentiometer (Variable Resistor)
+#### 4.1 Potentiometer (Variable Resistor)
 - **Fritzing available**: Yes
 - **Pins**: 3 (wiper + 2 ends)
 - **Complexity**: Medium (3-pin placement)
 - **Use case**: Analog input, voltage divider
+
+#### 4.2 Servo Motor
+- **Fritzing available**: Yes
+- **Pins**: 3 (signal, power, ground)
+- **Complexity**: Low-Medium (3-pin, PWM control)
+- **Use case**: Robotics, precise position control
+
+#### 4.3 DHT11 Temperature/Humidity Sensor
+- **Fritzing available**: Yes
+- **Pins**: 3-4 (data, power, ground, optional NC)
+- **Complexity**: Medium (single-wire protocol)
+- **Use case**: Environmental monitoring
+
+**Recently Completed**:
+- ✅ Ultrasonic Sensor (US-100) - December 11, 2025
+- ✅ Motor Controller (TB6612) - December 11, 2025
 
 
 
