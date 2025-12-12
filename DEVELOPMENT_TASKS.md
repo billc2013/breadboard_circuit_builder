@@ -2,12 +2,56 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: December 11, 2025
-**Current Phase**: Enhanced POC - Abstract Layout System, Bus Format Parsing
+**Last Updated**: December 12, 2025
+**Current Phase**: Enhanced POC - MicroPython Parser, Abstract Layout System
 
 ---
 
 ## Recently Completed (December 2025 Sessions)
+
+### ✅ MicroPython Parser for Circuit Explorer
+**Completed**: December 12, 2025
+
+**Goal**: Parse annotated MicroPython code to extract circuit information and visualize in Circuit Explorer mode WITHOUT requiring breadboard hole placements.
+
+**What was delivered**:
+- **MicroPython Parser** (`micropython-parser.js`):
+  - Regex-based extraction of `Pin()`, `PWM()`, `ADC()` declarations
+  - Inline comment annotations: `led = Pin(15, Pin.OUT)  # led-red-5mm`
+  - Component resolution against library with validation
+  - Auto-generation of support components (resistors) from `functionalGroup.requires`
+  - Wire generation with proper roles (signal, power, ground) and colors
+- **UI Integration** in `circuit-explorer.html`:
+  - MicroPython input panel with code textarea
+  - Parse & Visualize button
+  - Error/success display with component/wire counts
+- **Abstract Layout Rendering** (bypasses CircuitLoader):
+  - `loadFromMicroPython()` directly uses `AbstractLayoutSystem`
+  - `buildFunctionalGroupsFromParser()` creates groups from parsed data
+  - `renderMicroPythonComponents()` places components in slots
+  - `renderMicroPythonWires()` draws bezier curves from Pico to groups
+  - No breadboard hole placements needed for conceptual visualization
+  - Sensors at top, outputs at bottom
+
+**Test Results**:
+- LED + Button + Photocell circuit: 3 functional groups, 6 components, 8 wires ✓
+- Sensors (button, photocell) positioned in top region ✓
+- Output (LED) positioned in bottom region ✓
+- Support resistors auto-generated and grouped with primaries ✓
+- Wire colors follow component metadata wireOrder ✓
+
+**Architecture Decision**:
+The MicroPython parser generates circuit data that is intentionally **different** from the full JSON format used by CircuitLoader. For Explorer mode (conceptual visualization), we bypass CircuitLoader entirely and render directly using the abstract layout system. This is by design - Explorer mode doesn't need physical breadboard placements.
+
+**Future Extension** (see Medium Priority section):
+A separate system will be needed to generate **full breadboard-placement JSON** from MicroPython code, compatible with the guided wiring system. This would allow:
+1. MicroPython code → Conceptual visualization (Explorer) ✓ COMPLETED
+2. MicroPython code → Physical build instructions (Guided Wiring) → Future work
+
+**Files created**: `micropython-parser.js`
+**Files modified**: `circuit-explorer.html`, `styles/circuit-explorer.css`, `explorer-app.js`
+
+---
 
 ### ✅ Abstract Layout System & Bus Format Parsing
 **Completed**: December 11, 2025
@@ -210,7 +254,139 @@ normalizeEndpoint(endpoint) {
 
 ## High Priority Tasks
 
-### 1. JSON Text Input Feature ⭐ NEW
+### 1. MicroPython Parser Testing & Refinement ⭐ NEXT
+
+**Description**: Test the MicroPython parser with more complex circuits and edge cases.
+
+**Test Cases Needed**:
+- [ ] Multiple LEDs (different colors)
+- [ ] PWM-controlled LED brightness
+- [ ] Multiple sensors (button + photocell + potentiometer)
+- [ ] Edge cases: duplicate variable names, invalid GPIO pins, unsupported components
+- [ ] Error handling: malformed code, missing annotations
+
+**Potential Improvements**:
+- Better error messages with line numbers
+- Support for multi-line comments
+- Support for variable reassignment detection
+- Warn about unused GPIO pins
+
+**Priority**: HIGH - Needed before LLM prompt creation
+
+---
+
+### 2. LLM Prompt for Compliant MicroPython Code ⭐ NEXT
+
+**Description**: Create a prompt that instructs an LLM (Claude, GPT-4) to generate MicroPython code that is compliant with our parser and component library.
+
+**Prompt Requirements**:
+- Explain the inline annotation format: `variable = Pin(N, Pin.MODE)  # component-type`
+- List available component types from `components/library.json`
+- Explain GPIO pin constraints (0-28, ADC on 26-28)
+- Explain mode constraints (OUT for outputs, IN for sensors)
+- Provide examples of valid code
+
+**Deliverable**: `prompts/micropython-generator.md`
+
+**Example Prompt Structure**:
+```markdown
+# MicroPython Code Generator for Circuit Explorer
+
+You are generating MicroPython code for the Raspberry Pi Pico that will be
+visualized in the Breadboard Circuit Builder's Circuit Explorer.
+
+## Required Format
+Each component declaration MUST include an inline comment with the component type:
+```python
+variable_name = Pin(gpio_number, Pin.MODE)  # component-type
+```
+
+## Available Components
+- led-red-5mm, led-green-5mm, led-blue-5mm, led-yellow-5mm (outputs)
+- button-tactile-6mm (sensor, use Pin.PULL_DOWN)
+- photocell-ldr (sensor, use ADC)
+
+## GPIO Pin Rules
+- Digital pins: GP0-GP22
+- ADC pins: GP26, GP27, GP28 (for analog sensors)
+- ...
+```
+
+**Priority**: HIGH - Enables end-to-end workflow
+
+---
+
+### 3. Component Library Expansion: TB6612 Motor Controller ⭐ NEXT
+
+**Description**: Add the TB6612 dual H-bridge motor controller to the component library.
+
+**Component Details**:
+- **Type ID**: `motor-controller-tb6612`
+- **Pins**: 16 (VM, VCC, GND×3, AIN1, AIN2, PWMA, BIN1, BIN2, PWMB, STBY, A01, A02, B01, B02)
+- **Category**: `output` (motor driver)
+- **Fritzing SVG**: Available
+
+**Files to Create**:
+- `components/motors/tb6612.json` - Component metadata
+- `components/motors/tb6612-geometry.js` - Position calculations
+- `components/motors/tb6612-adapter.js` - Rendering adapter
+
+**functionalGroup Metadata**:
+```json
+{
+  "functionalGroup": {
+    "groupLabel": "Motor Controller",
+    "category": "output",
+    "wireOrder": [
+      { "role": "power", "color": "#ff4444", "label": "Motor Power (VM)" },
+      { "role": "logic-power", "color": "#ff8800", "label": "Logic Power (VCC)" },
+      { "role": "signal", "color": "#ffcc00", "label": "Control Signals" },
+      { "role": "ground", "color": "#333333", "label": "Ground" }
+    ]
+  }
+}
+```
+
+**Priority**: HIGH - Key robotics component
+
+---
+
+### 4. Component Library Expansion: US-100 Ultrasonic Sensor ⭐ NEXT
+
+**Description**: Add the US-100 ultrasonic distance sensor to the component library.
+
+**Component Details**:
+- **Type ID**: `ultrasonic-us100`
+- **Pins**: 5 (VCC, Trig/TX, Echo/RX, GND, GND)
+- **Category**: `sensor` (distance)
+- **Modes**: Trigger/Echo mode OR UART mode
+
+**Files to Create**:
+- `components/sensors/us100.json` - Component metadata
+- `components/sensors/us100-geometry.js` - Position calculations
+- `components/sensors/us100-adapter.js` - Rendering adapter
+
+**functionalGroup Metadata**:
+```json
+{
+  "functionalGroup": {
+    "groupLabel": "Distance Sensor",
+    "category": "sensor",
+    "wireOrder": [
+      { "role": "power", "color": "#ff4444", "label": "Power 5V" },
+      { "role": "signal", "color": "#ffcc00", "label": "Trigger" },
+      { "role": "signal", "color": "#33cc33", "label": "Echo" },
+      { "role": "ground", "color": "#333333", "label": "Ground" }
+    ]
+  }
+}
+```
+
+**Priority**: HIGH - Key robotics component
+
+---
+
+### 5. JSON Text Input Feature (COMPLETED)
 
 **Description**: Add a text box/text area where users can paste circuit JSON directly from LLMs, eliminating the need to save as a file first.
 
@@ -350,7 +526,60 @@ normalizeEndpoint(endpoint) {
 
 ## Medium Priority Tasks
 
-### 3. Component Library Expansion
+### 3. MicroPython to Guided Wiring JSON Generation ⭐ FUTURE
+
+**Description**: Extend the MicroPython parser to generate **full breadboard-placement JSON** compatible with the Guided Wiring system, just like LLM-generated circuits.
+
+**Context**:
+Currently, we have two circuit input paths:
+1. **LLM-generated JSON** → Full placement data → Works with both Explorer AND Guided Wiring
+2. **MicroPython Parser** → Abstract data (no placements) → Works with Explorer only
+
+**Goal**: Add a third capability:
+3. **MicroPython Parser + Layout Generator** → Full placement data → Works with BOTH modes
+
+**User Story**:
+- Student writes MicroPython code for their project
+- Student can visualize conceptually in Explorer (current work)
+- Student can ALSO generate a buildable circuit with physical hole placements
+- Generated JSON is identical in format to LLM-generated circuits
+- Student uses Guided Wiring mode to build the physical circuit
+
+**Technical Approach**:
+```
+MicroPython Code
+      ↓
+[MicroPythonParser] → Parsed components + wires (abstract)
+      ↓
+[BreadboardLayoutGenerator] → Assigns physical hole placements
+      ↓
+Full Circuit JSON (compatible with CircuitLoader + Guided Wiring)
+```
+
+**Layout Algorithm Considerations**:
+- Assign breadboard columns based on functional groups
+- Sensors on left side, outputs on right side (or configurable)
+- Auto-route wires avoiding conflicts
+- Respect electrical rules (bus connectivity, no shorts)
+- Consider component physical sizes
+
+**Key Design Principle** ("One Truth"):
+- The component library JSON (`functionalGroup.requires`, `pins`, etc.) should drive ALL placement decisions
+- Same metadata used for Explorer visualization AND guided wiring generation
+- No duplication of component knowledge
+
+**Acceptance Criteria**:
+- [ ] `BreadboardLayoutGenerator` class that takes parsed MicroPython data
+- [ ] Generates valid `placement` objects for all components
+- [ ] Generates wire endpoints with actual hole IDs (not abstract like `led.signal`)
+- [ ] Output JSON passes CircuitLoader validation
+- [ ] Works in Guided Wiring mode for step-by-step building
+
+**Priority**: MEDIUM - Important for complete MicroPython workflow, but Explorer visualization is the first step
+
+---
+
+### 4. Component Library Expansion
 
 **Candidates for Next Components**:
 

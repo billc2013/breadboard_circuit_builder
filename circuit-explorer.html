@@ -76,14 +76,52 @@
                 </div>
             </div>
 
-            <!-- Right: Circuits Panel -->
-            <div id="circuits-panel">
-                <div class="panel-header">
-                    <h3>Circuits</h3>
-                    <button id="add-circuit-btn" class="icon-btn" title="Add new circuit">+</button>
+            <!-- Right: Sidebar Panels -->
+            <div id="sidebar-panels">
+                <!-- MicroPython Input Panel -->
+                <div id="micropython-panel" class="input-panel">
+                    <div class="panel-header">
+                        <h3>Load from MicroPython</h3>
+                        <button id="micropython-toggle-btn" class="icon-btn" title="Toggle panel">
+                            <span class="toggle-icon">−</span>
+                        </button>
+                    </div>
+                    <div class="panel-content">
+                        <div class="input-instructions">
+                            Paste MicroPython code with component annotations: <code># component-type</code>
+                        </div>
+                        <textarea
+                            id="micropython-input"
+                            class="code-input"
+                            placeholder="from machine import Pin, PWM, ADC
+
+led = Pin(15, Pin.OUT)  # led-red-5mm
+button = Pin(14, Pin.IN, Pin.PULL_DOWN)  # button-tactile-6mm
+sensor = ADC(Pin(26))  # photocell-ldr"
+                            spellcheck="false"
+                        ></textarea>
+                        <div class="panel-actions">
+                            <button id="parse-micropython-btn" class="action-btn primary">
+                                Parse & Visualize
+                            </button>
+                            <button id="clear-micropython-btn" class="action-btn secondary">
+                                Clear
+                            </button>
+                        </div>
+                        <div id="micropython-errors" class="error-display"></div>
+                        <div id="micropython-success" class="success-display"></div>
+                    </div>
                 </div>
-                <div id="circuits-list">
-                    <!-- Circuit items will be added dynamically -->
+
+                <!-- Circuits Panel -->
+                <div id="circuits-panel">
+                    <div class="panel-header">
+                        <h3>Circuits (JSON)</h3>
+                        <button id="add-circuit-btn" class="icon-btn" title="Add new circuit">+</button>
+                    </div>
+                    <div id="circuits-list">
+                        <!-- Circuit items will be added dynamically -->
+                    </div>
                 </div>
             </div>
         </main>
@@ -119,6 +157,7 @@
     <script src="circuit-loader.js"></script>
     <script src="circuit-explorer.js"></script>
     <script src="abstract-layout.js"></script>
+    <script src="micropython-parser.js"></script>
     <script src="explorer-app.js"></script>
     <script src="circuits-manager.js"></script>
 

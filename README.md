@@ -14,12 +14,18 @@ The Breadboard Circuit Builder is a proof-of-concept educational tool that rende
 - Interactive breadboard visualization (400 holes with accurate positioning)
 - Component rendering (LEDs, resistors, Raspberry Pi Pico, photocells, buttons)
 - **Circuit Explorer Mode** (NEW - December 2025):
+  - **MicroPython Parser** - Paste annotated MicroPython code to visualize circuits:
+    ```python
+    led = Pin(15, Pin.OUT)  # led-red-5mm
+    button = Pin(14, Pin.IN, Pin.PULL_DOWN)  # button-tactile-6mm
+    sensor = ADC(Pin(26))  # photocell-ldr
+    ```
   - **Abstract slot-based layout** - Sensors at top, outputs at bottom, dynamically sized slots
   - **Functional group highlighting** - Click LED to highlight entire LED Circuit (LED + resistor + wires + Pico pins)
   - **Always-visible wire labels** near Pico pins (Signal GP14, Ground, Power 3.3V)
   - **Faded/bright transitions** - Labels dim by default, brighten when group selected
   - **Bus format wire support** - Parses both `5C` and `Bus1J-F` endpoint formats
-  - Support components (resistors) auto-detected from component JSON metadata
+  - Support components (resistors) auto-generated from component JSON metadata
   - Educational info panel showing group relationships
 - **Hover-based component information** - Interactive info boxes with full component details
 - **Bus-aware wire routing** - LLMs specify buses instead of exact holes for flexible placement
@@ -446,6 +452,10 @@ python3 -m http.server 8000
 See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 
 **Recently Completed (December 2025):**
+- ✅ **MicroPython Parser** - Parse annotated MicroPython code to visualize circuits in Explorer mode
+  - Supports `Pin()`, `PWM()`, `ADC()` declarations with inline component annotations
+  - Auto-generates support components (resistors) from component library metadata
+  - Bypasses CircuitLoader for direct abstract layout rendering
 - ✅ **Abstract slot-based layout** for Circuit Explorer with sensor/output regions
 - ✅ **Bus format wire parsing** - Supports both `5C` and `Bus1J-F` wire endpoint formats
 - ✅ **Unified Circuit Explorer** with functional group highlighting
@@ -467,10 +477,11 @@ See `DEVELOPMENT_TASKS.md` for detailed internal task tracking.
 - Bezier curve wire routing
 
 **High Priority:**
+- Expanded MicroPython parser testing with more complex circuits
+- LLM prompt engineering for compliant MicroPython code generation
+- Component library expansion (TB6612 motor controller, US-100 ultrasonic sensor)
 - Component rendering refinements (alignment, stub length, consistency)
 - Wire deletion with occupation cleanup
-- Additional component library expansion (HC-SR04, TB6612, potentiometer)
-- Individual wire color-coding and editing
 
 **Medium Priority:**
 - Drag-and-drop component positioning
@@ -492,6 +503,6 @@ For questions, issues, or contributions, please refer to the project repository 
 
 ---
 
-**Last Updated**: December 11, 2025
-**Status**: Enhanced POC - Abstract Layout System, Bus Format Parsing
-**Version**: 1.4-POC
+**Last Updated**: December 12, 2025
+**Status**: Enhanced POC - MicroPython Parser, Abstract Layout System
+**Version**: 1.5-POC

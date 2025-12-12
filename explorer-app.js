@@ -118,6 +118,7 @@ class ExplorerApp {
         this.renderPicoPins();
         this.attachEventListeners();
         this.setupKeyboardListeners();
+        this.setupMicroPythonUI();
 
         // Enable bundled wire mode styling
         if (this.bundledWireMode) {
@@ -2462,6 +2463,621 @@ class ExplorerApp {
             if (!this.wireToGroup) this.wireToGroup = new Map();
             this.wireToGroup.set(wire.id, group.id);
         });
+    }
+
+    // ==================== MicroPython Parser Integration ====================
+
+    /**
+     * Set up the MicroPython input panel UI
+     */
+    setupMicroPythonUI() {
+        const toggleBtn = document.getElementById('micropython-toggle-btn');
+        const parseBtn = document.getElementById('parse-micropython-btn');
+        const clearBtn = document.getElementById('clear-micropython-btn');
+        const panel = document.getElementById('micropython-panel');
+        const textarea = document.getElementById('micropython-input');
+
+        // Toggle panel collapse
+        toggleBtn?.addEventListener('click', () => {
+            panel.classList.toggle('collapsed');
+            const icon = toggleBtn.querySelector('.toggle-icon');
+            if (icon) {
+                icon.textContent = panel.classList.contains('collapsed') ? '+' : '−';
+            }
+        });
+
+        // Parse button
+        parseBtn?.addEventListener('click', async () => {
+            const code = textarea?.value?.trim();
+            if (!code) {
+                this.showMicroPythonError([{
+                    type: 'empty_input',
+                    message: 'Please enter MicroPython code'
+                }]);
+                return;
+            }
+
+            // Clear previous messages
+            this.hideMicroPythonMessages();
+
+            // Show loading state
+            parseBtn.textContent = 'Parsing...';
+            parseBtn.disabled = true;
+
+            try {
+                const result = await this.loadFromMicroPython(code);
+
+                if (!result.success) {
+                    this.showMicroPythonError(result.errors, result.warnings);
+                } else {
+                    this.showMicroPythonSuccess(result);
+                }
+            } catch (err) {
+                this.showMicroPythonError([{
+                    type: 'parse_error',
+                    message: err.message || 'Failed to parse MicroPython code'
+                }]);
+            } finally {
+                parseBtn.textContent = 'Parse & Visualize';
+                parseBtn.disabled = false;
+            }
+        });
+
+        // Clear button
+        clearBtn?.addEventListener('click', () => {
+            if (textarea) textarea.value = '';
+            this.hideMicroPythonMessages();
+        });
+
+        console.log('[Explorer] MicroPython UI initialized');
+    }
+
+    /**
+     * Load circuit from MicroPython code
+     * @param {string} micropythonCode - Annotated MicroPython code
+     * @returns {Promise<{success: boolean, errors: array, warnings: array, components?: number, wires?: number}>}
+     */
+    async loadFromMicroPython(micropythonCode) {
+        console.log('[Explorer] Loading circuit from MicroPython code (abstract mode)');
+
+        // Initialize parser
+        if (typeof MicroPythonParser === 'undefined') {
+            return {
+                success: false,
+                errors: [{
+                    type: 'parser_not_loaded',
+                    message: 'MicroPython parser not available',
+                    suggestion: 'Ensure micropython-parser.js is loaded'
+                }],
+                warnings: []
+            };
+        }
+
+        const parser = new MicroPythonParser();
+        const parseResult = await parser.parse(micropythonCode);
+
+        if (!parseResult.success) {
+            console.error('[Explorer] Parse errors:', parseResult.errors);
+            return {
+                success: false,
+                errors: parseResult.errors,
+                warnings: parseResult.warnings
+            };
+        }
+
+        console.log('[Explorer] Parse successful, circuit data:', parseResult.circuitData);
+
+        // Clear existing circuit
+        this.clearCircuit();
+
+        try {
+            // Store circuit data
+            this.circuitData = parseResult.circuitData;
+
+            // === BYPASS CircuitLoader - render directly in abstract mode ===
+
+            // 1. Load component metadata for each component
+            const componentMetadata = new Map();
+            for (const comp of parseResult.circuitData.circuit.components) {
+                if (comp.type === 'raspberry-pi-pico') continue; // Skip Pico
+
+                const metadata = await this.loadComponentMetadata(comp.type);
+                if (metadata) {
+                    componentMetadata.set(comp.id, {
+                        type: comp.type,
+                        metadata: metadata,
+                        picoConnection: comp.picoConnection,
+                        parentId: comp.parentId,
+                        autoGenerated: comp.autoGenerated,
+                        role: comp.role
+                    });
+                }
+            }
+
+            console.log('[Explorer] Loaded metadata for', componentMetadata.size, 'components');
+
+            // 2. Build functional groups from parser output
+            this.buildFunctionalGroupsFromParser(parseResult.circuitData, componentMetadata);
+
+            // 3. Initialize abstract layout and calculate slots
+            if (!this.abstractLayout) {
+                this.abstractLayout = new AbstractLayoutSystem();
+            }
+            this.abstractLayout.calculateSlots(this.functionalGroups);
+
+            // 4. Render group boundaries
+            this.renderGroupBoundariesAbstract();
+
+            // 5. Render components at abstract positions
+            this.renderMicroPythonComponents(componentMetadata);
+
+            // 6. Render wires from Pico to functional groups
+            this.renderMicroPythonWires(parseResult.circuitData.circuit.wires);
+
+            // 7. Apply breadboard fade for abstract view
+            this.applyBreadboardFade();
+
+            // 8. Enable interactions
+            this.enableGroupInteraction();
+
+            return {
+                success: true,
+                errors: [],
+                warnings: parseResult.warnings,
+                components: componentMetadata.size,
+                wires: parseResult.circuitData.circuit.wires.length
+            };
+        } catch (err) {
+            console.error('[Explorer] Error loading circuit:', err);
+            return {
+                success: false,
+                errors: [{
+                    type: 'render_error',
+                    message: `Failed to render circuit: ${err.message}`
+                }],
+                warnings: parseResult.warnings
+            };
+        }
+    }
+
+    /**
+     * Load component metadata from library
+     * @param {string} componentType - e.g., 'led-red-5mm'
+     * @returns {Promise<object|null>}
+     */
+    async loadComponentMetadata(componentType) {
+        try {
+            // Load library index
+            const libraryResponse = await fetch('components/library.json');
+            const libraryData = await libraryResponse.json();
+            const index = libraryData.library.index;
+
+            if (!index[componentType]) {
+                console.warn(`[Explorer] Unknown component type: ${componentType}`);
+                return null;
+            }
+
+            // Load component metadata
+            const metadataPath = `components/${index[componentType].metadata}`;
+            const metadataResponse = await fetch(metadataPath);
+            const metadataData = await metadataResponse.json();
+
+            return metadataData.component;
+        } catch (err) {
+            console.error(`[Explorer] Failed to load metadata for ${componentType}:`, err);
+            return null;
+        }
+    }
+
+    /**
+     * Build functional groups directly from parser output (no breadboard detection needed)
+     * @param {object} circuitData - Parsed circuit data
+     * @param {Map} componentMetadata - Component metadata map
+     */
+    buildFunctionalGroupsFromParser(circuitData, componentMetadata) {
+        this.functionalGroups = [];
+        this.componentToGroup = new Map();
+
+        const components = circuitData.circuit.components;
+        const wires = circuitData.circuit.wires;
+
+        // Find primary components (those with functionalGroup in metadata)
+        for (const comp of components) {
+            if (comp.type === 'raspberry-pi-pico') continue;
+            if (comp.autoGenerated) continue; // Skip support components, will add to parent's group
+
+            const compData = componentMetadata.get(comp.id);
+            if (!compData?.metadata?.functionalGroup) continue;
+
+            const metadata = compData.metadata;
+            const group = {
+                id: `${comp.id}-group`,
+                label: metadata.functionalGroup.groupLabel || comp.id,
+                primaryComponent: comp.id,
+                primaryMetadata: metadata,
+                allComponents: [comp.id],
+                supportComponents: [],
+                wires: [],
+                wireLabels: metadata.functionalGroup.wireLabels || {}
+            };
+
+            // Find auto-generated support components for this primary
+            for (const otherComp of components) {
+                if (otherComp.parentId === comp.id && otherComp.autoGenerated) {
+                    group.supportComponents.push(otherComp.id);
+                    group.allComponents.push(otherComp.id);
+                }
+            }
+
+            // Find wires connected to this component
+            for (const wire of wires) {
+                // Wire from/to format: "pico1.GP15" or "led.signal"
+                const componentId = comp.id;
+                if (wire.from?.startsWith(`${componentId}.`) ||
+                    wire.to?.startsWith(`${componentId}.`) ||
+                    wire.id?.startsWith(`${componentId}-`)) {
+                    if (!group.wires.includes(wire.id)) {
+                        group.wires.push(wire.id);
+                    }
+                }
+            }
+
+            this.functionalGroups.push(group);
+
+            // Map all components in group
+            for (const compId of group.allComponents) {
+                this.componentToGroup.set(compId, group);
+            }
+
+            console.log(`[Explorer] Built functional group: ${group.label}`, {
+                primary: group.primaryComponent,
+                support: group.supportComponents,
+                wires: group.wires
+            });
+        }
+
+        console.log('[Explorer] Total functional groups from parser:', this.functionalGroups.length);
+    }
+
+    /**
+     * Render components for MicroPython-loaded circuits
+     * @param {Map} componentMetadata - Component metadata map
+     */
+    renderMicroPythonComponents(componentMetadata) {
+        const componentsLayer = document.getElementById('components-layer');
+        if (!componentsLayer) return;
+
+        for (const group of this.functionalGroups) {
+            const slot = this.abstractLayout.getSlotForGroup(group.id);
+            if (!slot) {
+                console.warn(`[Explorer] No slot for group ${group.id}`);
+                continue;
+            }
+
+            // Render each component in the group at abstract position
+            for (let i = 0; i < group.allComponents.length; i++) {
+                const compId = group.allComponents[i];
+                const compData = componentMetadata.get(compId);
+                if (!compData) continue;
+
+                // Calculate position within slot
+                const position = this.abstractLayout.getAbstractPosition(
+                    compId,
+                    group.id,
+                    null // No physical position
+                );
+
+                // Render component at position
+                this.renderComponentAtPositionDirect(compId, compData, position, componentsLayer);
+
+                // Update position cache
+                this.componentPositions.set(compId, {
+                    centerX: position.centerX,
+                    centerY: position.centerY,
+                    width: position.width || 30,
+                    height: position.height || 30,
+                    isAbstract: true
+                });
+            }
+        }
+
+        console.log('[Explorer] Rendered', componentMetadata.size, 'components at abstract positions');
+    }
+
+    /**
+     * Render a component directly (without CircuitLoader)
+     * @param {string} componentId - Component ID
+     * @param {object} compData - Component data with metadata
+     * @param {object} position - Position { centerX, centerY }
+     * @param {SVGElement} layer - Target SVG layer
+     */
+    renderComponentAtPositionDirect(componentId, compData, position, layer) {
+        const metadata = compData.metadata;
+        const rendering = metadata?.rendering?.breadboard;
+
+        if (!rendering?.svg) {
+            console.warn(`[Explorer] No SVG for component ${componentId}`);
+            return;
+        }
+
+        // Create component group
+        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.classList.add('component', 'abstract-component');
+        group.setAttribute('data-component-id', componentId);
+        group.setAttribute('data-component-type', compData.type);
+
+        // Create image element for component SVG
+        const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        img.setAttribute('href', rendering.svg);
+
+        // Scale component to fit in slot
+        const scale = 0.7;
+        const displayWidth = (rendering.width || 30) * scale;
+        const displayHeight = (rendering.height || 30) * scale;
+
+        img.setAttribute('width', displayWidth);
+        img.setAttribute('height', displayHeight);
+        img.setAttribute('x', position.centerX - displayWidth / 2);
+        img.setAttribute('y', position.centerY - displayHeight / 2);
+        img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+        group.appendChild(img);
+
+        // Add component label
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.classList.add('component-label', 'abstract-label');
+        label.setAttribute('x', position.centerX);
+        label.setAttribute('y', position.centerY + displayHeight / 2 + 8);
+        label.setAttribute('text-anchor', 'middle');
+
+        const displayName = metadata?.metadata?.name || metadata?.name || componentId;
+        label.textContent = displayName;
+
+        group.appendChild(label);
+        layer.appendChild(group);
+    }
+
+    /**
+     * Render wires for MicroPython-loaded circuits
+     * @param {Array} wires - Wire definitions from parser
+     */
+    renderMicroPythonWires(wires) {
+        if (!wires || wires.length === 0) return;
+
+        // Clear existing wires
+        this.wiresLayer.innerHTML = '';
+
+        for (const group of this.functionalGroups) {
+            const slot = this.abstractLayout.getSlotForGroup(group.id);
+            if (!slot) continue;
+
+            // Get wire order from component metadata
+            const wireOrder = group.primaryMetadata?.functionalGroup?.wireOrder || [];
+
+            // Find and classify wires for this group
+            const groupWires = [];
+            for (const wireId of group.wires) {
+                const wire = wires.find(w => w.id === wireId);
+                if (!wire) continue;
+
+                // Use role and color from wire definition (set by parser)
+                groupWires.push({
+                    wire,
+                    role: wire.role || 'signal',
+                    color: wire.color || '#ffcc00',
+                    picoEndpoint: wire.from?.startsWith('pico1.') ? wire.from : wire.to
+                });
+            }
+
+            // Sort by wire order
+            const roleOrder = wireOrder.map(wo => wo.role);
+            if (roleOrder.length === 0) {
+                roleOrder.push('power', 'signal', 'ground');
+            }
+            groupWires.sort((a, b) => {
+                const aIdx = roleOrder.indexOf(a.role);
+                const bIdx = roleOrder.indexOf(b.role);
+                return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+            });
+
+            // Render wire bundle
+            this.renderMicroPythonWireBundle(group, slot, groupWires);
+        }
+    }
+
+    /**
+     * Render a bundle of wires for a functional group (MicroPython mode)
+     * @param {object} group - Functional group
+     * @param {object} slot - Slot from AbstractLayoutSystem
+     * @param {Array} classifiedWires - Wires with role and color
+     */
+    renderMicroPythonWireBundle(group, slot, classifiedWires) {
+        if (classifiedWires.length === 0) return;
+
+        const wireEntryX = slot.wireEntry.x;
+        const wireEntryY = slot.wireEntry.y;
+        const height = slot.bounds.height;
+
+        // Calculate vertical spacing
+        const wireCount = classifiedWires.length;
+        const verticalSpacing = Math.min(8, (height - 10) / (wireCount + 1));
+        const startY = wireEntryY - ((wireCount - 1) * verticalSpacing) / 2;
+
+        // Bundle point
+        const bundleX = wireEntryX - 25;
+
+        classifiedWires.forEach((classified, index) => {
+            const { wire, color, role, picoEndpoint } = classified;
+
+            // Get Pico pin coordinates
+            let startX, startY_wire;
+
+            if (picoEndpoint) {
+                const pinName = picoEndpoint.split('.')[1];
+                const picoPin = this.picoPins.find(p => p.pinKey === pinName);
+                if (picoPin) {
+                    startX = picoPin.x;
+                    startY_wire = picoPin.y;
+                } else {
+                    // Fallback: estimate position based on pin name
+                    startX = 50;
+                    startY_wire = 100;
+                    console.warn(`[Explorer] Pico pin ${pinName} not found in picoPins`);
+                }
+            } else {
+                startX = 50;
+                startY_wire = 100;
+            }
+
+            // End point at group boundary
+            const endX = wireEntryX;
+            const endY = startY + index * verticalSpacing;
+            const bundleY = endY;
+
+            // Create bezier path
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.classList.add('bundled-wire');
+            path.classList.add(`wire-${role}`);
+            path.setAttribute('data-wire-id', wire.id);
+            path.setAttribute('data-group-id', group.id);
+            path.style.stroke = color;
+
+            // Control points for smooth curve
+            const cp1x = startX + (bundleX - startX) * 0.5;
+            const cp1y = startY_wire;
+            const cp2x = bundleX - 20;
+            const cp2y = bundleY;
+
+            const d = `M ${startX} ${startY_wire}
+                       C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${bundleX} ${bundleY}
+                       L ${endX} ${endY}`;
+
+            path.setAttribute('d', d);
+            this.wiresLayer.appendChild(path);
+
+            // Store wire-to-group mapping
+            if (!this.wireToGroup) this.wireToGroup = new Map();
+            this.wireToGroup.set(wire.id, group.id);
+        });
+
+        console.log(`[Explorer] Rendered ${classifiedWires.length} wires for group "${group.label}"`);
+    }
+
+    /**
+     * Clear the current circuit display
+     */
+    clearCircuit() {
+        // Clear wires
+        if (this.wiresLayer) {
+            this.wiresLayer.innerHTML = '';
+        }
+
+        // Clear components
+        if (this.componentsLayer) {
+            this.componentsLayer.innerHTML = '';
+        }
+
+        // Clear group boundaries
+        if (this.groupBoundariesLayer) {
+            this.groupBoundariesLayer.innerHTML = '';
+        }
+
+        // Clear wire labels
+        if (this.wireLabelsLayer) {
+            this.wireLabelsLayer.innerHTML = '';
+        }
+
+        // Reset state
+        this.wires = [];
+        this.functionalGroups = [];
+        this.componentPositions.clear();
+        this.wireToComponents.clear();
+        this.componentToWires.clear();
+        this.groupBoundaries.clear();
+        this.activeGroup = null;
+        this.highlightedWire = null;
+        this.highlightedComponent = null;
+
+        console.log('[Explorer] Circuit cleared');
+    }
+
+    /**
+     * Show error messages in the MicroPython panel
+     */
+    showMicroPythonError(errors, warnings = []) {
+        const errorsDiv = document.getElementById('micropython-errors');
+        const successDiv = document.getElementById('micropython-success');
+
+        if (!errorsDiv) return;
+
+        // Hide success
+        successDiv?.classList.remove('visible');
+
+        // Build error HTML
+        let html = '';
+
+        // Show errors first
+        for (const err of errors) {
+            html += `
+                <div class="error-item">
+                    <div class="error-type">${err.type}</div>
+                    <div class="error-message">${err.message}</div>
+                    ${err.suggestion ? `<div class="error-suggestion">💡 ${err.suggestion}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // Show warnings
+        for (const warn of warnings) {
+            html += `
+                <div class="error-item warning-item">
+                    <div class="error-type">⚠️ ${warn.type}</div>
+                    <div class="error-message">${warn.message}</div>
+                    ${warn.suggestion ? `<div class="error-suggestion">${warn.suggestion}</div>` : ''}
+                </div>
+            `;
+        }
+
+        errorsDiv.innerHTML = html;
+        errorsDiv.classList.add('visible');
+    }
+
+    /**
+     * Show success message in the MicroPython panel
+     */
+    showMicroPythonSuccess(result) {
+        const errorsDiv = document.getElementById('micropython-errors');
+        const successDiv = document.getElementById('micropython-success');
+
+        if (!successDiv) return;
+
+        // Hide errors
+        errorsDiv?.classList.remove('visible');
+
+        // Build success message
+        let html = `<div>Circuit loaded successfully!</div>`;
+        html += `<div class="success-stats">`;
+        html += `📦 ${result.components} components • `;
+        html += `🔌 ${result.wires} wires`;
+        html += `</div>`;
+
+        // Show warnings if any
+        if (result.warnings && result.warnings.length > 0) {
+            html += `<div style="margin-top: 8px; color: #FFB74D; font-size: 11px;">`;
+            html += `⚠️ ${result.warnings.length} warning(s) - check console for details`;
+            html += `</div>`;
+        }
+
+        successDiv.innerHTML = html;
+        successDiv.classList.add('visible');
+    }
+
+    /**
+     * Hide all MicroPython messages
+     */
+    hideMicroPythonMessages() {
+        document.getElementById('micropython-errors')?.classList.remove('visible');
+        document.getElementById('micropython-success')?.classList.remove('visible');
     }
 }
 
