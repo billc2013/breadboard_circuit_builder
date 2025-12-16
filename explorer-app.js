@@ -83,9 +83,15 @@ class ExplorerApp {
 
         // Event handler references (for cleanup)
         this.boundHandleWireClick = this.handleWireClick.bind(this);
+        this.boundHandleWireHover = this.handleWireHover.bind(this);
+        this.boundHandleWireHoverEnd = this.handleWireHoverEnd.bind(this);
         this.boundHandleComponentClick = this.handleComponentClick.bind(this);
         this.boundHandleKeydown = this.handleKeydown.bind(this);
         this.boundHandleGroupClick = this.handleGroupClick.bind(this);
+
+        // Tooltip pinning state
+        this.pinnedTooltips = new Set();  // Set of wireIds with pinned tooltips
+        this.hoveredWireId = null;  // Currently hovered wire (for non-pinned tooltip)
 
         this.init();
     }
@@ -936,6 +942,28 @@ class ExplorerApp {
             const lastPoint = points[points.length - 1].split(',');
             x = parseFloat(lastPoint[0]);
             y = parseFloat(lastPoint[1]) - 4;
+        } else if (wireElement.tagName === 'path') {
+            // For bezier paths (MicroPython bundled wires), get the bounding box midpoint
+            // or parse the 'd' attribute to get the endpoint
+            const d = wireElement.getAttribute('d');
+            if (d) {
+                // The path ends with "L endX endY" - extract those coordinates
+                const lMatch = d.match(/L\s*([\d.]+)\s+([\d.]+)\s*$/);
+                if (lMatch) {
+                    x = parseFloat(lMatch[1]);
+                    y = parseFloat(lMatch[2]) - 4;
+                } else {
+                    // Fallback: use bounding box center
+                    try {
+                        const bbox = wireElement.getBBox();
+                        x = bbox.x + bbox.width;
+                        y = bbox.y + bbox.height / 2;
+                    } catch (e) {
+                        // getBBox can fail if element not rendered
+                        return null;
+                    }
+                }
+            }
         }
 
         return x !== undefined ? { x, y } : null;
@@ -952,17 +980,70 @@ class ExplorerApp {
     enableWireInteraction() {
         if (this.wiresLayer) {
             this.wiresLayer.addEventListener('click', this.boundHandleWireClick);
+            // Use mouseover/mouseout which bubble (unlike mouseenter/mouseleave)
+            this.wiresLayer.addEventListener('mouseover', this.boundHandleWireHover);
+            this.wiresLayer.addEventListener('mouseout', this.boundHandleWireHoverEnd);
         }
     }
 
     disableWireInteraction() {
         if (this.wiresLayer) {
             this.wiresLayer.removeEventListener('click', this.boundHandleWireClick);
+            this.wiresLayer.removeEventListener('mouseover', this.boundHandleWireHover);
+            this.wiresLayer.removeEventListener('mouseout', this.boundHandleWireHoverEnd);
+        }
+    }
+
+    /**
+     * Find wire element from event target (handles both .wire and .bundled-wire classes)
+     */
+    findWireElement(target) {
+        // Check for both regular wires and bundled wires (MicroPython mode)
+        return target.closest('.wire') || target.closest('.bundled-wire');
+    }
+
+    /**
+     * Handle wire hover - show tooltip on hover (if not already pinned)
+     */
+    handleWireHover(event) {
+        const wireElement = this.findWireElement(event.target);
+        if (!wireElement) {
+            return;
+        }
+
+        const wireId = wireElement.getAttribute('data-wire-id');
+        if (!wireId) {
+            console.log('[Explorer] Wire element found but no data-wire-id:', wireElement);
+            return;
+        }
+
+        // Don't show hover tooltip if this wire is already pinned
+        if (this.pinnedTooltips.has(wireId)) return;
+
+        console.log('[Explorer] Wire hover:', wireId);
+        this.hoveredWireId = wireId;
+        this.showTooltip(wireId);
+    }
+
+    /**
+     * Handle wire hover end - hide tooltip if not pinned
+     */
+    handleWireHoverEnd(event) {
+        const wireElement = this.findWireElement(event.target);
+        if (!wireElement) return;
+
+        const wireId = wireElement.getAttribute('data-wire-id');
+        if (!wireId) return;
+
+        // Only hide if this is the currently hovered wire and it's not pinned
+        if (this.hoveredWireId === wireId && !this.pinnedTooltips.has(wireId)) {
+            this.hideTooltip();
+            this.hoveredWireId = null;
         }
     }
 
     handleWireClick(event) {
-        const wireElement = event.target.closest('.wire');
+        const wireElement = this.findWireElement(event.target);
         if (!wireElement) return;
 
         const wireId = wireElement.getAttribute('data-wire-id');
@@ -980,19 +1061,21 @@ class ExplorerApp {
     }
 
     handleSingleWireClick(wireId) {
-        // Unhighlight previous wire
-        if (this.highlightedWire && this.highlightedWire !== wireId) {
-            this.unhighlightWire(this.highlightedWire);
-        }
-
-        // Toggle highlight
-        if (this.highlightedWire === wireId) {
+        // Toggle tooltip pinning
+        if (this.pinnedTooltips.has(wireId)) {
+            // Unpin - remove from pinned set and hide tooltip
+            this.pinnedTooltips.delete(wireId);
+            this.hideTooltip();
             this.unhighlightWire(wireId);
             this.highlightedWire = null;
-            this.hideTooltip();
+            console.log('[Explorer] Tooltip unpinned for wire:', wireId);
         } else {
+            // Pin - add to pinned set and show tooltip
+            this.pinnedTooltips.add(wireId);
+            this.showTooltip(wireId);
             this.highlightWire(wireId);
             this.highlightedWire = wireId;
+            console.log('[Explorer] Tooltip pinned for wire:', wireId);
         }
     }
 
@@ -1277,6 +1360,10 @@ class ExplorerApp {
         });
         this.highlightedWire = null;
         this.highlightedGroup = null;
+
+        // Clear pinned tooltips
+        this.pinnedTooltips.clear();
+        this.hoveredWireId = null;
     }
 
     // ==================== Group Info Panel ====================
@@ -1286,7 +1373,8 @@ class ExplorerApp {
         if (!panel) return;
 
         const title = panel.querySelector('.group-info-title');
-        const components = panel.querySelector('.group-info-components');
+        const componentsEl = panel.querySelector('.group-info-components');
+        const pathsEl = panel.querySelector('.group-info-paths');
 
         if (title) {
             title.textContent = group.primaryMetadata?.functionalGroup?.groupLabel ||
@@ -1294,11 +1382,129 @@ class ExplorerApp {
                                'Functional Group';
         }
 
-        if (components) {
-            components.textContent = `Primary: ${group.primaryComponent} | ${group.wires.length} wires`;
+        // Build and display signal paths
+        const signalPaths = this.buildSignalPaths(group);
+
+        if (pathsEl) {
+            pathsEl.innerHTML = signalPaths.map((path, index) => {
+                const isLast = index === signalPaths.length - 1;
+                const prefix = isLast ? '└─' : '├─';
+                return `<div class="signal-path ${path.role}">${prefix} ${path.display}</div>`;
+            }).join('');
+        }
+
+        if (componentsEl) {
+            // Show component count instead of just primary
+            const compCount = group.allComponents.length;
+            const wireCount = group.wires.length;
+            componentsEl.textContent = compCount > 1
+                ? `${compCount} components | ${wireCount} wires`
+                : `${wireCount} wires`;
         }
 
         panel.classList.add('visible');
+    }
+
+    /**
+     * Build signal path descriptions for a functional group
+     * Uses component JSON metadata to construct paths like:
+     *   "trig: GP14 → Trigger"
+     *   "Signal: GP13 → resistor → anode"
+     * @param {object} group - Functional group object
+     * @returns {Array} Array of path objects with {display, role, wireId}
+     */
+    buildSignalPaths(group) {
+        const paths = [];
+        const wires = this.circuitData?.circuit?.wires || [];
+        const metadata = group.primaryMetadata;
+        const requires = metadata?.functionalGroup?.requires || [];
+        const hasResistor = requires.some(r => r.type === 'resistor');
+
+        for (const wireId of group.wires) {
+            const wire = wires.find(w => w.id === wireId);
+            if (!wire) continue;
+
+            // Determine direction arrow based on pin electrical type
+            const electricalType = this.getWireElectricalType(wire, metadata);
+            const arrow = electricalType === 'output' ? '←' : '→';
+
+            // Build the display string
+            let display = '';
+
+            if (wire.role === 'signal') {
+                // Signal wire: show variable name or role, GPIO, path through resistor, component pin
+                const varName = wire.variableName || '';
+                const gpioPin = wire.gpioPin !== null && wire.gpioPin !== undefined
+                    ? `GP${wire.gpioPin}`
+                    : this.extractGpioFromEndpoint(wire.from);
+                const componentPin = wire.componentPinName || 'signal';
+
+                if (hasResistor && wire.role === 'signal') {
+                    // LED-style: Signal goes through resistor
+                    display = varName
+                        ? `${varName}: ${gpioPin} ${arrow} resistor ${arrow} ${componentPin}`
+                        : `Signal: ${gpioPin} ${arrow} resistor ${arrow} ${componentPin}`;
+                } else {
+                    // Direct connection
+                    display = varName
+                        ? `${varName}: ${gpioPin} ${arrow} ${componentPin}`
+                        : `Signal: ${gpioPin} ${arrow} ${componentPin}`;
+                }
+            } else if (wire.role === 'ground') {
+                const componentPin = wire.componentPinName || 'GND';
+                display = `GND ${arrow} ${componentPin}`;
+            } else if (wire.role === 'power') {
+                const componentPin = wire.componentPinName || 'VCC';
+                display = `3V3 ${arrow} ${componentPin}`;
+            } else {
+                // Generic wire
+                display = wire.description || `${wire.from} ${arrow} ${wire.to}`;
+            }
+
+            paths.push({
+                display,
+                role: wire.role || 'signal',
+                wireId: wireId,
+                variableName: wire.variableName,
+                gpioPin: wire.gpioPin
+            });
+        }
+
+        // Sort paths: signal wires first, then power, then ground
+        const roleOrder = { 'signal': 0, 'power': 1, 'ground': 2 };
+        paths.sort((a, b) => (roleOrder[a.role] || 3) - (roleOrder[b.role] || 3));
+
+        return paths;
+    }
+
+    /**
+     * Get electrical type for a wire based on component pin metadata
+     * @param {object} wire - Wire object
+     * @param {object} metadata - Component metadata
+     * @returns {string} 'input', 'output', 'power', or 'ground'
+     */
+    getWireElectricalType(wire, metadata) {
+        if (wire.role === 'ground') return 'ground';
+        if (wire.role === 'power') return 'power';
+
+        // Try to find the pin in component metadata
+        const pinRole = wire.pinRole || wire.to?.split('.')[1];
+        if (pinRole && metadata?.pins?.[pinRole]) {
+            return metadata.pins[pinRole].electricalType || 'input';
+        }
+
+        return 'input'; // Default
+    }
+
+    /**
+     * Extract GPIO pin number from a Pico endpoint string
+     * @param {string} endpoint - e.g., "pico1.GP14" or "pico1.GP26_ADC0"
+     * @returns {string} e.g., "GP14"
+     */
+    extractGpioFromEndpoint(endpoint) {
+        if (!endpoint) return '';
+        const match = endpoint.match(/GP(\d+)/i);
+        return match ? `GP${match[1]}` : endpoint;
     }
 
     hideGroupInfo() {
@@ -1311,10 +1517,18 @@ class ExplorerApp {
     // ==================== Educational Tooltip ====================
 
     showTooltip(wireId) {
-        if (!wireId || !this.circuitData) return;
+        if (!wireId || !this.circuitData) {
+            console.log('[Explorer] showTooltip: missing wireId or circuitData', { wireId, hasCircuitData: !!this.circuitData });
+            return;
+        }
 
         const wire = this.circuitData.circuit.wires.find(w => w.id === wireId);
-        if (!wire) return;
+        if (!wire) {
+            console.log('[Explorer] showTooltip: wire not found for id:', wireId);
+            console.log('[Explorer] Available wire IDs:', this.circuitData.circuit.wires.map(w => w.id));
+            return;
+        }
+        console.log('[Explorer] showTooltip: found wire', wire);
 
         const guideContent = this.getConnectionGuideContent(wire);
 
@@ -1325,6 +1539,7 @@ class ExplorerApp {
         const purposeEl = this.tooltipElement.querySelector('.tooltip-purpose');
         const warningsEl = this.tooltipElement.querySelector('.tooltip-warnings');
         const troubleshootingEl = this.tooltipElement.querySelector('.tooltip-troubleshooting');
+        const hintEl = this.tooltipElement.querySelector('.tooltip-hint');
 
         if (titleEl) titleEl.textContent = guideContent.title || 'Connection Info';
         if (purposeEl) purposeEl.textContent = guideContent.purpose || '';
@@ -1341,8 +1556,24 @@ class ExplorerApp {
                 : '';
         }
 
+        // Update hint based on pinned state
+        const isPinned = this.pinnedTooltips.has(wireId);
+        if (hintEl) {
+            hintEl.textContent = isPinned ? 'Click wire again to dismiss' : 'Click to keep visible';
+        }
+
+        // Add/remove pinned class for visual indicator
+        if (isPinned) {
+            this.tooltipElement.classList.add('pinned');
+        } else {
+            this.tooltipElement.classList.remove('pinned');
+        }
+
         this.positionTooltipNearWire(wireId);
         this.tooltipElement.classList.add('visible');
+
+        // Store current wire ID for tracking
+        this.tooltipElement.setAttribute('data-wire-id', wireId);
     }
 
     hideTooltip() {
@@ -1357,19 +1588,43 @@ class ExplorerApp {
     }
 
     getConnectionGuideContent(wire) {
+        // Build title from extended wire data if available
+        let title;
+        if (wire.variableName && wire.gpioPin !== null && wire.gpioPin !== undefined) {
+            title = `${wire.variableName} → GP${wire.gpioPin}`;
+        } else if (wire.gpioPin !== null && wire.gpioPin !== undefined) {
+            title = `GP${wire.gpioPin}`;
+        } else if (wire.role === 'ground') {
+            title = `GND → ${wire.componentPinName || 'Ground'}`;
+        } else if (wire.role === 'power') {
+            title = `3V3 → ${wire.componentPinName || 'Power'}`;
+        } else {
+            title = `Wire: ${wire.from} → ${wire.to}`;
+        }
+
         const content = {
-            title: `Wire: ${wire.from} → ${wire.to}`,
-            purpose: wire.description || 'Connection between circuit elements',
+            title,
+            purpose: '',
             warnings: [],
             troubleshooting: []
         };
 
-        // Try to get component-specific guide
-        const componentGuide = this.findComponentConnectionGuide(wire);
-        if (componentGuide) {
-            content.purpose = componentGuide.purpose || content.purpose;
-            content.warnings = componentGuide.warnings || [];
-            content.troubleshooting = componentGuide.troubleshooting || [];
+        // Use connectionGuide from wire if available (from extended data)
+        if (wire.connectionGuide) {
+            content.purpose = wire.connectionGuide.purpose || '';
+            content.warnings = wire.connectionGuide.warnings || [];
+            content.troubleshooting = wire.connectionGuide.troubleshooting || [];
+        } else {
+            // Fall back to description or try to find component guide
+            content.purpose = wire.description || 'Connection between circuit elements';
+
+            // Try to get component-specific guide
+            const componentGuide = this.findComponentConnectionGuide(wire);
+            if (componentGuide) {
+                content.purpose = componentGuide.purpose || content.purpose;
+                content.warnings = componentGuide.warnings || [];
+                content.troubleshooting = componentGuide.troubleshooting || [];
+            }
         }
 
         return content;
@@ -2112,8 +2367,6 @@ class ExplorerApp {
      * Update info panel with active group information
      */
     updateGroupInfoPanel() {
-        if (!this.infoPanel) return;
-
         if (this.activeGroup) {
             const boundary = this.groupBoundaries.get(this.activeGroup);
             if (boundary?.group) {
@@ -2121,10 +2374,21 @@ class ExplorerApp {
                 const componentNames = group.allComponents.map(id =>
                     this.getComponentDisplayName(id)
                 ).join(' + ');
-                this.infoPanel.textContent = `${group.label}: ${componentNames}`;
+
+                // Update header info panel
+                if (this.infoPanel) {
+                    this.infoPanel.textContent = `${group.label}: ${componentNames}`;
+                }
+
+                // Show the side panel with signal paths
+                this.showGroupInfo(group);
             }
         } else {
-            this.infoPanel.textContent = 'Click on a component or group to explore connections';
+            // No active group - update header and hide side panel
+            if (this.infoPanel) {
+                this.infoPanel.textContent = 'Click on a component or group to explore connections';
+            }
+            this.hideGroupInfo();
         }
     }
 
@@ -2619,6 +2883,7 @@ class ExplorerApp {
 
             // 8. Enable interactions
             this.enableGroupInteraction();
+            this.enableWireInteraction();  // Enable wire hover/click for tooltips
 
             return {
                 success: true,

@@ -491,39 +491,72 @@ class MicroPythonParser {
                     pinName = `GP${component.gpioPin}_ADC${adcChannel}`;
                 }
 
+                // Get the target pin from wireLabels
+                const signalLabel = component.metadata.functionalGroup?.wireLabels?.signal;
+                const targetPinKey = signalLabel?.pinConnection;
+                const targetPin = targetPinKey ? component.metadata.pins?.[targetPinKey] : null;
+
                 wires.push({
                     id: `${component.id}-signal`,
                     from: `pico1.${pinName}`,
                     to: `${component.id}.signal`,
                     description: `${signalWire.label || 'Signal'} for ${component.id}`,
                     role: 'signal',
-                    color: signalWire.color || '#ffcc00'
+                    color: signalWire.color || '#ffcc00',
+                    // Extended data for UI display
+                    variableName: component.id,
+                    gpioPin: component.gpioPin,
+                    componentPinName: targetPin?.name || targetPinKey || 'signal',
+                    componentPinDescription: targetPin?.description || null,
+                    connectionGuide: targetPin?.connectionGuide || null
                 });
             }
 
             // Ground wire
             const groundWire = wireOrder.find(w => w.role === 'ground');
             if (groundWire) {
+                // Get the target pin from wireLabels
+                const groundLabel = component.metadata.functionalGroup?.wireLabels?.ground;
+                const targetPinKey = groundLabel?.pinConnection;
+                const targetPin = targetPinKey ? component.metadata.pins?.[targetPinKey] : null;
+
                 wires.push({
                     id: `${component.id}-ground`,
                     from: `pico1.${getNextGnd()}`,
                     to: `${component.id}.ground`,
                     description: `${groundWire.label || 'Ground'} for ${component.id}`,
                     role: 'ground',
-                    color: groundWire.color || '#333333'
+                    color: groundWire.color || '#333333',
+                    // Extended data for UI display
+                    variableName: null,  // Ground wires don't have a code variable
+                    gpioPin: null,
+                    componentPinName: targetPin?.name || targetPinKey || 'ground',
+                    componentPinDescription: targetPin?.description || null,
+                    connectionGuide: targetPin?.connectionGuide || null
                 });
             }
 
             // Power wire (for sensors that need 3.3V)
             const powerWire = wireOrder.find(w => w.role === 'power');
             if (powerWire && category === 'sensor') {
+                // Get the target pin from wireLabels
+                const powerLabel = component.metadata.functionalGroup?.wireLabels?.power;
+                const targetPinKey = powerLabel?.pinConnection;
+                const targetPin = targetPinKey ? component.metadata.pins?.[targetPinKey] : null;
+
                 wires.push({
                     id: `${component.id}-power`,
                     from: 'pico1.3V3_OUT',
                     to: `${component.id}.power`,
                     description: `${powerWire.label || 'Power 3.3V'} for ${component.id}`,
                     role: 'power',
-                    color: powerWire.color || '#ff4444'
+                    color: powerWire.color || '#ff4444',
+                    // Extended data for UI display
+                    variableName: null,  // Power wires don't have a code variable
+                    gpioPin: null,
+                    componentPinName: targetPin?.name || targetPinKey || 'power',
+                    componentPinDescription: targetPin?.description || null,
+                    connectionGuide: targetPin?.connectionGuide || null
                 });
             }
         }
@@ -592,7 +625,7 @@ class MicroPythonParser {
                 picoPinName = `GP${pin.gpioPin}_ADC${adcChannel}`;
             }
 
-            // Create wire
+            // Create wire with extended data for UI display
             wires.push({
                 id: `${component.id}-${pinRole}`,
                 from: `pico1.${picoPinName}`,
@@ -600,33 +633,53 @@ class MicroPythonParser {
                 description: `${wireLabel} (GP${pin.gpioPin}) for ${component.id}`,
                 role: wireRole,
                 color: wireColor,
-                pinRole: pinRole
+                pinRole: pinRole,
+                // Extended data for UI display
+                variableName: pin.variableName,
+                gpioPin: pin.gpioPin,
+                componentPinName: pinDef.name || pinRole,
+                componentPinDescription: pinDef.description || null,
+                connectionGuide: pinDef.connectionGuide || null
             });
         }
 
         // Add power wire if component needs it (sensors need 3.3V or 5V)
         const powerWire = wireOrder.find(w => w.role === 'power');
         if (powerWire && category === 'sensor') {
+            const vccPin = pinDefinitions['vcc'];
             wires.push({
                 id: `${component.id}-power`,
                 from: 'pico1.3V3_OUT',
                 to: `${component.id}.vcc`,
                 description: `${powerWire.label || 'Power'} for ${component.id}`,
                 role: 'power',
-                color: powerWire.color || '#ff4444'
+                color: powerWire.color || '#ff4444',
+                // Extended data for UI display
+                variableName: null,
+                gpioPin: null,
+                componentPinName: vccPin?.name || 'VCC',
+                componentPinDescription: vccPin?.description || null,
+                connectionGuide: vccPin?.connectionGuide || null
             });
         }
 
         // Add ground wire
         const groundWire = wireOrder.find(w => w.role === 'ground');
         if (groundWire) {
+            const gndPin = pinDefinitions['gnd'];
             wires.push({
                 id: `${component.id}-ground`,
                 from: `pico1.${getNextGnd()}`,
                 to: `${component.id}.gnd`,
                 description: `${groundWire.label || 'Ground'} for ${component.id}`,
                 role: 'ground',
-                color: groundWire.color || '#333333'
+                color: groundWire.color || '#333333',
+                // Extended data for UI display
+                variableName: null,
+                gpioPin: null,
+                componentPinName: gndPin?.name || 'GND',
+                componentPinDescription: gndPin?.description || null,
+                connectionGuide: gndPin?.connectionGuide || null
             });
         }
 
@@ -634,13 +687,20 @@ class MicroPythonParser {
         if (component.type === 'tb6612-motor-driver') {
             const logicPowerWire = wireOrder.find(w => w.role === 'logic-power');
             if (logicPowerWire) {
+                const vccPin = pinDefinitions['vcc'];
                 wires.push({
                     id: `${component.id}-vcc`,
                     from: 'pico1.3V3_OUT',
                     to: `${component.id}.vcc`,
                     description: `${logicPowerWire.label || 'Logic Power 3.3V'} for ${component.id}`,
                     role: 'power',
-                    color: logicPowerWire.color || '#ff8800'
+                    color: logicPowerWire.color || '#ff8800',
+                    // Extended data for UI display
+                    variableName: null,
+                    gpioPin: null,
+                    componentPinName: vccPin?.name || 'VCC',
+                    componentPinDescription: vccPin?.description || null,
+                    connectionGuide: vccPin?.connectionGuide || null
                 });
             }
         }
