@@ -1,0 +1,41 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "LED Alarm Indicator",
+      "description": "Red LED with current-limiting resistor controlled by GPIO pin for blinking alarm",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "20H",
+          "pin1": "23H"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "anode": "23G",
+          "cathode": "24G"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w6",
+        "from": "pico1.GP15",
+        "to": "20J",
+        "description": "Wire from Pico GPIO15 to resistor at 20J. Controls LED blinking for alarm."
+      },
+      {
+        "id": "w7",
+        "from": "10Z",
+        "to": "24E",
+        "description": "Wire from ground rail to LED cathode at 24E. Completes LED circuit to ground."
+      }
+    ]
+  }
+}

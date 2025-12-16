@@ -1,0 +1,47 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Pushbutton Alarm Reset",
+      "description": "Tactile button with pulldown resistor for disabling the alarm",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "button1",
+        "type": "button-tactile-6mm",
+        "placement": {
+          "leg0": "3D",
+          "leg1": "4D"
+        }
+      },
+      {
+        "id": "r3",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "4C",
+          "pin1": "9C"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w8",
+        "from": "15W",
+        "to": "3E",
+        "description": "Wire from power rail to button leg0 at 3E. Provides 3.3V when button pressed."
+      },
+      {
+        "id": "w9",
+        "from": "pico1.GP16",
+        "to": "4B",
+        "description": "Wire from Pico GPIO16 to junction at 4B. Reads button state (HIGH when pressed, LOW when not)."
+      },
+      {
+        "id": "w10",
+        "from": "15Z",
+        "to": "9A",
+        "description": "Wire from ground rail to pulldown resistor at 9A. Keeps GPIO LOW when button not pressed."
+      }
+    ]
+  }
+}

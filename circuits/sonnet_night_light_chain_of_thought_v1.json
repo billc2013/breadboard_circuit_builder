@@ -1,0 +1,75 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Night Light with Photoresistor",
+      "description": "Automatic LED night light that turns on when ambient light is low, using a photoresistor voltage divider for light sensing.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "sensor1",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "5F",
+          "pin1": "8F"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "8E",
+          "pin1": "13E"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "20F",
+          "pin1": "23F"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "24E",
+          "anode": "23E"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "5G",
+        "description": "Power supply to photoresistor. Connects 3.3V to one side of the voltage divider."
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP26_ADC0",
+        "to": "8G",
+        "description": "Analog input from voltage divider junction. Reads the variable voltage between photoresistor and 10kΩ resistor to measure light level."
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "13D",
+        "description": "Ground connection for voltage divider. Completes the ground path for the 10kΩ resistor in the light sensor circuit."
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GP15",
+        "to": "20G",
+        "description": "GPIO control signal for LED. When set HIGH, provides current through the current-limiting resistor to the LED."
+      },
+      {
+        "id": "w5",
+        "from": "pico1.GND_28",
+        "to": "24D",
+        "description": "Ground connection for LED cathode. Completes the current path for the LED circuit."
+      }
+    ]
+  }
+}

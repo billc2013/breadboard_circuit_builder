@@ -9,7 +9,7 @@
       "basic": {
         "name": "Basic Components",
         "description": "LEDs, resistors, capacitors, switches, and other fundamental parts",
-        "components": ["led-red-5mm", "led-green-5mm", "led-blue-5mm", "resistor-220", "resistor-10k", "button-tactile-6mm"]
+        "components": ["led-red-5mm", "led-green-5mm", "led-blue-5mm", "led-yellow-5mm", "resistor-220", "resistor-10k", "photocell-ldr", "button-tactile-6mm"]
       },
       "microcontrollers": {
         "name": "Microcontrollers",
@@ -37,6 +37,12 @@
         "adapter": "basic/led-5mm-adapter.js",
         "adapterClass": "LED5mmAdapter"
       },
+      "led-yellow-5mm": {
+        "metadata": "basic/led-yellow-5mm.json",
+        "geometry": "basic/led-5mm-geometry.js",
+        "adapter": "basic/led-5mm-adapter.js",
+        "adapterClass": "LED5mmAdapter"
+      },
       "resistor-220": {
         "metadata": "basic/resistor-220.json",
         "geometry": "basic/resistor-geometry.js",
@@ -48,6 +54,12 @@
         "geometry": "basic/resistor-geometry.js",
         "adapter": "basic/resistor-adapter.js",
         "adapterClass": "ResistorAdapter"
+      },
+      "photocell-ldr": {
+        "metadata": "basic/photocell.json",
+        "geometry": "basic/photocell-geometry.js",
+        "adapter": "basic/photocell-adapter.js",
+        "adapterClass": "PhotocellAdapter"
       },
       "button-tactile-6mm": {
         "metadata": "basic/button-tactile-6mm.json",

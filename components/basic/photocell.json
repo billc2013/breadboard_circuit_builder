@@ -1,0 +1,103 @@
+{
+  "component": {
+    "metadata": {
+      "id": "photocell-ldr",
+      "name": "Photocell (LDR)",
+      "description": "A generic light dependent resistor (photocell/LDR)",
+      "author": "Fritzing Team",
+      "tags": [
+        "LDR",
+        "light dependent resistor",
+        "photocell",
+        "light sensor",
+        "sensor",
+        "fritzing core"
+      ],
+      "version": "5",
+      "created": "2010-04-06",
+      "fritzingVersion": "0.3.7b.08.26.3377",
+      "category": "basic"
+    },
+    "pins": {
+      "pin0": {
+        "number": 1,
+        "name": "Pin 0",
+        "description": "First terminal (non-polarized)",
+        "connectorId": "connector0"
+      },
+      "pin1": {
+        "number": 2,
+        "name": "Pin 1",
+        "description": "Second terminal (non-polarized)",
+        "connectorId": "connector1"
+      }
+    },
+    "properties": {
+      "darkResistance": "300kΩ",
+      "darkResistanceValue": 300000,
+      "darkResistanceCondition": "@0.01lx",
+      "lightResistance": "400Ω",
+      "lightResistanceValue": 400,
+      "lightResistanceCondition": "@100lx",
+      "luminance": "10lx",
+      "power": "0.25W",
+      "package": "THT",
+      "family": "Photo-Resistor",
+      "pinSpacing": "300 mil"
+    },
+    "physical": {
+      "type": "tht",
+      "package": "THT",
+      "pinSpacing": "300 mil"
+    },
+    "rendering": {
+      "breadboard": {
+        "svg": "components_svg/ldr.svg",
+        "width": 24.328,
+        "height": 10.932,
+        "unit": "px",
+        "anchor": "center",
+        "pinOffsets": {
+          "pin0": {"x": -11.164, "y": 0},
+          "pin1": {"x": 11.164, "y": 0}
+        },
+        "renderMode": "on-breadboard",
+        "orientation": {
+          "default": "horizontal",
+          "allowed": ["horizontal", "vertical"]
+        }
+      },
+      "schematic": {
+        "svg": "schematic/ldr.svg"
+      },
+      "pcb": {
+        "svg": "pcb/axial_lay_2_300mil_pcb.svg"
+      }
+    },
+    "validation": {
+      "electricalType": "variable-resistor",
+      "polarity": "non-polarized",
+      "behavior": "light-sensitive",
+      "rules": {
+        "checkPowerDissipation": true,
+        "maxPowerWatts": 0.25,
+        "resistanceRange": {
+          "min": 400,
+          "max": 300000,
+          "unit": "ohm"
+        }
+      },
+      "warnings": [
+        "Ensure power dissipation does not exceed 0.25W",
+        "Resistance varies from ~400Ω (bright light) to ~300kΩ (darkness)",
+        "Response time is typically 20-30ms for light-to-dark transition",
+        "Often used in voltage divider configuration with fixed resistor"
+      ],
+      "usageNotes": [
+        "Common uses: light detection, automatic lighting control, light meters",
+        "Typical voltage divider: LDR + 10kΩ resistor",
+        "Connect to analog input (ADC) to read light level"
+      ]
+    }
+  }
+}

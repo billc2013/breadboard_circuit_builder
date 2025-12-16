@@ -1,0 +1,87 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Exported Circuit",
+      "description": "Circuit exported from Breadboard Builder",
+      "exported": "2025-12-09T03:56:49.042Z"
+    },
+    "components": [
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "18E",
+          "anode": "19E"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "19D",
+          "pin1": "24D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w5",
+        "from": "18D",
+        "to": "pico1.GND_28",
+        "fromCoords": {
+          "x": 266.594,
+          "y": 136.876
+        },
+        "toCoords": {
+          "x": 74.96000000000001,
+          "y": 115.94
+        },
+        "waypoints": [
+          {
+            "x": 112.27499999999999,
+            "y": 112.27499999999999
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Wire from Pico ground pin to breadboard Bus18A-E. This connects the LED cathode to ground."
+      },
+      {
+        "id": "w4",
+        "from": "24E",
+        "to": "pico1.GP15",
+        "fromCoords": {
+          "x": 320.486,
+          "y": 127.894
+        },
+        "toCoords": {
+          "x": 24.56,
+          "y": 166.34
+        },
+        "waypoints": [
+          {
+            "x": 309.87899999999996,
+            "y": 67.365
+          },
+          {
+            "x": 94.31099999999999,
+            "y": 76.347
+          },
+          {
+            "x": 85.329,
+            "y": 4.491
+          },
+          {
+            "x": 13.472999999999999,
+            "y": 13.472999999999999
+          },
+          {
+            "x": 4.491,
+            "y": 130.23899999999998
+          }
+        ],
+        "routingMode": "straight",
+        "description": "Wire from Pico GPIO 15 to breadboard Bus24A-E. This is the digital output pin that controls the LED."
+      }
+    ]
+  }
+}

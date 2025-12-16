@@ -134,21 +134,26 @@ function calculateLEDPosition(placement, breadboardHoles) {
     
     const deltaX = Math.abs(anodeHole.x - cathodeHole.x);
     const deltaY = Math.abs(anodeHole.y - cathodeHole.y);
-    
-    let orientation, rotation;
+
+    let orientation, rotation, flipHorizontal;
     if (deltaX > deltaY) {
+        // Horizontal layout
         orientation = 'horizontal';
-        rotation = cathodeHole.x < anodeHole.x ? 0 : 180;
+        rotation = 0;
+        flipHorizontal = cathodeHole.x > anodeHole.x; // Flip if cathode is on the right
     } else {
+        // Vertical layout
         orientation = 'vertical';
-        rotation = cathodeHole.y < anodeHole.y ? 90 : 270;
+        rotation = 90;
+        flipHorizontal = cathodeHole.y > anodeHole.y; // Flip if cathode is below anode
     }
-    
+
     return {
         centerX,
         centerY,
         orientation,
         rotation,
+        flipHorizontal,
         cathodeCoords: { x: cathodeHole.x, y: cathodeHole.y },
         anodeCoords: { x: anodeHole.x, y: anodeHole.y },
         cathodeHoleId: placement.cathode,

@@ -82,14 +82,18 @@ class LED5mmAdapter {
         // Calculate positioning
         const { scale, insertionOffset } = LED_5MM_CONFIG.rendering;
         const { centerX, baseY } = LED_5MM_CONFIG.svg.body;
-        
-        const translateX = position.centerX - (centerX * scale);
-        const translateY = position.centerY - (baseY * scale) + insertionOffset;
-        
-        // Apply transform
-        ledGroup.setAttribute('transform', 
-            `translate(${translateX}, ${translateY}) scale(${scale})`
-        );
+
+        // Apply transform: translate to center, rotate, flip if needed, then scale and offset
+        // flipHorizontal mirrors the LED to swap cathode/anode while keeping bulb upright
+        const scaleX = position.flipHorizontal ? -scale : scale;
+        const scaleY = scale;
+
+        const transform = `translate(${position.centerX}, ${position.centerY}) ` +
+                         `rotate(${position.rotation}) ` +
+                         `scale(${scaleX}, ${scaleY}) ` +
+                         `translate(${-centerX}, ${-baseY + (insertionOffset / scale)})`;
+
+        ledGroup.setAttribute('transform', transform);
         
         // Append cloned content
         ledGroup.appendChild(clonedContent);
@@ -125,19 +129,7 @@ class LED5mmAdapter {
         
         // Add LED body
         componentsLayer.appendChild(ledGroup);
-        
-        // Add label with color indicator
-        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        label.setAttribute('x', position.centerX);
-        label.setAttribute('y', position.centerY - 15);
-        label.setAttribute('text-anchor', 'middle');
-        label.setAttribute('font-size', '8');
-        label.setAttribute('fill', '#333');
-        label.setAttribute('font-weight', 'bold');
-        label.textContent = `${componentId.toUpperCase()} (${colorName})`;
-        label.classList.add('component-label');
-        componentsLayer.appendChild(label);
-        
+
         // Store metadata
         ledGroup._componentData = {
             position,
@@ -145,7 +137,25 @@ class LED5mmAdapter {
             config: LED_5MM_CONFIG,
             color: colorName
         };
-        
+
+        // Add hover event listeners for info box
+        const placement = {
+            cathode: position.cathodeHoleId,
+            anode: position.anodeHoleId
+        };
+
+        ledGroup.addEventListener('mouseover', () => {
+            if (window.breadboardApp) {
+                window.breadboardApp.showComponentInfo(componentId, metadata, placement, position);
+            }
+        });
+
+        ledGroup.addEventListener('mouseout', () => {
+            if (window.breadboardApp) {
+                window.breadboardApp.hideComponentInfo();
+            }
+        });
+
         // Mark holes as occupied
         markHoleOccupied(position.cathodeHoleId, 'component', componentId);
         markHoleOccupied(position.anodeHoleId, 'component', componentId);

@@ -1,0 +1,75 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Automatic Night Light",
+      "description": "Light sensor detects darkness and automatically turns on LED. Uses voltage divider with photoresistor to read light levels on analog pin.",
+      "created": "2025-11-01"
+    },
+    "components": [
+      {
+        "id": "photoresistor1",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "5F",
+          "pin1": "8F"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "8E",
+          "pin1": "13E"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-red-5mm",
+        "placement": {
+          "cathode": "20E",
+          "anode": "21E"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "21D",
+          "pin1": "25D"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "5E",
+        "description": "Power supply to photoresistor. Connects 3.3V to top of voltage divider."
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP26_ADC0",
+        "to": "8D",
+        "description": "Analog reading from voltage divider midpoint. Measures light level."
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_8",
+        "to": "13D",
+        "description": "Ground connection for voltage divider bottom resistor."
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GP16",
+        "to": "25E",
+        "description": "GPIO control signal to LED through current-limiting resistor."
+      },
+      {
+        "id": "w5",
+        "from": "pico1.GND_23",
+        "to": "20D",
+        "description": "Ground return path for LED cathode."
+      }
+    ]
+  }
+}

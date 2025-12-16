@@ -130,19 +130,19 @@ You are a helpful circuit design assistant for educational robotics. Generate br
         "id": "w1",
         "from": "pico1.GP16",
         "to": "{column}{row}",
-        "description": "Wire for high/low measurement."
+        "description": "Where the wire starts and ends. What the wire is for to help student understand placements."
       },
       {
         "id": "w2",
         "from": "pico1.3V3_OUT",
         "to": "{column}{row}",
-        "description": "wire connecting switch to High."
+        "description": "Where the wire starts and ends. What the wire is for to help student understand placements."
       },
       {
         "id": "w3",
         "from": "pico1.GND_23",
         "to": "{column}{row}",
-        "description": "Wire pico ground to pulldown."
+        "description": "Where the wire starts and ends. What the wire is for to help student understand placements."
       }
     ]
   }
@@ -182,19 +182,19 @@ You are a helpful circuit design assistant for educational robotics. Generate br
         "id": "w1",
         "from": "pico1.GP16",
         "to": "9A",
-        "description": "Wire for high/low measurement."
+        "description": "Wire from Pico GPIO 16 to Breadboard 9A. This wire is the for high/low measurement."
       },
       {
         "id": "w2",
         "from": "pico1.3V3_OUT",
         "to": "2D",
-        "description": "wire connecting switch to High."
+        "description": "Wire from Pico 3.3V pin to Breadboard 2D. This wire connects the switch to 3.3V."
       },
       {
         "id": "w3",
         "from": "pico1.GND_23",
         "to": "9C",
-        "description": "Wire pico ground to pulldown."
+        "description": "Wire from Pico ground pin to Breadboard 9C. This wire connects the pulldown resistor to ground."
       }
     ]
   }

@@ -11,61 +11,90 @@
         <header>
             <h1>Interactive Breadboard - Proof of Concept</h1>
             <div id="info-panel">
-                <span id="hover-info">Hover over holes to see coordinates</span>
+                <div id="hover-info">Hover over holes to see coordinates</div>
+                <div id="wire-instruction"></div>
             </div>
         </header>
         
-        <main>
-            <div id="breadboard-container">
-                <svg id="breadboard-svg" width="800" height="600" viewBox="0 0 400 200">
-                    <!-- Pico board (NEW) -->
-                    <image 
-                        id="pico-board"
-                        href="components_svg/pico-breadboard.svg" 
-                        x="20" 
-                        y="20" 
-                        width="59.53" 
-                        height="150.24"
-                        preserveAspectRatio="xMidYMid meet"
-                        data-config-ref="pico.svg"
-                    />
-                    
-                    <!-- Pico pins layer (NEW - interactive overlays) -->
-                    <g id="pico-pins-layer"></g>
+        <main id="workspace">
+            <!-- Left: Breadboard Area -->
+            <div id="breadboard-area">
+                <div id="breadboard-container">
+                    <svg id="breadboard-svg" width="800" height="600" viewBox="0 0 400 200">
+                        <!-- Pico board -->
+                        <image
+                            id="pico-board"
+                            href="components_svg/pico-breadboard.svg"
+                            x="20"
+                            y="20"
+                            width="59.53"
+                            height="150.24"
+                            preserveAspectRatio="xMidYMid meet"
+                            data-config-ref="pico.svg"
+                        />
 
-                    <!-- Breadboard background image -->
-                    <image 
-                        id="breadboard-image"
-                        href="components_svg/Half_breadboard56a.svg" 
-                        x="100" 
-                        y="20" 
-                        width="292.41" 
-                        height="189"
-                        preserveAspectRatio="xMidYMid meet"
-                        data-config-ref="breadboard.svg"
-                    />
-                    <!-- Wires layer (above image, below holes) -->
-                    <g id="wires-layer"></g>
-                    <!-- Components layer -->
-                    <g id="components-layer"></g>
-                    <!-- Holes layer (interactive overlays) -->
-                    <g id="holes-layer"></g>
-                    <!-- Labels layer -->
-                    <g id="labels-layer"></g>
-                </svg>
+                        <!-- Pico pins layer -->
+                        <g id="pico-pins-layer"></g>
+
+                        <!-- Breadboard background image -->
+                        <image
+                            id="breadboard-image"
+                            href="components_svg/Half_breadboard56a.svg"
+                            x="100"
+                            y="20"
+                            width="292.41"
+                            height="189"
+                            preserveAspectRatio="xMidYMid meet"
+                            data-config-ref="breadboard.svg"
+                        />
+                        <!-- Wires layer -->
+                        <g id="wires-layer"></g>
+                        <!-- Components layer -->
+                        <g id="components-layer"></g>
+                        <!-- Holes layer -->
+                        <g id="holes-layer"></g>
+                        <!-- Labels layer -->
+                        <g id="labels-layer"></g>
+                    </svg>
+                </div>
+
+                <div id="controls">
+                    <button id="clear-wires">Clear All Wires</button>
+                    <button id="toggle-labels">Toggle Labels</button>
+                    <div id="wire-count">Wires: 0</div>
+                </div>
             </div>
-            
-            <div id="controls">
-                <button id="clear-wires">Clear All Wires</button>
-                <button id="toggle-labels">Toggle Labels</button>
-                <button id="load-circuit-btn">📁 Load Circuit</button>
-                <input type="file" id="circuit-file-input" accept=".json" style="display:none">
-                <button id="export-circuit-btn">💾 Export Circuit</button>
-                <div id="wire-count">Wires: 0</div>
+
+            <!-- Right: Circuits Panel -->
+            <div id="circuits-panel">
+                <div class="panel-header">
+                    <h3>Circuits</h3>
+                    <button id="add-circuit-btn" class="icon-btn" title="Add new circuit">+</button>
+                </div>
+                <div id="circuits-list">
+                    <!-- Circuit items will be added dynamically -->
+                </div>
             </div>
         </main>
     </div>
-    
+
+    <!-- Component Info Box -->
+    <div id="component-info-box" style="display: none;">
+        <div id="info-box-title"></div>
+        <div id="info-box-details"></div>
+    </div>
+
+    <!-- Floating Wire Instruction Box -->
+    <div id="wire-instruction-floating" style="display: none;">
+        <div class="wire-instruction-header">
+            <span class="wire-number"></span>
+            <span class="wire-why-indicator" title="Press SPACE to learn why">?</span>
+        </div>
+        <div class="wire-connection"></div>
+        <div class="wire-hint">Press SPACE to learn why</div>
+        <div class="wire-description"></div>
+    </div>
+
     <!-- Validator Toggle Button -->
     <button id="validator-toggle">🔍 Circuit Validator</button>
     
@@ -141,5 +170,19 @@
     <script src="guided-wiring.js"></script>
     <script src="app.js"></script>
     <script src="validator-panel-ui.js"></script>
+    <script src="circuits-manager.js"></script>
+
+    <!-- Attribution Footer -->
+    <footer id="attribution-footer">
+        <p>
+            Component graphics from <a href="https://fritzing.org" target="_blank" rel="noopener">Fritzing</a>
+            are licensed under
+            <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">
+                CC BY-SA 3.0
+            </a>.
+            Original Fritzing parts © their respective authors.
+            This work uses and may modify Fritzing parts under the same license.
+        </p>
+    </footer>
 </body>
 </html>

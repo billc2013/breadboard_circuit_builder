@@ -1,0 +1,131 @@
+{
+  "circuit": {
+    "metadata": {
+      "name": "Automatic Night Light - 3 Yellow LEDs",
+      "description": "Light-sensitive night light using photocell sensor. When ambient light drops below threshold, 3 yellow LEDs automatically turn on. Battery powered via 3.3V.",
+      "created": "2025-01-15"
+    },
+    "components": [
+      {
+        "id": "photocell1",
+        "type": "photocell-ldr",
+        "placement": {
+          "pin0": "3E",
+          "pin1": "8E"
+        }
+      },
+      {
+        "id": "r1",
+        "type": "resistor-10k",
+        "placement": {
+          "pin0": "8D",
+          "pin1": "13D"
+        }
+      },
+      {
+        "id": "r2",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "18E",
+          "pin1": "23E"
+        }
+      },
+      {
+        "id": "r3",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "18D",
+          "pin1": "23D"
+        }
+      },
+      {
+        "id": "r4",
+        "type": "resistor-220",
+        "placement": {
+          "pin0": "18C",
+          "pin1": "23C"
+        }
+      },
+      {
+        "id": "led1",
+        "type": "led-yellow-5mm",
+        "placement": {
+          "anode": "24E",
+          "cathode": "25E"
+        }
+      },
+      {
+        "id": "led2",
+        "type": "led-yellow-5mm",
+        "placement": {
+          "anode": "24D",
+          "cathode": "25D"
+        }
+      },
+      {
+        "id": "led3",
+        "type": "led-yellow-5mm",
+        "placement": {
+          "anode": "24C",
+          "cathode": "25C"
+        }
+      }
+    ],
+    "wires": [
+      {
+        "id": "w1",
+        "from": "pico1.3V3_OUT",
+        "to": "3D",
+        "description": "3.3V power to photocell"
+      },
+      {
+        "id": "w2",
+        "from": "pico1.GP26",
+        "to": "13E",
+        "description": "ADC input from voltage divider (photocell)"
+      },
+      {
+        "id": "w3",
+        "from": "pico1.GND_23",
+        "to": "13C",
+        "description": "Ground to resistor (voltage divider)"
+      },
+      {
+        "id": "w4",
+        "from": "pico1.GP15",
+        "to": "23E",
+        "description": "GPIO output to LED1 current-limiting resistor"
+      },
+      {
+        "id": "w5",
+        "from": "pico1.GP14",
+        "to": "23D",
+        "description": "GPIO output to LED2 current-limiting resistor"
+      },
+      {
+        "id": "w6",
+        "from": "pico1.GP13",
+        "to": "23C",
+        "description": "GPIO output to LED3 current-limiting resistor"
+      },
+      {
+        "id": "w7",
+        "from": "pico1.GND_8",
+        "to": "25E",
+        "description": "Ground to LED1 cathode"
+      },
+      {
+        "id": "w8",
+        "from": "pico1.GND_13",
+        "to": "25D",
+        "description": "Ground to LED2 cathode"
+      },
+      {
+        "id": "w9",
+        "from": "pico1.GND_18",
+        "to": "25C",
+        "description": "Ground to LED3 cathode"
+      }
+    ]
+  }
+}

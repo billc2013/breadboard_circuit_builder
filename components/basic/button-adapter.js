@@ -91,19 +91,7 @@ class ButtonAdapter {
         
         // Add to components layer
         componentsLayer.appendChild(buttonGroup);
-        
-        // Add label
-        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        label.setAttribute('x', position.centerX);
-        label.setAttribute('y', position.centerY - 30);
-        label.setAttribute('text-anchor', 'middle');
-        label.setAttribute('font-size', '8');
-        label.setAttribute('fill', '#333');
-        label.setAttribute('font-weight', 'bold');
-        label.textContent = componentId.toUpperCase();
-        label.classList.add('component-label');
-        componentsLayer.appendChild(label);
-        
+
         // Store metadata
         buttonGroup._componentData = {
             position,
@@ -111,7 +99,25 @@ class ButtonAdapter {
             config: BUTTON_CONFIG,
             scale
         };
-        
+
+        // Add hover event listeners for info box
+        const placement = {
+            leg0: position.leg0HoleId,
+            leg1: position.leg1HoleId
+        };
+
+        buttonGroup.addEventListener('mouseover', () => {
+            if (window.breadboardApp) {
+                window.breadboardApp.showComponentInfo(componentId, metadata, placement, position);
+            }
+        });
+
+        buttonGroup.addEventListener('mouseout', () => {
+            if (window.breadboardApp) {
+                window.breadboardApp.hideComponentInfo();
+            }
+        });
+
         // Mark holes as occupied
         markHoleOccupied(position.leg0HoleId, 'component', componentId);
         markHoleOccupied(position.leg1HoleId, 'component', componentId);

@@ -43,6 +43,7 @@ async init() {
     this.circuitLoader = new CircuitLoader(this);
     await this.circuitLoader.init();
     this.guidedWiring = new GuidedWiringManager(this); // Initialize guided wiring
+    console.log('✓ GuidedWiringManager instantiated:', this.guidedWiring);
     this.renderHoles();
     this.renderPicoPins(); // NEW
     this.attachEventListeners();
@@ -193,8 +194,28 @@ async init() {
             }
         });
         
-        // Clear selection on background click
+        // SVG click handler - handles guided wiring waypoints or background click
         this.svg.addEventListener('click', (e) => {
+            // Check if guided wiring is active and wire has been started
+            if (this.guidedWiring && this.guidedWiring.isActive && this.guidedWiring.startPoint) {
+                // Don't handle if clicking on a hole or pin (those have their own handlers)
+                if (!e.target.closest('.hole') && !e.target.closest('.pin')) {
+                    // Get SVG coordinates from click event
+                    const pt = this.svg.createSVGPoint();
+                    pt.x = e.clientX;
+                    pt.y = e.clientY;
+                    const svgP = pt.matrixTransform(this.svg.getScreenCTM().inverse());
+
+                    // Snap to waypoint grid
+                    const snapped = this.guidedWiring.snapToWaypointGrid(svgP.x, svgP.y);
+
+                    // Add waypoint at snapped position
+                    this.guidedWiring.addWaypoint(snapped);
+                    return;
+                }
+            }
+
+            // Original behavior - clear selection on background click
             if (e.target === this.svg) {
                 this.clearSelection();
             }
@@ -208,49 +229,6 @@ async init() {
         document.getElementById('toggle-labels').addEventListener('click', () => {
             this.toggleLabels();
         });
-
-        // Circuit import/export buttons
-    document.getElementById('load-circuit-btn')?.addEventListener('click', () => {
-        document.getElementById('circuit-file-input').click();
-    });
-
-    document.getElementById('circuit-file-input')?.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            try {
-                const text = await file.text();
-                const json = JSON.parse(text);
-                
-                console.log('📁 Loading circuit from file:', file.name);
-                const result = await this.circuitLoader.loadCircuit(json);
-                
-                if (result.success) {
-                    this.infoPanel.textContent = `✅ Circuit loaded: ${result.components} components, ${result.wires} wires`;
-                } else {
-                    this.infoPanel.textContent = `❌ Circuit loaded with ${result.errors.length} errors`;
-                }
-            } catch (error) {
-                this.infoPanel.textContent = `❌ Error loading circuit: ${error.message}`;
-                console.error('Circuit load error:', error);
-            }
-        }
-        // Clear file input so same file can be loaded again
-        e.target.value = '';
-    });
-
-    document.getElementById('export-circuit-btn')?.addEventListener('click', () => {
-        const circuit = this.circuitLoader.exportCircuit();
-        const json = JSON.stringify(circuit, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `circuit-${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        this.infoPanel.textContent = '✅ Circuit exported';
-    });
-
     }
     
     handleHoleHover(holeElement) {
@@ -441,14 +419,52 @@ getConnectionElement(pointId) {
 
     
     renderWire(wire) {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.classList.add('wire');
-        line.setAttribute('x1', wire.fromCoords.x);
-        line.setAttribute('y1', wire.fromCoords.y);
-        line.setAttribute('x2', wire.toCoords.x);
-        line.setAttribute('y2', wire.toCoords.y);
-        line.setAttribute('data-wire-id', wire.id);
-        this.wiresLayer.appendChild(line);
+        // Check if wire has waypoints
+        if (wire.waypoints && wire.waypoints.length > 0) {
+            // Create polyline for wire with waypoints
+            const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+            polyline.classList.add('wire');
+            polyline.setAttribute('data-wire-id', wire.id);
+
+            // Build points string: start -> waypoint1 -> waypoint2 -> ... -> end
+            let points = `${wire.fromCoords.x},${wire.fromCoords.y}`;
+
+            wire.waypoints.forEach(waypoint => {
+                points += ` ${waypoint.x},${waypoint.y}`;
+            });
+
+            points += ` ${wire.toCoords.x},${wire.toCoords.y}`;
+            polyline.setAttribute('points', points);
+
+            this.wiresLayer.appendChild(polyline);
+
+            // Render waypoint markers
+            this.renderWaypointMarkers(wire);
+        } else {
+            // Simple straight line (no waypoints)
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.classList.add('wire');
+            line.setAttribute('x1', wire.fromCoords.x);
+            line.setAttribute('y1', wire.fromCoords.y);
+            line.setAttribute('x2', wire.toCoords.x);
+            line.setAttribute('y2', wire.toCoords.y);
+            line.setAttribute('data-wire-id', wire.id);
+            this.wiresLayer.appendChild(line);
+        }
+    }
+
+    renderWaypointMarkers(wire) {
+        // Render small circles at each waypoint
+        wire.waypoints.forEach((waypoint, index) => {
+            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            marker.classList.add('waypoint-marker');
+            marker.setAttribute('cx', waypoint.x);
+            marker.setAttribute('cy', waypoint.y);
+            marker.setAttribute('r', '3');  // Small circle
+            marker.setAttribute('data-wire-id', wire.id);
+            marker.setAttribute('data-waypoint-index', index);
+            this.wiresLayer.appendChild(marker);
+        });
     }
     
     clearSelection() {
@@ -509,6 +525,105 @@ getConnectionElement(pointId) {
             wires: this.wires,
             timestamp: new Date().toISOString()
         };
+    }
+
+    // Show component info box
+    showComponentInfo(componentId, metadata, placement, position) {
+        const infoBox = document.getElementById('component-info-box');
+        const infoTitle = document.getElementById('info-box-title');
+        const infoDetails = document.getElementById('info-box-details');
+
+        // Set title
+        infoTitle.textContent = `${componentId.toUpperCase()}`;
+
+        // Build details HTML
+        let detailsHTML = '';
+
+        // Component type and name
+        if (metadata && metadata.name) {
+            detailsHTML += `<div class="info-section">
+                <span class="info-label">Type:</span>
+                <span class="info-value">${metadata.name}</span>
+            </div>`;
+        }
+
+        // Component description
+        if (metadata && metadata.description) {
+            detailsHTML += `<div class="info-section">
+                <span class="info-label">Description:</span>
+                <span class="info-value">${metadata.description}</span>
+            </div>`;
+        }
+
+        // Placement information
+        if (placement) {
+            detailsHTML += `<div class="info-section">
+                <span class="info-label">Placement:</span>
+                <ul>`;
+            for (const [pin, location] of Object.entries(placement)) {
+                if (pin !== 'position') {
+                    detailsHTML += `<li>${pin}: ${location}</li>`;
+                }
+            }
+            detailsHTML += `</ul></div>`;
+        }
+
+        // Electrical properties
+        if (metadata && metadata.properties) {
+            const props = metadata.properties;
+            detailsHTML += `<div class="info-section">
+                <span class="info-label">Electrical:</span>
+                <ul>`;
+
+            if (props.forward_voltage) {
+                detailsHTML += `<li>Forward voltage: ${props.forward_voltage}</li>`;
+            }
+            if (props.max_current) {
+                detailsHTML += `<li>Max current: ${props.max_current}</li>`;
+            }
+            if (props.resistance) {
+                detailsHTML += `<li>Resistance: ${props.resistance}</li>`;
+            }
+            if (props.power_rating) {
+                detailsHTML += `<li>Power rating: ${props.power_rating}</li>`;
+            }
+            if (props.color) {
+                detailsHTML += `<li>Color: ${props.color}</li>`;
+            }
+
+            detailsHTML += `</ul></div>`;
+        }
+
+        infoDetails.innerHTML = detailsHTML;
+
+        // Position the info box next to the component
+        if (position) {
+            const svg = this.svg;
+            const svgRect = svg.getBoundingClientRect();
+            const container = document.getElementById('breadboard-container');
+            const containerRect = container.getBoundingClientRect();
+
+            // Calculate position relative to the SVG viewBox
+            const viewBox = svg.viewBox.baseVal;
+            const scaleX = svgRect.width / viewBox.width;
+            const scaleY = svgRect.height / viewBox.height;
+
+            // Position to the right of the component
+            const screenX = containerRect.left + (position.centerX * scaleX) + 30;
+            const screenY = containerRect.top + (position.centerY * scaleY) - 20;
+
+            infoBox.style.left = `${screenX}px`;
+            infoBox.style.top = `${screenY}px`;
+        }
+
+        // Show the info box
+        infoBox.style.display = 'block';
+    }
+
+    // Hide component info box
+    hideComponentInfo() {
+        const infoBox = document.getElementById('component-info-box');
+        infoBox.style.display = 'none';
     }
 }
 
