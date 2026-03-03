@@ -93,19 +93,31 @@ breadboard-circuit-builder/
 │       ├── pico.json           # Pico pin metadata
 │       └── pico-geometry.js    # PICO_PINS positions
 │
-├── components_svg/             # Fritzing SVG graphics
-├── circuits/                   # Example circuits and MicroPython examples
+├── components_svg/             # Fritzing SVG graphics (rendered in diagrams)
+├── micropython_examples/       # Example MicroPython files
+│   ├── led_blink.py
+│   ├── night_light.py
+│   └── wall-follower.py
 ├── styles/                     # CSS
 │   ├── common.css
 │   └── circuit-explorer.css
 ├── prompts/                    # LLM prompt templates
+│   └── micropython-generator.md  # Prompt for LLM code generation
+├── fritzing_data/              # Fritzing XML source files + pico-data.js
+├── scripts/                    # Fritzing parser utilities
+│   ├── parse-fritzing.js
+│   └── parse-all-components.sh
+├── circuit_json_files/         # JSON circuit examples (legacy reference)
 │
-├── archive/                    # Archived for future restoration
-│   └── guided-wiring/         # Guided wiring mode (17 files)
-│       └── README.md          # Restoration instructions
-│
-└── docs/                       # Documentation
-    └── mermaid_diagrams/       # Architecture analysis diagrams
+└── archive/                    # Archived for future restoration
+    ├── guided-wiring/          # Guided wiring system (17 files + README)
+    ├── json-circuits/          # LLM-generated JSON circuits + README
+    ├── json-prompts/           # JSON generation prompts (v01-v06) + README
+    ├── layouts/                # Layout engine experiments
+    ├── prev_versions/          # Earlier code versions
+    ├── screenshots/            # Development screenshots
+    ├── docs/                   # Session notes + mermaid architecture diagrams
+    └── docs_archive/           # v1 POC development docs
 ```
 
 ### Data Flow: MicroPython → Visualization

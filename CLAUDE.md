@@ -23,12 +23,23 @@
 │   ├── library.json             # Master index
 │   ├── basic/                   # LEDs, resistors, buttons, photocells, sensors, motors
 │   └── microcontrollers/        # Pico (pico.json + pico-geometry.js)
-├── components_svg/              # Fritzing SVG graphics
-├── circuits/                    # Example circuits + micropython_examples/
+├── components_svg/              # Fritzing SVG graphics (rendered in diagrams)
+├── micropython_examples/        # Example MicroPython files (led_blink, night_light, wall-follower)
 ├── styles/                      # common.css + circuit-explorer.css
-├── prompts/                     # LLM prompt templates
-├── archive/guided-wiring/       # Archived guided wiring system (17 files)
-└── docs/mermaid_diagrams/       # Architecture analysis from Dec 2025
+├── prompts/                     # LLM prompt templates (micropython-generator.md)
+├── fritzing_data/               # Fritzing XML source files + pico-data.js
+├── scripts/                     # Fritzing parser utilities (parse-fritzing.js)
+├── circuit_json_files/          # JSON circuit examples (legacy reference)
+├── archive/                     # All archived files
+│   ├── guided-wiring/           # Guided wiring system (17 files)
+│   ├── json-circuits/           # LLM-generated JSON circuits
+│   ├── json-prompts/            # JSON circuit generation prompts (v01-v06)
+│   ├── layouts/                 # Layout engine experiments
+│   ├── prev_versions/           # Earlier code versions
+│   ├── screenshots/             # Development screenshots
+│   ├── docs/                    # Session notes + mermaid diagrams (Dec 2025)
+│   └── docs_archive/            # v1 POC development docs
+└── screenshots/                 # (empty — active screenshots go here)
 ```
 
 ### Quick Exploration Commands
@@ -297,7 +308,7 @@ The "Wires: 0" counter in the bottom-left does not update when loading via Micro
 - **Fritzing**: Component SVG graphics (CC BY-SA 3.0)
 - **Raspberry Pi Pico**: GPIO pinout reference
 - **MicroPython**: `machine` module documentation
-- **Mermaid diagrams**: `docs/mermaid_diagrams/` — architecture analysis from Dec 2025 session
+- **Mermaid diagrams**: `archive/docs/mermaid_diagrams/` — architecture analysis from Dec 2025 session
 
 ---
 

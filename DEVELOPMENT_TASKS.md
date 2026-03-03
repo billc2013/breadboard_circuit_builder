@@ -407,21 +407,13 @@ normalizeEndpoint(endpoint) {
 
 ---
 
-### 2. LLM Prompt for Compliant MicroPython Code ⭐ NEXT
+### 2. LLM Prompt for Compliant MicroPython Code ✅ COMPLETED
 
-**Description**: Create a prompt that instructs an LLM (Claude, GPT-4) to generate MicroPython code that is compliant with our parser and component library.
-
-**Prompt Requirements**:
-- Explain the inline annotation format: `variable = Pin(N, Pin.MODE)  # component-type`
-- List available component types from `components/library.json`
-- Explain GPIO pin constraints (0-28, ADC on 26-28)
-- Explain mode constraints (OUT for outputs, IN for sensors)
-- Provide examples of valid code
-- Explain multi-pin annotation format: `# component-type:pinRole`
+**Completed**: March 3, 2026
 
 **Deliverable**: `prompts/micropython-generator.md`
 
-**Priority**: HIGH - Enables end-to-end workflow
+Covers all 10 component types, annotation format (single-pin and multi-pin `:pinRole`), GPIO pin rules, auto-generated support components, and 5 complete examples (LED blink, button LED, night light, traffic light, wall-follower).
 
 ---
 
@@ -739,7 +731,7 @@ For each component:
 
 **Current P1 Tasks (Next Session Focus)**:
 1. MicroPython parser testing with edge cases (ADC-as-digital, multi-LED, PWM)
-2. LLM prompt for compliant MicroPython code generation (`prompts/micropython-generator.md`)
+2. ~~LLM prompt for compliant MicroPython code generation~~ ✅ `prompts/micropython-generator.md`
 3. Fix wire count display (currently stays "Wires: 0" after MicroPython load)
 4. Parser warning cleanup (reduce verbose console output)
 
