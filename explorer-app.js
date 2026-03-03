@@ -354,7 +354,12 @@ class ExplorerApp {
     }
 
     highlightPicoPin(pinName) {
-        const pinElement = document.querySelector(`[data-pin-id="pico1.${pinName}"]`);
+        // Exact match first, then prefix match for ADC-capable pins
+        // (e.g., "GP26" matches element with data-pin-id="pico1.GP26_ADC0")
+        let pinElement = document.querySelector(`[data-pin-id="pico1.${pinName}"]`);
+        if (!pinElement) {
+            pinElement = document.querySelector(`[data-pin-id^="pico1.${pinName}_"]`);
+        }
         if (pinElement) {
             pinElement.classList.add('pin-highlighted');
         }
@@ -1337,7 +1342,10 @@ class ExplorerApp {
 
             if (picoEndpoint) {
                 const pinName = picoEndpoint.split('.')[1];
-                const picoPin = this.picoPins.find(p => p.pinKey === pinName);
+                // Exact match first, then prefix match for ADC-capable pins
+                // (e.g., "GP26" matches "GP26_ADC0" in pico-geometry)
+                const picoPin = this.picoPins.find(p => p.pinKey === pinName) ||
+                                this.picoPins.find(p => p.pinKey.startsWith(pinName + '_'));
                 if (picoPin) {
                     startX = picoPin.x;
                     startY_wire = picoPin.y;
