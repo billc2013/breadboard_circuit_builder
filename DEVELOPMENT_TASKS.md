@@ -2,8 +2,77 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: December 11, 2025
-**Current Phase**: Enhanced POC - MicroPython Parser with Multi-Pin Components, US-100 & TB6612 Support
+**Last Updated**: March 3, 2026
+**Current Phase**: Explorer-Only Branch — MicroPython → Block Diagram Visualization
+**Branch**: `explorer-only` (created from `Pin_and_component`)
+
+---
+
+## Recently Completed (March 2026 Session)
+
+### ✅ Explorer-Only Branch: Codebase Cleanup & Streamlining
+**Completed**: March 3, 2026
+
+**Goal**: Create a focused branch containing only the MicroPython → Circuit Explorer workflow, archiving the guided wiring system for future restoration.
+
+**What was delivered**:
+
+**1. Archived 17 guided wiring files** to `archive/guided-wiring/`:
+- `guided-wiring.html`, `guided-wiring.js`, `guided-app.js`, `guided-wiring.css`
+- `circuit-loader.js`, `circuit-explorer.js`, `circuits-manager.js`
+- `circuit-validator.js`, `validator-panel-ui.js`, `breadboard-data.js`
+- `app.js`, `json-text-input.js`, `components-library.js`, `styles.css`
+- `test-validator.html`, `test-validator.js`
+- `index.html` (archived as `index-landing.html`)
+- Created `archive/guided-wiring/README.md` with restoration instructions
+
+**2. Trimmed `explorer-app.js`** from 3,401 → 1,485 lines (56% reduction):
+- Removed entire JSON loading pipeline (`loadCircuit`, `categorizeWires`, `detectFunctionalGroups`, etc.)
+- Removed physical layout methods (`calculateGroupPositions`, `renderGroupBoundaries`, etc.)
+- Removed legacy rendering (`renderHoles`, `createWire`, `renderWire`, `renderWireLabels`)
+- Removed component interaction for JSON mode, filter listeners
+- Removed 6 compatibility stub global functions
+- Simplified `findComponentConnectionGuide`, `handleComponentClick`, `getComponentDisplayName`
+- Renamed ambiguous methods: `loadComponentMetadata` → `loadPicoMetadata` / `loadComponentMetadataByType`
+
+**3. Cleaned up `circuit-explorer.html`**:
+- Removed 4 script tags (`breadboard-data.js`, `circuit-loader.js`, `circuit-explorer.js`, `circuits-manager.js`)
+- Removed "Circuits (JSON)" sidebar panel
+- Removed "Back to mode selection" link
+- Remaining scripts: `pico-geometry.js`, `abstract-layout.js`, `micropython-parser.js`, `explorer-app.js`
+
+**4. Created `index.html`** as simple redirect to `circuit-explorer.html`
+
+**5. Updated README.md and CLAUDE.md** for branch context
+
+**Commits**: 5 commits on `explorer-only` branch (archive → trim → HTML cleanup → bug fix → docs)
+
+**Files modified**: `explorer-app.js`, `circuit-explorer.html`, `index.html`, `README.md`, `CLAUDE.md`
+**Files archived**: 17 files moved to `archive/guided-wiring/`
+
+---
+
+### ✅ Fix: ADC-Capable Pin Wire Routing
+**Completed**: March 3, 2026
+
+**Problem**: When using `Pin(26, Pin.OUT)` (GPIO 26 as digital output), the signal wire rendered to the center of the Pico instead of the correct GP26 pin position. Same issue affected GP27 and GP28.
+
+**Root Cause**: `pico-geometry.js` registers ADC-capable pins as `GP26_ADC0`, `GP27_ADC1`, `GP28_ADC2`. The MicroPython parser generates `pico1.GP26` (without ADC suffix) when pins are used as digital GPIO. The exact-match lookup in `renderMicroPythonWireBundle` failed, falling back to the default center position `(50, 100)`.
+
+**Fix**: Added prefix-match fallback in two places in `explorer-app.js`:
+1. Wire endpoint rendering (line ~1342): `picoPins.find(p => p.pinKey.startsWith(pinName + '_'))`
+2. Pin highlighting (line ~360): `querySelector('[data-pin-id^="pico1.${pinName}_"]')`
+
+**Files modified**: `explorer-app.js`
+
+---
+
+### Known Issues (explorer-only branch)
+
+| Issue | Severity | Description |
+|-------|----------|-------------|
+| Wire count display | Minor | "Wires: 0" in bottom-left doesn't update when loading via MicroPython |
+| `layouts/` directory | Cleanup | Contains archived layout engine code not loaded by any script; could be moved to archive |
 
 ---
 
@@ -313,7 +382,7 @@ normalizeEndpoint(endpoint) {
 
 ---
 
-## High Priority Tasks
+## High Priority Tasks (explorer-only branch)
 
 ### 1. MicroPython Parser Testing & Refinement ⭐ NEXT
 
@@ -325,12 +394,14 @@ normalizeEndpoint(endpoint) {
 - [ ] Multiple sensors (button + photocell + potentiometer)
 - [ ] Edge cases: duplicate variable names, invalid GPIO pins, unsupported components
 - [ ] Error handling: malformed code, missing annotations
+- [ ] ADC pins used as digital GPIO (GP26-28 with Pin.OUT)
 
 **Potential Improvements**:
 - Better error messages with line numbers
 - Support for multi-line comments
 - Support for variable reassignment detection
 - Warn about unused GPIO pins
+- Fix wire count display ("Wires: 0" doesn't update)
 
 **Priority**: HIGH - Needed before LLM prompt creation
 
@@ -346,61 +417,17 @@ normalizeEndpoint(endpoint) {
 - Explain GPIO pin constraints (0-28, ADC on 26-28)
 - Explain mode constraints (OUT for outputs, IN for sensors)
 - Provide examples of valid code
+- Explain multi-pin annotation format: `# component-type:pinRole`
 
 **Deliverable**: `prompts/micropython-generator.md`
-
-**Example Prompt Structure**:
-```markdown
-# MicroPython Code Generator for Circuit Explorer
-
-You are generating MicroPython code for the Raspberry Pi Pico that will be
-visualized in the Breadboard Circuit Builder's Circuit Explorer.
-
-## Required Format
-Each component declaration MUST include an inline comment with the component type:
-```python
-variable_name = Pin(gpio_number, Pin.MODE)  # component-type
-```
-
-## Available Components
-- led-red-5mm, led-green-5mm, led-blue-5mm, led-yellow-5mm (outputs)
-- button-tactile-6mm (sensor, use Pin.PULL_DOWN)
-- photocell-ldr (sensor, use ADC)
-
-## GPIO Pin Rules
-- Digital pins: GP0-GP22
-- ADC pins: GP26, GP27, GP28 (for analog sensors)
-- ...
-```
 
 **Priority**: HIGH - Enables end-to-end workflow
 
 ---
 
-### 3. Component Library Expansion: TB6612 Motor Controller (COMPLETED)
-
-**Status**: ✅ **COMPLETED** - December 11, 2025
-
-See "Recently Completed" section above for full details.
-
----
-
-### 4. Component Library Expansion: US-100 Ultrasonic Sensor (COMPLETED)
-
-**Status**: ✅ **COMPLETED** - December 11, 2025
-
-See "Recently Completed" section above for full details.
-
----
-
-### 5. MicroPython Parser Warning Cleanup ⭐ NEXT
+### 3. MicroPython Parser Warning Cleanup
 
 **Description**: Clean up console warnings and deprecation notices in the MicroPython parser.
-
-**Current Issues**:
-- Multiple console.warn() calls for debugging that should be removed or consolidated
-- Some unused code paths from development iterations
-- Verbose logging that could be reduced for production use
 
 **Tasks**:
 - [ ] Review all console.warn() calls in `micropython-parser.js`
@@ -413,58 +440,7 @@ See "Recently Completed" section above for full details.
 
 ---
 
-### 6. JSON Text Input Feature (COMPLETED)
-
-**Description**: Add a text box/text area where users can paste circuit JSON directly from LLMs, eliminating the need to save as a file first.
-
-**User Story**:
-- User asks Claude/GPT-4 for a circuit design
-- LLM responds with JSON in chat
-- User copies JSON from chat
-- User pastes into text box in our application
-- User clicks "Load from Text" button
-- Circuit renders immediately
-- **Bonus**: User can edit JSON in the text box to make quick changes
-
-**Benefits**:
-- Faster workflow (no file save/upload step)
-- Better LLM integration (stay in chat interface)
-- Enables quick experimentation (edit and reload)
-- Reduces friction for students
-
-**Implementation Notes**:
-```javascript
-// Add to UI:
-// - <textarea id="circuit-json-input"> (large, monospace font)
-// - "Load from Text" button
-// - "Copy Current Circuit" button (populate textarea with exported JSON)
-// - Syntax highlighting (optional, use a lightweight lib like Prism.js)
-
-// Validation:
-// - Parse JSON, catch SyntaxError
-// - Show line number of error
-// - Highlight problematic line in textarea
-
-// Integration:
-// - Reuse existing circuit-loader.js loadCircuit() method
-// - Add parseJSONFromText() wrapper
-```
-
-**Acceptance Criteria**:
-- [x] Text area with monospace font
-- [x] "Load from Text" button triggers circuit render
-- [x] Clear error messages for invalid JSON (with line number)
-- [x] "Copy Current Circuit" button exports to textarea
-- [x] Textarea persists between loads (localStorage)
-- [x] Tab key inserts tabs (not focus change)
-
-**Priority**: HIGH - Significant UX improvement for LLM workflow
-
-**Status**: ✅ **COMPLETED** - November 2025
-
----
-
-### 2. Component Rendering Issues
+### 4. Component Rendering Issues
 
 **Description**: Document and fix various component rendering alignment and visual issues discovered during testing.
 
@@ -553,56 +529,17 @@ See "Recently Completed" section above for full details.
 
 ## Medium Priority Tasks
 
-### 3. MicroPython to Guided Wiring JSON Generation ⭐ FUTURE
+### 3. MicroPython to Guided Wiring JSON Generation ⭐ DEFERRED
 
-**Description**: Extend the MicroPython parser to generate **full breadboard-placement JSON** compatible with the Guided Wiring system, just like LLM-generated circuits.
+**Status**: Deferred — requires guided wiring system (archived on this branch)
 
-**Context**:
-Currently, we have two circuit input paths:
-1. **LLM-generated JSON** → Full placement data → Works with both Explorer AND Guided Wiring
-2. **MicroPython Parser** → Abstract data (no placements) → Works with Explorer only
+**Description**: Extend the MicroPython parser to generate **full breadboard-placement JSON** compatible with the Guided Wiring system. This would enable:
+1. MicroPython code → Conceptual visualization (Explorer) ✅ COMPLETED
+2. MicroPython code → Physical build instructions (Guided Wiring) → Future work
 
-**Goal**: Add a third capability:
-3. **MicroPython Parser + Layout Generator** → Full placement data → Works with BOTH modes
+**To resume**: Restore guided wiring from `archive/guided-wiring/` or work on `Pin_and_component` branch.
 
-**User Story**:
-- Student writes MicroPython code for their project
-- Student can visualize conceptually in Explorer (current work)
-- Student can ALSO generate a buildable circuit with physical hole placements
-- Generated JSON is identical in format to LLM-generated circuits
-- Student uses Guided Wiring mode to build the physical circuit
-
-**Technical Approach**:
-```
-MicroPython Code
-      ↓
-[MicroPythonParser] → Parsed components + wires (abstract)
-      ↓
-[BreadboardLayoutGenerator] → Assigns physical hole placements
-      ↓
-Full Circuit JSON (compatible with CircuitLoader + Guided Wiring)
-```
-
-**Layout Algorithm Considerations**:
-- Assign breadboard columns based on functional groups
-- Sensors on left side, outputs on right side (or configurable)
-- Auto-route wires avoiding conflicts
-- Respect electrical rules (bus connectivity, no shorts)
-- Consider component physical sizes
-
-**Key Design Principle** ("One Truth"):
-- The component library JSON (`functionalGroup.requires`, `pins`, etc.) should drive ALL placement decisions
-- Same metadata used for Explorer visualization AND guided wiring generation
-- No duplication of component knowledge
-
-**Acceptance Criteria**:
-- [ ] `BreadboardLayoutGenerator` class that takes parsed MicroPython data
-- [ ] Generates valid `placement` objects for all components
-- [ ] Generates wire endpoints with actual hole IDs (not abstract like `led.signal`)
-- [ ] Output JSON passes CircuitLoader validation
-- [ ] Works in Guided Wiring mode for step-by-step building
-
-**Priority**: MEDIUM - Important for complete MicroPython workflow, but Explorer visualization is the first step
+**Priority**: MEDIUM - Deferred on `explorer-only`, relevant when guided wiring is re-integrated
 
 ---
 
@@ -801,15 +738,10 @@ For each component:
 **P3 (Low)**: Future enhancements, exploration
 
 **Current P1 Tasks (Next Session Focus)**:
-1. ✅ Archive old documentation
-2. ✅ Create new README.md
-3. ✅ Create this DEVELOPMENT_TASKS.md
-4. ✅ JSON text input feature (Completed November 2025)
-5. ✅ Component hover information system (Completed December 8, 2025)
-6. ✅ Bus reference system for wires (Completed December 8, 2025)
-7. ✅ Case-insensitive system (Completed December 8, 2025)
-8. Component rendering issue investigation/fixes (Ongoing - see section 2)
-9. Consider adding button component (✅ Completed - button already in library)
+1. MicroPython parser testing with edge cases (ADC-as-digital, multi-LED, PWM)
+2. LLM prompt for compliant MicroPython code generation (`prompts/micropython-generator.md`)
+3. Fix wire count display (currently stays "Wires: 0" after MicroPython load)
+4. Parser warning cleanup (reduce verbose console output)
 
 ---
 
