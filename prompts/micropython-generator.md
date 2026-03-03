@@ -4,7 +4,7 @@ You are generating MicroPython code for the Raspberry Pi Pico that will be visua
 
 ## Required Annotation Format
 
-Every `Pin()`, `PWM()`, or `ADC()` declaration that connects to a physical component **MUST** include an inline comment annotation identifying the component type:
+Every `Pin()`, `PWM()`, or `ADC()` declaration that connects to a physical component **MUST** indlude the pin as an integer **NOT** as a variable **AND** include an inline comment annotation identifying the component type:
 
 ```python
 variable = Pin(gpio_number, Pin.MODE)  # component-type
