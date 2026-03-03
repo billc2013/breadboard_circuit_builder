@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breadboard Circuit Builder</title>
+    <link rel="stylesheet" href="styles/common.css">
+    <style>
+        /* Landing Page Specific Styles */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .landing-container {
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .landing-title {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .landing-subtitle {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 50px;
+        }
+
+        .mode-cards {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-card {
+            background: #2a2a2a;
+            border: 2px solid #3e3e42;
+            border-radius: 15px;
+            padding: 30px;
+            width: 320px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .mode-card:hover {
+            border-color: #4CAF50;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.2);
+        }
+
+        .mode-card.guided:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.2);
+        }
+
+        .mode-card.explorer:hover {
+            border-color: #00ccff;
+            box-shadow: 0 10px 30px rgba(0, 204, 255, 0.2);
+        }
+
+        .mode-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .mode-card.guided .mode-icon {
+            color: #4CAF50;
+        }
+
+        .mode-card.explorer .mode-icon {
+            color: #00ccff;
+        }
+
+        .mode-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .mode-description {
+            font-size: 14px;
+            color: #999;
+            line-height: 1.6;
+        }
+
+        .mode-features {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .mode-features li {
+            margin: 8px 0;
+            padding-left: 5px;
+        }
+
+        .mode-features li::marker {
+            color: #4CAF50;
+        }
+
+        .mode-card.explorer .mode-features li::marker {
+            color: #00ccff;
+        }
+
+        /* Attribution Footer for landing page */
+        #attribution-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(30, 30, 30, 0.95);
+            border-top: 1px solid #444;
+            padding: 8px 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+        }
+
+        #attribution-footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        #attribution-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-container">
+        <h1 class="landing-title">Breadboard Circuit Builder</h1>
+        <p class="landing-subtitle">Learn electronics with interactive circuit visualization</p>
+
+        <div class="mode-cards">
+            <!-- Guided Wiring Mode -->
+            <a href="guided-wiring.html" class="mode-card guided">
+                <div class="mode-icon">&#128268;</div>
+                <h2 class="mode-title">Guided Wiring</h2>
+                <p class="mode-description">
+                    Follow step-by-step instructions to wire circuits on a virtual breadboard.
+                    Perfect for learning how to build circuits from scratch.
+                </p>
+                <ul class="mode-features">
+                    <li>Step-by-step wire placement</li>
+                    <li>Visual endpoint highlighting</li>
+                    <li>Real-time validation</li>
+                    <li>Practice wiring from JSON specifications</li>
+                </ul>
+            </a>
+
+            <!-- Circuit Explorer Mode -->
+            <a href="circuit-explorer.html" class="mode-card explorer">
+                <div class="mode-icon">&#128269;</div>
+                <h2 class="mode-title">Circuit Explorer</h2>
+                <p class="mode-description">
+                    Explore complete circuits by clicking on wires to understand connections.
+                    Great for reviewing and understanding existing circuits.
+                </p>
+                <ul class="mode-features">
+                    <li>View all wires or functional groups</li>
+                    <li>Click to highlight wire connections</li>
+                    <li>Educational tooltips explain each connection</li>
+                    <li>Progressive disclosure of complexity</li>
+                </ul>
+            </a>
+        </div>
+    </div>
+
+    <!-- Attribution Footer -->
+    <footer id="attribution-footer">
+        <p>
+            Component graphics from <a href="https://fritzing.org" target="_blank" rel="noopener">Fritzing</a>
+            are licensed under
+            <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>.
+        </p>
+    </footer>
+</body>
+</html>
