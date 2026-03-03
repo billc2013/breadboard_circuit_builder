@@ -11,8 +11,6 @@
     <div id="app">
         <header class="explorer-header">
             <h1>Circuit Explorer</h1>
-            <a href="index.html" style="color: #888; font-size: 12px; margin-left: 20px;">← Back to mode selection</a>
-
             <div id="info-panel">
                 <div id="hover-info">Click on components or wires to explore connections</div>
             </div>
@@ -113,16 +111,7 @@ sensor = ADC(Pin(26))  # photocell-ldr"
                     </div>
                 </div>
 
-                <!-- Circuits Panel -->
-                <div id="circuits-panel">
-                    <div class="panel-header">
-                        <h3>Circuits (JSON)</h3>
-                        <button id="add-circuit-btn" class="icon-btn" title="Add new circuit">+</button>
-                    </div>
-                    <div id="circuits-list">
-                        <!-- Circuit items will be added dynamically -->
-                    </div>
-                </div>
+
             </div>
         </main>
     </div>
@@ -153,14 +142,10 @@ sensor = ADC(Pin(26))  # photocell-ldr"
         <div id="info-box-details"></div>
     </div>
 
-    <script src="breadboard-data.js"></script>
     <script src="components/microcontrollers/pico-geometry.js"></script>
-    <script src="circuit-loader.js"></script>
-    <script src="circuit-explorer.js"></script>
     <script src="abstract-layout.js"></script>
     <script src="micropython-parser.js"></script>
     <script src="explorer-app.js"></script>
-    <script src="circuits-manager.js"></script>
 
     <!-- Attribution Footer -->
     <footer id="attribution-footer">
