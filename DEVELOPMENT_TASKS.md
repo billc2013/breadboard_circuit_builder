@@ -2,13 +2,56 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: March 3, 2026
-**Current Phase**: Explorer-Only Branch — MicroPython → Block Diagram Visualization
+**Last Updated**: March 12, 2026
+**Current Phase**: Explorer-Only Branch — LLM-Based MicroPython → Block Diagram Visualization
 **Branch**: `explorer-only` (created from `Pin_and_component`)
 
 ---
 
-## Recently Completed (March 2026 Session)
+## Recently Completed (March 12, 2026 Session)
+
+### ✅ LLM-Based Parser — Replace Regex Extraction with LLM Call
+**Completed**: March 12, 2026
+
+**Goal**: Replace the regex-based MicroPython parser (which required `# component-type` inline annotations) with an LLM call that can analyze any MicroPython code and infer component types automatically.
+
+**What was delivered**:
+
+**1. `llm-micropython-parser.js` — LLMParser class**
+- Sends MicroPython code to Modal serverless endpoint (Duncan Johnson's infrastructure)
+- LLM returns structured JSON declarations: component types, GPIO pins, modes, pin roles
+- Declarations feed into existing `MicroPythonParser` pipeline (resolve → support components → wires → circuitData)
+- JSON schema with `strict: true` enforces structured output (OpenAI Structured Outputs)
+- System instructions guide component identification from code context
+- LLM also returns `analysis.summary` and `analysis.warnings` for student-facing messages
+
+**2. `llmResponse.js` — Streaming utility (kept for future use)**
+- Originally designed for SSE streaming; Modal endpoint returns plain JSON
+- `_callLLM()` in LLMParser makes direct fetch instead
+
+**3. `config.js` — Runtime configuration (gitignored)**
+- Holds `window.APP_CONFIG.MODAL_ENDPOINT_URL`
+- Replaces `.env.local` + Vite pattern (project doesn't use a bundler)
+
+**4. `circuit-explorer.html` — Updated script loading**
+- Loads 6 scripts: `config.js`, `pico-geometry.js`, `abstract-layout.js`, `micropython-parser.js`, `llm-micropython-parser.js`, `llmResponse.js`, `explorer-app.js`
+
+**5. `explorer-app.js` — `loadFromLLMCall()` replaces `loadFromMicroPython()`**
+- Parse button calls `loadFromLLMCall()` which instantiates `LLMParser`
+- Old `loadFromMicroPython()` commented out but preserved
+
+**Architecture Decision**: The LLM only replaces the regex extraction step. All component metadata, wire colors, support component generation, and rendering still derive from the "One Truth" component JSON files. This means the LLM doesn't need to know about rendering internals — it just identifies what's in the code.
+
+**Test Results**:
+- LED blink (single component, no annotations): ✓ — LED Circuit with auto-generated resistor
+- Wall-follower (complex, 3 functional groups, no annotations): ✓ — Distance Sensor + LED Circuit + Motor Controller, 4 components, 15 wires
+
+**Files created**: `llm-micropython-parser.js`, `llmResponse.js`, `config.js`
+**Files modified**: `circuit-explorer.html`, `explorer-app.js`, `.gitignore`
+
+---
+
+## Previously Completed (March 3, 2026 Session)
 
 ### ✅ Explorer-Only Branch: Codebase Cleanup & Streamlining
 **Completed**: March 3, 2026
@@ -384,26 +427,29 @@ normalizeEndpoint(endpoint) {
 
 ## High Priority Tasks (explorer-only branch)
 
-### 1. MicroPython Parser Testing & Refinement ⭐ NEXT
+### 1. LLM Parser Testing & Edge Cases ⭐ NEXT
 
-**Description**: Test the MicroPython parser with more complex circuits and edge cases.
+**Description**: Test the LLM-based parser with various circuits and edge cases.
 
 **Test Cases Needed**:
+- [x] Single LED (led_blink.py) — verified March 12
+- [x] Complex multi-component (wall-follower with US-100 + TB6612 + LED) — verified March 12
 - [ ] Multiple LEDs (different colors)
 - [ ] PWM-controlled LED brightness
-- [ ] Multiple sensors (button + photocell + potentiometer)
-- [ ] Edge cases: duplicate variable names, invalid GPIO pins, unsupported components
-- [ ] Error handling: malformed code, missing annotations
+- [ ] Multiple sensors (button + photocell)
+- [ ] Edge cases: unsupported components, ambiguous variable names
+- [ ] Error handling: code with no hardware declarations, non-MicroPython code
 - [ ] ADC pins used as digital GPIO (GP26-28 with Pin.OUT)
 
 **Potential Improvements**:
-- Better error messages with line numbers
-- Support for multi-line comments
-- Support for variable reassignment detection
-- Warn about unused GPIO pins
+- Update panel text to remove "component annotations" instruction (no longer needed)
+- Display LLM analysis summary to students
+- Show LLM warnings in the UI
 - Fix wire count display ("Wires: 0" doesn't update)
+- Add loading spinner/progress during LLM call
+- Handle LLM timeout gracefully
 
-**Priority**: HIGH - Needed before LLM prompt creation
+**Priority**: HIGH
 
 ---
 

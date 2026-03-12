@@ -92,10 +92,9 @@
                             id="micropython-input"
                             class="code-input"
                             placeholder="from machine import Pin, PWM, ADC
-
-led = Pin(15, Pin.OUT)  # led-red-5mm
-button = Pin(14, Pin.IN, Pin.PULL_DOWN)  # button-tactile-6mm
-sensor = ADC(Pin(26))  # photocell-ldr"
+                                led = Pin(15, Pin.OUT)  # led-red-5mm
+                                button = Pin(14, Pin.IN, Pin.PULL_DOWN)  # button-tactile-6mm
+                                sensor = ADC(Pin(26))  # photocell-ldr"
                             spellcheck="false"
                         ></textarea>
                         <div class="panel-actions">
@@ -142,9 +141,12 @@ sensor = ADC(Pin(26))  # photocell-ldr"
         <div id="info-box-details"></div>
     </div>
 
+    <script src="config.js"></script>
     <script src="components/microcontrollers/pico-geometry.js"></script>
     <script src="abstract-layout.js"></script>
     <script src="micropython-parser.js"></script>
+    <script src="llm-micropython-parser.js"></script>
+    <script src="llmResponse.js"></script>
     <script src="explorer-app.js"></script>
 
     <!-- Attribution Footer -->

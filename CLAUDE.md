@@ -15,9 +15,12 @@
 
 ```
 ├── explorer-app.js              # Circuit Explorer application (~1,485 lines)
-├── micropython-parser.js        # MicroPython code → circuit data (~860 lines)
+├── llm-micropython-parser.js    # LLM-based parser — sends code to Modal endpoint (~316 lines)
+├── llmResponse.js               # Streaming utility for Modal (kept for future use)
+├── micropython-parser.js        # Regex-based parser — used as pipeline delegate by LLMParser (~860 lines)
 ├── abstract-layout.js           # Slot-based positioning system (~377 lines)
-├── circuit-explorer.html        # Main HTML (loads 4 scripts)
+├── config.js                    # Runtime config (gitignored) — Modal endpoint URL
+├── circuit-explorer.html        # Main HTML (loads 6 scripts)
 ├── index.html                   # Redirect → circuit-explorer.html
 ├── components/                  # Component library ("One Truth")
 │   ├── library.json             # Master index
@@ -64,7 +67,8 @@ This branch was created March 2026 from `Pin_and_component`. It strips the codeb
 - **Removed**: JSON circuit loading, guided wiring, physical layout, CircuitLoader, CircuitsManager, breadboard-data.js
 - **Archived**: 17 files in `archive/guided-wiring/` with restoration instructions
 - **Trimmed**: `explorer-app.js` from 3,401 → ~1,485 lines (56% reduction)
-- **4 scripts loaded**: `pico-geometry.js`, `abstract-layout.js`, `micropython-parser.js`, `explorer-app.js`
+- **6 scripts loaded**: `config.js`, `pico-geometry.js`, `abstract-layout.js`, `micropython-parser.js`, `llm-micropython-parser.js`, `llmResponse.js`, `explorer-app.js`
+- **LLM parser added** (March 12, 2026): Replaces regex extraction with LLM call via Modal serverless endpoint. No comment annotations needed.
 
 ### Restoration
 
@@ -79,8 +83,8 @@ See `archive/guided-wiring/README.md` for the full file list.
 
 This is an **educational tool for introductory robotics**. Students:
 1. Describe a circuit goal to an LLM ("Make an LED blink when I press a button")
-2. LLM generates annotated MicroPython code (see `prompts/`)
-3. Student pastes code into Circuit Explorer to understand the circuit conceptually
+2. LLM generates MicroPython code
+3. Student pastes code into Circuit Explorer — an LLM call identifies components automatically
 4. Student learns circuit topology through interactive block diagram visualization
 
 **Key insight**: The tool bridges the gap between abstract circuit concepts and physical breadboard assembly.
@@ -177,27 +181,35 @@ return {
 
 ## Current Architecture Patterns
 
-### MicroPython Parser Flow
+### LLM Parser Flow (Primary — `llm-micropython-parser.js`)
 
 ```
-MicroPython Code
-    ↓ extractDeclarations() — Regex extraction
-Declarations Array
-    ↓ resolveComponent() — Library lookup
+MicroPython Code (no annotations needed)
+    ↓ _callLLM() — POST to Modal endpoint
+    ↓ LLM returns structured JSON declarations
+Declarations Array (component types, GPIO pins, modes)
+    ↓ MicroPythonParser.groupMultiPinDeclarations()
+    ↓ MicroPythonParser.resolveComponent() — Library lookup
 Resolved Components
-    ↓ generateSupportComponents() — From functionalGroup.requires
+    ↓ MicroPythonParser.generateSupportComponents() — From functionalGroup.requires
 Support Components
-    ↓ generateWires() — From functionalGroup.wireOrder
+    ↓ MicroPythonParser.generateWires() — From functionalGroup.wireOrder
 Wires Array
-    ↓ buildCircuitData()
+    ↓ MicroPythonParser.buildCircuitData()
 Circuit Data Structure
-    ↓ loadFromMicroPython() in explorer-app.js
+    ↓ loadFromLLMCall() in explorer-app.js
     ↓ buildFunctionalGroupsFromParser()
     ↓ abstractLayout.calculateSlots()
     ↓ renderMicroPythonComponents()
     ↓ renderMicroPythonWires()
 Visual Output
 ```
+
+### Legacy Regex Parser Flow (`micropython-parser.js`)
+
+Still loaded as a dependency — LLMParser delegates to its pipeline methods.
+Can be used directly via `loadFromMicroPython()` if LLM is unavailable.
+Requires `# component-type` inline comment annotations.
 
 ### Abstract Layout System
 
@@ -297,8 +309,10 @@ The "Wires: 0" counter in the bottom-left does not update when loading via Micro
 | No CircuitLoader dependency | Explorer renders directly from parser output, no physical placement needed |
 | Auto-generate support components | Reduces user/LLM burden, ensures correctness |
 | Slot-based abstract layout | Conceptual understanding over physical accuracy |
-| Regex-based parser | Simple, sufficient for annotated code format |
-| Inline comment annotations | Minimal syntax, easy for LLMs to generate |
+| LLM-based parser (primary) | No annotations needed; LLM infers components from code context |
+| Regex parser as delegate | LLMParser reuses MicroPythonParser's pipeline (resolve, wires, support components) — no duplication |
+| Modal serverless endpoint | Duncan's endpoint handles OpenAI API key and structured outputs server-side |
+| config.js for endpoint URL | Plain `<script>` pattern — no build tools needed; gitignored for safety |
 | Prefix-match for ADC pins | Gracefully handles GP26 vs GP26_ADC0 naming across parser and geometry |
 
 ---
