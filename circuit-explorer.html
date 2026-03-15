@@ -36,21 +36,21 @@
                         <!-- Pico pins layer -->
                         <g id="pico-pins-layer"></g>
 
-                        <!-- Breadboard background image -->
+                        <!-- Breadboard background image (cropped: no power rails) -->
                         <image
                             id="breadboard-image"
-                            href="components_svg/Half_breadboard56a.svg"
+                            href="components_svg/Half_breadboard_nopwr.svg"
                             x="100"
                             y="20"
                             width="292.41"
-                            height="189"
+                            height="120"
                             preserveAspectRatio="xMidYMid meet"
                             data-config-ref="breadboard.svg"
                         />
 
-                        <!-- Breadboard fade overlay (for dimming in explorer mode) -->
+                        <!-- Breadboard fade overlay -->
                         <rect id="breadboard-fade-overlay" class="breadboard-fade-overlay"
-                            x="100" y="20" width="292.41" height="189"
+                            x="100" y="20" width="292.41" height="120"
                             style="display: none;"/>
 
                         <!-- Functional group boundaries layer (below wires) -->
@@ -86,7 +86,7 @@
                     </div>
                     <div class="panel-content">
                         <div class="input-instructions">
-                            Paste MicroPython code with component annotations: <code># component-type</code>
+                            Paste MicroPython code — components are identified automatically
                         </div>
                         <textarea
                             id="micropython-input"
@@ -110,6 +110,34 @@
                     </div>
                 </div>
 
+                <!-- Graphics Test Panel -->
+                <div id="graphics-test-panel" class="input-panel">
+                    <div class="panel-header">
+                        <h3>Graphics Test</h3>
+                        <button id="gtest-toggle-btn" class="icon-btn" title="Toggle panel">
+                            <span class="toggle-icon">−</span>
+                        </button>
+                    </div>
+                    <div class="panel-content">
+                        <div class="input-instructions">Toggle components to test breadboard placement</div>
+                        <div id="gtest-buttons" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
+                            <button class="gtest-toggle action-btn secondary" data-gtest="debug-holes" title="Show debug hole markers">Holes</button>
+                            <button class="gtest-toggle action-btn secondary" data-gtest="led" title="LED + resistor">LED</button>
+                            <button class="gtest-toggle action-btn secondary" data-gtest="button" title="Button + resistor">Button</button>
+                            <button class="gtest-toggle action-btn secondary" data-gtest="photocell" title="Photocell + resistor">Photocell</button>
+                            <button class="gtest-toggle action-btn secondary" data-gtest="us100" title="US-100 ultrasonic sensor">US-100</button>
+                            <button class="gtest-toggle action-btn secondary" data-gtest="tb6612" title="TB6612 motor driver">TB6612</button>
+                        </div>
+                        <div style="display: flex; gap: 4px;">
+                            <button id="gtest-all-btn" class="action-btn secondary" style="flex:1">Show All</button>
+                            <button id="gtest-clear-btn" class="action-btn secondary" style="flex:1">Clear All</button>
+                        </div>
+                        <div style="display: flex; gap: 4px; margin-top: 4px;">
+                            <button id="gtest-copy-btn" class="action-btn secondary" style="flex:1" title="Copy current placements as JSON to clipboard">Copy Positions</button>
+                        </div>
+                        <div id="gtest-status" style="color: #888; font-size: 11px; margin-top: 6px;"></div>
+                    </div>
+                </div>
 
             </div>
         </main>
@@ -143,6 +171,8 @@
 
     <script src="config.js"></script>
     <script src="components/microcontrollers/pico-geometry.js"></script>
+    <script src="breadboard-data.js"></script>
+    <script src="breadboard-placement.js"></script>
     <script src="abstract-layout.js"></script>
     <script src="micropython-parser.js"></script>
     <script src="llm-micropython-parser.js"></script>

@@ -992,6 +992,641 @@ class ExplorerApp {
         });
 
         console.log('[Explorer] MicroPython UI initialized');
+
+        // Graphics test panel
+        this.setupGraphicsTestUI();
+    }
+
+    // ==================== Graphics Test (Phase 2) ====================
+
+    /**
+     * Graphics test definitions — each test key maps to a group + its SVG info
+     */
+    _getGraphicsTestDefs() {
+        return {
+            'debug-holes': { type: 'debug' },
+            'led': {
+                groups: [
+                    {
+                        id: 'led-red-5mm-0-group',
+                        primaryComponent: 'led-red-5mm-0',
+                        primaryMetadata: { id: 'led-red-5mm' },
+                        allComponents: ['led-red-5mm-0', 'resistor-220-0'],
+                        supportComponents: ['resistor-220-0']
+                    },
+                    {
+                        id: 'led-red-5mm-1-group',
+                        primaryComponent: 'led-red-5mm-1',
+                        primaryMetadata: { id: 'led-red-5mm' },
+                        allComponents: ['led-red-5mm-1', 'resistor-220-1'],
+                        supportComponents: ['resistor-220-1']
+                    },
+                    {
+                        id: 'led-red-5mm-2-group',
+                        primaryComponent: 'led-red-5mm-2',
+                        primaryMetadata: { id: 'led-red-5mm' },
+                        allComponents: ['led-red-5mm-2', 'resistor-220-2'],
+                        supportComponents: ['resistor-220-2']
+                    }
+                ],
+                svgMap: {
+                    'led-red-5mm': { svg: 'components_svg/LED-5mm-red-leg.svg', width: 18, height: 40, label: 'LED' },
+                    'resistor-220': { svg: 'components_svg/resistor_220.svg', width: 45, height: 12, label: 'R220' }
+                }
+            },
+            'button': {
+                groups: [
+                    {
+                        id: 'button-tactile-6mm-0-group',
+                        primaryComponent: 'button-tactile-6mm-0',
+                        primaryMetadata: { id: 'button-tactile-6mm' },
+                        allComponents: ['button-tactile-6mm-0', 'resistor-10k-0'],
+                        supportComponents: ['resistor-10k-0']
+                    },
+                    {
+                        id: 'button-tactile-6mm-1-group',
+                        primaryComponent: 'button-tactile-6mm-1',
+                        primaryMetadata: { id: 'button-tactile-6mm' },
+                        allComponents: ['button-tactile-6mm-1', 'resistor-10k-2'],
+                        supportComponents: ['resistor-10k-2']
+                    }
+                ],
+                svgMap: {
+                    'button-tactile-6mm': { svg: 'components_svg/Pushbuttonc.svg', width: 50, height: 56, label: 'Button' },
+                    'resistor-10k': { svg: 'components_svg/resistor_220.svg', width: 45, height: 12, label: 'R10k' }
+                }
+            },
+            'photocell': {
+                groups: [{
+                    id: 'photocell-ldr-0-group',
+                    primaryComponent: 'photocell-ldr-0',
+                    primaryMetadata: { id: 'photocell-ldr' },
+                    allComponents: ['photocell-ldr-0', 'resistor-10k-1'],
+                    supportComponents: ['resistor-10k-1']
+                }],
+                svgMap: {
+                    'photocell-ldr': { svg: 'components_svg/ldr.svg', width: 24, height: 11, label: 'Photocell' },
+                    'resistor-10k': { svg: 'components_svg/resistor_220.svg', width: 45, height: 12, label: 'R10k' }
+                }
+            },
+            'us100': {
+                groups: [{
+                    id: 'us100-ultrasonic-0-group',
+                    primaryComponent: 'us100-ultrasonic-0',
+                    primaryMetadata: { id: 'us100-ultrasonic' },
+                    allComponents: ['us100-ultrasonic-0'],
+                    supportComponents: []
+                }],
+                svgMap: {
+                    'us100-ultrasonic': { svg: 'components_svg/US-100_ultrasonic-distance-sensor.svg', width: 44, height: 26, label: 'US-100' }
+                }
+            },
+            'tb6612': {
+                groups: [{
+                    id: 'tb6612-motor-driver-0-group',
+                    primaryComponent: 'tb6612-motor-driver-0',
+                    primaryMetadata: { id: 'tb6612-motor-driver' },
+                    allComponents: ['tb6612-motor-driver-0'],
+                    supportComponents: []
+                }],
+                svgMap: {
+                    'tb6612-motor-driver': { svg: 'components_svg/tb6612-motor-driver.svg', width: 54, height: 76, label: 'TB6612' }
+                }
+            }
+        };
+    }
+
+    setupGraphicsTestUI() {
+        // Track which tests are active
+        this._gtestActive = new Set();
+        this._gtestPlacementSystem = null;
+
+        const toggleBtns = document.querySelectorAll('.gtest-toggle');
+        const allBtn = document.getElementById('gtest-all-btn');
+        const clearBtn = document.getElementById('gtest-clear-btn');
+        const panelToggle = document.getElementById('gtest-toggle-btn');
+        const panel = document.getElementById('graphics-test-panel');
+
+        panelToggle?.addEventListener('click', () => {
+            panel.classList.toggle('collapsed');
+            const icon = panelToggle.querySelector('.toggle-icon');
+            if (icon) icon.textContent = panel.classList.contains('collapsed') ? '+' : '−';
+        });
+
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => this._gtestToggle(btn.dataset.gtest, btn));
+        });
+
+        allBtn?.addEventListener('click', () => {
+            toggleBtns.forEach(btn => {
+                if (!this._gtestActive.has(btn.dataset.gtest)) {
+                    this._gtestToggle(btn.dataset.gtest, btn);
+                }
+            });
+        });
+
+        clearBtn?.addEventListener('click', () => {
+            this._gtestActive.clear();
+            toggleBtns.forEach(btn => btn.classList.remove('gtest-on'));
+            this._gtestRedraw();
+        });
+
+        const copyBtn = document.getElementById('gtest-copy-btn');
+        copyBtn?.addEventListener('click', () => this._gtestExportPlacements());
+    }
+
+    async _gtestEnsurePlacementSystem() {
+        if (!this._gtestPlacementSystem) {
+            this._gtestPlacementSystem = new BreadboardPlacementSystem();
+            await this._gtestPlacementSystem.load();
+        }
+        return this._gtestPlacementSystem;
+    }
+
+    async _gtestToggle(testKey, btn) {
+        if (this._gtestActive.has(testKey)) {
+            this._gtestActive.delete(testKey);
+            btn?.classList.remove('gtest-on');
+        } else {
+            this._gtestActive.add(testKey);
+            btn?.classList.add('gtest-on');
+        }
+        await this._gtestRedraw();
+    }
+
+    async _gtestRedraw() {
+        // Clean up any in-progress drag
+        this._gtestClearDragState();
+
+        // Clear SVG layers
+        this.componentsLayer.innerHTML = '';
+        this.holesLayer.innerHTML = '';
+
+        const defs = this._getGraphicsTestDefs();
+        const placementSystem = await this._gtestEnsurePlacementSystem();
+
+        // Reset slot allocation for fresh assignment
+        placementSystem.clear();
+
+        // Collect all active groups and SVG maps
+        const allGroups = [];
+        const allSvgMaps = {};
+        const groupRegistry = [];
+
+        for (const testKey of this._gtestActive) {
+            if (testKey === 'debug-holes') continue;
+            const def = defs[testKey];
+            if (!def || def.type === 'debug') continue;
+            for (const group of def.groups) {
+                allGroups.push(group);
+                groupRegistry.push({ testKey, group });
+            }
+            Object.assign(allSvgMaps, def.svgMap);
+        }
+
+        // Assign placements for all active groups
+        if (allGroups.length > 0) {
+            placementSystem.assignPlacements(allGroups);
+        }
+
+        // Render debug holes if active
+        if (this._gtestActive.has('debug-holes')) {
+            this._renderDebugHoles();
+        }
+
+        // Render each functional group as a draggable unit
+        for (const { testKey, group } of groupRegistry) {
+            const groupG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            groupG.setAttribute('class', 'gtest-group');
+            groupG.setAttribute('data-group-id', group.id);
+            groupG.style.cursor = 'grab';
+
+            // Render all components in this group into the group container
+            for (const componentId of group.allComponents) {
+                const placement = placementSystem.getComponentPosition(componentId);
+                if (!placement) continue;
+                const componentType = componentId.replace(/-\d+$/, '');
+                const svgInfo = allSvgMaps[componentType];
+                if (!svgInfo) continue;
+                this._gtestRenderComponent(componentId, placement, svgInfo, groupG);
+            }
+
+            this.componentsLayer.appendChild(groupG);
+
+            // Make draggable
+            this._gtestMakeDraggable(groupG, group);
+        }
+
+        // Update status
+        const statusEl = document.getElementById('gtest-status');
+        if (statusEl) {
+            const allPlacements = placementSystem.getAllPlacements();
+            const active = [...this._gtestActive].filter(k => k !== 'debug-holes');
+            statusEl.textContent = active.length > 0
+                ? `${allPlacements.size} components placed (${active.join(', ')}) — drag to reposition`
+                : '';
+        }
+    }
+
+    /**
+     * Render a single component into a parent SVG group
+     */
+    _gtestRenderComponent(componentId, placement, svgInfo, parentElement) {
+        const scale = 0.5;
+        const renderWidth = svgInfo.width * scale;
+        const renderHeight = svgInfo.height * scale;
+
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'component test-component');
+        g.setAttribute('data-component-id', componentId);
+
+        // Component image
+        const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        img.setAttribute('href', svgInfo.svg);
+        img.setAttribute('width', renderWidth);
+        img.setAttribute('height', renderHeight);
+        img.setAttribute('x', placement.centerX - renderWidth / 2);
+        img.setAttribute('y', placement.centerY - renderHeight / 2);
+        img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        g.appendChild(img);
+
+        // Label below
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', placement.centerX);
+        label.setAttribute('y', placement.centerY + renderHeight / 2 + 5);
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('fill', '#00ccff');
+        label.setAttribute('font-size', '4');
+        label.setAttribute('font-family', 'Arial, sans-serif');
+        label.textContent = `${svgInfo.label} [${componentId}]`;
+        g.appendChild(label);
+
+        // Pin markers
+        for (const [pinName, pinPos] of Object.entries(placement.pinPositions)) {
+            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            marker.setAttribute('cx', pinPos.x);
+            marker.setAttribute('cy', pinPos.y);
+            marker.setAttribute('r', '2');
+            marker.setAttribute('fill', 'rgba(255, 0, 0, 0.8)');
+            marker.setAttribute('stroke', '#ff0');
+            marker.setAttribute('stroke-width', '0.5');
+            g.appendChild(marker);
+
+            const pinLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            pinLabel.setAttribute('x', pinPos.x);
+            pinLabel.setAttribute('y', pinPos.y - 3);
+            pinLabel.setAttribute('text-anchor', 'middle');
+            pinLabel.setAttribute('fill', '#ff0');
+            pinLabel.setAttribute('font-size', '3');
+            pinLabel.textContent = `${pinName}:${pinPos.holeId}`;
+            g.appendChild(pinLabel);
+        }
+
+        (parentElement || this.componentsLayer).appendChild(g);
+    }
+
+    /**
+     * Render debug circles at every breadboard hole position
+     */
+    _renderDebugHoles() {
+        if (typeof BREADBOARD_HOLES === 'undefined') return;
+
+        const debugGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        debugGroup.setAttribute('id', 'debug-holes');
+        debugGroup.setAttribute('opacity', '0.4');
+
+        for (const hole of BREADBOARD_HOLES) {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', hole.x);
+            circle.setAttribute('cy', hole.y);
+            circle.setAttribute('r', '1.2');
+            circle.setAttribute('fill', hole.row >= 'F' ? 'rgba(0,200,255,0.5)' : 'rgba(255,200,0,0.5)');
+            circle.setAttribute('data-hole-id', hole.id);
+            debugGroup.appendChild(circle);
+        }
+
+        this.holesLayer.appendChild(debugGroup);
+        console.log(`[GraphicsTest] ${BREADBOARD_HOLES.length} debug holes rendered`);
+    }
+
+    // ==================== Drag-and-Drop System ====================
+
+    /** Row order for offset calculations (J=0 top → A=9 bottom) */
+    static get ALL_ROWS() { return ['J', 'I', 'H', 'G', 'F', 'E', 'D', 'C', 'B', 'A']; }
+
+    /** Parse hole ID string to column + row index */
+    _gtestParseHoleId(holeId) {
+        const match = holeId.match(/^(\d+)([A-J])$/i);
+        if (!match) return null;
+        return {
+            col: parseInt(match[1]),
+            row: match[2].toUpperCase(),
+            rowIdx: ExplorerApp.ALL_ROWS.indexOf(match[2].toUpperCase())
+        };
+    }
+
+    /** Build hole ID from column + row index */
+    _gtestBuildHoleId(col, rowIdx) {
+        if (col < 1 || col > 30 || rowIdx < 0 || rowIdx >= 10) return null;
+        return `${col}${ExplorerApp.ALL_ROWS[rowIdx]}`;
+    }
+
+    /** Compute the relative pin layout for a functional group (offsets from anchor) */
+    _gtestComputeRelativeLayout(group) {
+        const ps = this._gtestPlacementSystem;
+        const primaryPlacement = ps.getComponentPosition(group.primaryComponent);
+        if (!primaryPlacement) return null;
+
+        // Anchor = first pin of primary component
+        const pinEntries = Object.entries(primaryPlacement.pinPositions);
+        const [anchorPinName, anchorPin] = pinEntries[0];
+        const anchorHole = this._gtestParseHoleId(anchorPin.holeId);
+        if (!anchorHole) return null;
+
+        const pins = [];
+
+        // Primary component pins
+        for (const [pinName, pinPos] of pinEntries) {
+            const hole = this._gtestParseHoleId(pinPos.holeId);
+            if (!hole) continue;
+            pins.push({
+                componentId: group.primaryComponent,
+                pinName,
+                colOffset: hole.col - anchorHole.col,
+                rowOffset: hole.rowIdx - anchorHole.rowIdx,
+                isSupport: false
+            });
+        }
+
+        // Support component pins
+        for (const supportId of (group.supportComponents || [])) {
+            const supportPlacement = ps.getComponentPosition(supportId);
+            if (!supportPlacement) continue;
+            const supportType = supportId.replace(/-\d+$/, '');
+            const supportFormFactor = ps.normalizeType(supportType);
+
+            for (const [pinName, pinPos] of Object.entries(supportPlacement.pinPositions)) {
+                const hole = this._gtestParseHoleId(pinPos.holeId);
+                if (!hole) continue;
+                pins.push({
+                    componentId: supportId,
+                    pinName,
+                    colOffset: hole.col - anchorHole.col,
+                    rowOffset: hole.rowIdx - anchorHole.rowIdx,
+                    isSupport: true,
+                    supportFormFactor
+                });
+            }
+        }
+
+        return { anchor: { ...anchorHole, pinName: anchorPinName }, pins, group };
+    }
+
+    /** Apply relative layout at a new anchor position → array of {pinName, holeId, valid, x, y} */
+    _gtestApplyRelativeLayout(anchorCol, anchorRowIdx, relLayout) {
+        return relLayout.pins.map(pin => {
+            const newCol = anchorCol + pin.colOffset;
+            const newRowIdx = anchorRowIdx + pin.rowOffset;
+            const holeId = this._gtestBuildHoleId(newCol, newRowIdx);
+            const hole = holeId ? getHoleById(holeId) : null;
+            return { ...pin, holeId, valid: !!hole, x: hole?.x, y: hole?.y };
+        });
+    }
+
+    /** Find the nearest breadboard hole to an SVG coordinate */
+    _gtestFindNearestHole(svgX, svgY) {
+        if (typeof BREADBOARD_HOLES === 'undefined') return null;
+        let nearest = null, minDist = Infinity;
+        for (const hole of BREADBOARD_HOLES) {
+            const dist = (hole.x - svgX) ** 2 + (hole.y - svgY) ** 2;
+            if (dist < minDist) { minDist = dist; nearest = hole; }
+        }
+        return nearest;
+    }
+
+    /** Convert screen coordinates to SVG coordinates */
+    _gtestScreenToSVG(clientX, clientY) {
+        const pt = this.svg.createSVGPoint();
+        pt.x = clientX;
+        pt.y = clientY;
+        return pt.matrixTransform(this.svg.getScreenCTM().inverse());
+    }
+
+    /** Make a functional group element draggable */
+    _gtestMakeDraggable(groupG, group) {
+        const relLayout = this._gtestComputeRelativeLayout(group);
+        if (!relLayout) return;
+
+        groupG.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this._gtestStartDrag(e, groupG, relLayout);
+        });
+    }
+
+    /** Begin dragging a component group */
+    _gtestStartDrag(e, groupG, relLayout) {
+        const svgPt = this._gtestScreenToSVG(e.clientX, e.clientY);
+
+        // Get anchor pin's current SVG position
+        const anchorPlacement = this._gtestPlacementSystem.getComponentPosition(relLayout.anchor.componentId || relLayout.group.primaryComponent);
+        const anchorPinPos = anchorPlacement.pinPositions[relLayout.anchor.pinName];
+
+        // Create ghost (faded copy at original position)
+        const ghost = groupG.cloneNode(true);
+        ghost.setAttribute('class', 'gtest-group gtest-ghost');
+        ghost.style.opacity = '0.25';
+        ghost.style.pointerEvents = 'none';
+        this.componentsLayer.insertBefore(ghost, groupG);
+
+        // Drag cursor
+        groupG.style.cursor = 'grabbing';
+
+        // Target holes highlight layer
+        const highlightGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        highlightGroup.setAttribute('class', 'gtest-drag-highlights');
+        this.holesLayer.appendChild(highlightGroup);
+
+        // Store drag state
+        this._dragState = {
+            groupG,
+            ghost,
+            relLayout,
+            highlightGroup,
+            anchorOrigX: anchorPinPos.x,
+            anchorOrigY: anchorPinPos.y,
+            startSvgX: svgPt.x,
+            startSvgY: svgPt.y,
+            lastSnapHoleId: anchorPinPos.holeId,
+            originalAnchorHoleId: anchorPinPos.holeId
+        };
+
+        // Bind SVG-level handlers
+        this._boundDragMove = (ev) => this._gtestOnDragMove(ev);
+        this._boundDragEnd = (ev) => this._gtestOnDragEnd(ev);
+        this.svg.addEventListener('mousemove', this._boundDragMove);
+        this.svg.addEventListener('mouseup', this._boundDragEnd);
+        this.svg.addEventListener('mouseleave', this._boundDragEnd);
+
+        // Show initial target holes
+        const targetHoles = this._gtestApplyRelativeLayout(relLayout.anchor.col, relLayout.anchor.rowIdx, relLayout);
+        this._gtestRenderTargetHoles(targetHoles);
+
+        console.log(`[GraphicsTest] Drag started: ${relLayout.group.primaryComponent} anchor at ${anchorPinPos.holeId}`);
+    }
+
+    /** Handle mouse movement during drag */
+    _gtestOnDragMove(e) {
+        if (!this._dragState) return;
+        const svgPt = this._gtestScreenToSVG(e.clientX, e.clientY);
+        const { anchorOrigX, anchorOrigY, startSvgX, startSvgY, relLayout } = this._dragState;
+
+        // Where anchor pin would be at current mouse position
+        const targetX = anchorOrigX + (svgPt.x - startSvgX);
+        const targetY = anchorOrigY + (svgPt.y - startSvgY);
+
+        // Find nearest hole for anchor
+        const nearestHole = this._gtestFindNearestHole(targetX, targetY);
+        if (!nearestHole || nearestHole.id === this._dragState.lastSnapHoleId) return;
+
+        this._dragState.lastSnapHoleId = nearestHole.id;
+
+        // Snap: translate group so anchor pin lands on this hole
+        const snapDx = nearestHole.x - anchorOrigX;
+        const snapDy = nearestHole.y - anchorOrigY;
+        this._dragState.groupG.setAttribute('transform', `translate(${snapDx}, ${snapDy})`);
+
+        // Compute and show target holes
+        const anchorParsed = this._gtestParseHoleId(nearestHole.id);
+        const targetHoles = this._gtestApplyRelativeLayout(anchorParsed.col, anchorParsed.rowIdx, relLayout);
+        this._gtestRenderTargetHoles(targetHoles);
+    }
+
+    /** Handle drag end — finalize position */
+    _gtestOnDragEnd(e) {
+        if (!this._dragState) return;
+
+        // Remove SVG-level handlers
+        this.svg.removeEventListener('mousemove', this._boundDragMove);
+        this.svg.removeEventListener('mouseup', this._boundDragEnd);
+        this.svg.removeEventListener('mouseleave', this._boundDragEnd);
+
+        const { relLayout, lastSnapHoleId, originalAnchorHoleId } = this._dragState;
+
+        // Compute final positions
+        const anchorParsed = this._gtestParseHoleId(lastSnapHoleId);
+        const targetHoles = this._gtestApplyRelativeLayout(anchorParsed.col, anchorParsed.rowIdx, relLayout);
+        const allValid = targetHoles.every(t => t.valid);
+
+        if (allValid && lastSnapHoleId !== originalAnchorHoleId) {
+            // Update in-memory placement registry
+            this._gtestUpdatePlacementRegistry(relLayout, targetHoles);
+            console.log(`[GraphicsTest] Dropped ${relLayout.group.primaryComponent}: anchor ${originalAnchorHoleId} → ${lastSnapHoleId}`);
+        }
+
+        // Clean up drag visuals
+        if (this._dragState.ghost) this._dragState.ghost.remove();
+        if (this._dragState.highlightGroup) this._dragState.highlightGroup.remove();
+        this._dragState = null;
+
+        // Re-render everything at updated positions
+        this._gtestRedraw();
+    }
+
+    /** Render green/red circles at target hole positions during drag */
+    _gtestRenderTargetHoles(targetHoles) {
+        const hg = this._dragState?.highlightGroup;
+        if (!hg) return;
+        hg.innerHTML = '';
+
+        for (const target of targetHoles) {
+            if (!target.x || !target.y) continue;
+
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', target.x);
+            circle.setAttribute('cy', target.y);
+            circle.setAttribute('r', '2.5');
+            circle.setAttribute('fill', target.valid ? 'rgba(0, 255, 100, 0.6)' : 'rgba(255, 0, 0, 0.6)');
+            circle.setAttribute('stroke', target.valid ? '#0f0' : '#f00');
+            circle.setAttribute('stroke-width', '0.5');
+            hg.appendChild(circle);
+
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('x', target.x);
+            label.setAttribute('y', target.y - 3.5);
+            label.setAttribute('text-anchor', 'middle');
+            label.setAttribute('fill', target.valid ? '#0f0' : '#f00');
+            label.setAttribute('font-size', '2.5');
+            label.textContent = target.holeId || '??';
+            hg.appendChild(label);
+        }
+    }
+
+    /** Update the in-memory placement registry after a successful drag */
+    _gtestUpdatePlacementRegistry(relLayout, targetHoles) {
+        const ps = this._gtestPlacementSystem;
+        const group = relLayout.group;
+        const componentType = ps._getComponentType(group);
+        const formFactor = ps.normalizeType(componentType);
+        const placementDef = ps.placements[formFactor];
+        if (!placementDef) return;
+
+        const primaryPlacement = ps.getComponentPosition(group.primaryComponent);
+        if (!primaryPlacement) return;
+        const slotDef = placementDef.slots[primaryPlacement.slotIndex];
+        if (!slotDef) return;
+
+        // Build new hole ID maps from target positions
+        const newPrimary = {};
+        const newSupport = {};
+
+        for (const target of targetHoles) {
+            if (!target.holeId) continue;
+            if (!target.isSupport) {
+                newPrimary[target.pinName] = target.holeId;
+            } else {
+                const sfKey = target.supportFormFactor || 'resistor';
+                if (!newSupport[sfKey]) newSupport[sfKey] = {};
+                newSupport[sfKey][target.pinName] = target.holeId;
+            }
+        }
+
+        // Write back to the in-memory registry
+        slotDef.placement = newPrimary;
+        slotDef.supportPlacements = newSupport;
+        console.log(`[GraphicsTest] Registry updated: ${formFactor} slot ${primaryPlacement.slotIndex}`, newPrimary, newSupport);
+    }
+
+    /** Clean up any active drag state */
+    _gtestClearDragState() {
+        if (this._dragState) {
+            if (this._dragState.ghost) this._dragState.ghost.remove();
+            if (this._dragState.highlightGroup) this._dragState.highlightGroup.remove();
+            this._dragState = null;
+        }
+    }
+
+    /** Export current placements to clipboard as JSON */
+    _gtestExportPlacements() {
+        const ps = this._gtestPlacementSystem;
+        if (!ps || !ps.placements) {
+            console.warn('[GraphicsTest] No placements to export');
+            return;
+        }
+        const exportData = {
+            _description: "Breadboard placement registry — exported from graphics test drag-and-drop",
+            typeNormalization: ps.typeNormalization,
+            placements: ps.placements
+        };
+        const json = JSON.stringify(exportData, null, 2);
+        navigator.clipboard.writeText(json).then(() => {
+            console.log('[GraphicsTest] Placements copied to clipboard');
+            const statusEl = document.getElementById('gtest-status');
+            if (statusEl) statusEl.textContent = 'Placements JSON copied to clipboard!';
+        }).catch(err => {
+            console.error('[GraphicsTest] Clipboard write failed:', err);
+            console.log('[GraphicsTest] Placements JSON:\n', json);
+        });
     }
 
 
@@ -1513,6 +2148,10 @@ class ExplorerApp {
 
         if (this.wireLabelsLayer) {
             this.wireLabelsLayer.innerHTML = '';
+        }
+
+        if (this.holesLayer) {
+            this.holesLayer.innerHTML = '';
         }
 
         this.wires = [];

@@ -1096,3 +1096,70 @@
     background: #252540;
     border-bottom: 1px solid #333;
 }
+
+/* ==================== Graphics Test Panel ==================== */
+
+#graphics-test-panel {
+    background: #1a1a2e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#graphics-test-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #252540;
+    border-bottom: 1px solid #333;
+}
+
+#graphics-test-panel .panel-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #9b59b6;
+}
+
+#graphics-test-panel.collapsed .panel-content {
+    display: none;
+}
+
+#graphics-test-panel .panel-content {
+    padding: 15px;
+}
+
+/* Active toggle button */
+.gtest-toggle.gtest-on {
+    background: #3a3a60;
+    color: #00ccff;
+    border-color: #00ccff;
+}
+
+/* ==================== Drag-and-Drop Styles ==================== */
+
+/* Draggable component groups */
+.gtest-group {
+    cursor: grab;
+}
+
+.gtest-group:active {
+    cursor: grabbing;
+}
+
+/* Ghost (faded copy at original position during drag) */
+.gtest-ghost {
+    opacity: 0.25 !important;
+    pointer-events: none !important;
+    cursor: default !important;
+}
+
+/* Target hole highlights (shown during drag) */
+.gtest-drag-highlights circle {
+    pointer-events: none;
+}
+
+.gtest-drag-highlights text {
+    pointer-events: none;
+    font-family: 'Monaco', 'Menlo', monospace;
+}

@@ -2,9 +2,73 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: March 12, 2026
-**Current Phase**: Explorer-Only Branch — LLM-Based MicroPython → Block Diagram Visualization
-**Branch**: `explorer-only` (created from `Pin_and_component`)
+**Last Updated**: March 15, 2026
+**Current Phase**: parse_to_breadboard Branch — Physical Breadboard Component Placement
+**Branch**: `parse_to_breadboard` (created from `explorer-only`)
+
+---
+
+## Recently Completed (March 15, 2026 Session)
+
+### ✅ Physical Breadboard View — Graphics Test with Drag-and-Drop
+**Completed**: March 15, 2026
+
+**Goal**: Replace abstract box layout with physical breadboard component placement. Components are placed at specific breadboard holes with correct electrical bus connections.
+
+**What was delivered**:
+
+**1. Cropped Breadboard SVG** — `components_svg/Half_breadboard_nopwr.svg`
+- Removed all power rail pins (W/X/Y/Z rows) and decorative lines
+- Adjusted viewBox to `"0 33 292.41 120"` — tight crop around rows J→A
+- 300 main grid pins (30 cols × 10 rows)
+
+**2. Breadboard Coordinate System** — `breadboard-data.js`
+- Generates 300 hole coordinates in parent SVG space
+- Accounts for cropped viewBox offset (viewBox_y: 33)
+- Provides `getHoleById()`, `parseBusReference()`, `getHolesForBusReference()`
+
+**3. Placement Registry** — `breadboard-placements.json`
+- Deterministic mapping: component form factor → breadboard slot positions
+- Type normalization: `led-red-5mm` / `led-green-5mm` → `led-5mm`
+- Each slot includes `supportPlacements` for resistors in electrically correct buses
+- Component types: LED (3 slots), Button (2 slots), Photocell (2 slots), US-100 (1 slot), TB6612 (1 slot)
+- Positions are user-configurable via drag-and-drop (see below)
+
+**4. BreadboardPlacementSystem** — `breadboard-placement.js`
+- Replaces `AbstractLayoutSystem` for breadboard view
+- `assignPlacements(functionalGroups)` → allocates slots per component type
+- Resolves hole IDs to SVG coordinates via `getHoleById()`
+- Tracks slot allocation for multiple instances
+
+**5. Interactive Graphics Test with Drag-and-Drop** — `explorer-app.js`
+- Per-component toggle buttons: Holes, LED, Button, Photocell, US-100, TB6612
+- LED shows all 3 slots, Button shows both slots — each independently draggable
+- **Drag-and-drop positioning system**:
+  - Components snap to breadboard hole grid during drag
+  - Ghost (faded copy) stays at original position for reference
+  - Green target hole highlights show where pins will land
+  - Functional group moves as a unit (component + its resistor)
+  - Relative pin layout preserved (e.g., resistor always 2 cols from cathode)
+  - On drop, in-memory placement registry is updated
+- **Copy Positions** button: exports current placements as JSON to clipboard
+- Show All / Clear All for bulk control
+
+**6. CSS Updates** — `styles/circuit-explorer.css`
+- Graphics test panel styling
+- Active toggle button state (`.gtest-on`)
+- Drag-and-drop: ghost opacity, target hole highlights, grab cursor
+
+**Architecture Decision**: Placement registry (breadboard-placements.json) is separate from component metadata (component JSON files). This is a view-layer concern — "where it GOES" vs "what it IS". The drag-and-drop system modifies the registry in-memory and can export to clipboard for saving.
+
+**Files created**: `Half_breadboard_nopwr.svg`, `breadboard-data.js`, `breadboard-placements.json`, `breadboard-placement.js`
+**Files modified**: `explorer-app.js`, `circuit-explorer.html`, `styles/circuit-explorer.css`
+
+**Current Placement Positions** (as of March 15, set via drag-and-drop):
+- LEDs: slots at row E (bottom section), columns 2-3, 6-7, 10-11
+- Buttons: slots at row J (top section), columns 1-2, 6-7
+- Photocell: slot 0 at row J, columns 10-11
+- US-100: columns 25-29, row J
+- TB6612: rows G/C (straddles gap), columns 15-23
 
 ---
 

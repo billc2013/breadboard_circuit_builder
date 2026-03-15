@@ -1,0 +1,167 @@
+{
+  "_description": "Breadboard placement registry — exported from graphics test drag-and-drop",
+  "typeNormalization": {
+    "led-red-5mm": "led-5mm",
+    "led-green-5mm": "led-5mm",
+    "led-yellow-5mm": "led-5mm",
+    "led-blue-5mm": "led-5mm",
+    "led-white-5mm": "led-5mm",
+    "resistor-220": "resistor",
+    "resistor-10k": "resistor",
+    "resistor-220-raw": "resistor"
+  },
+  "placements": {
+    "led-5mm": {
+      "description": "5mm LED: anode and cathode in adjacent columns, row J. Resistor horizontal in row I, one pin in cathode's bus.",
+      "pinCount": 2,
+      "slots": [
+        {
+          "slot": 0,
+          "placement": {
+            "anode": "2E",
+            "cathode": "3E"
+          },
+          "supportPlacements": {
+            "resistor": {
+              "pin0": "3D",
+              "pin1": "1D"
+            }
+          }
+        },
+        {
+          "slot": 1,
+          "placement": {
+            "anode": "6E",
+            "cathode": "7E"
+          },
+          "supportPlacements": {
+            "resistor": {
+              "pin0": "7D",
+              "pin1": "5D"
+            }
+          }
+        },
+        {
+          "slot": 2,
+          "placement": {
+            "anode": "10E",
+            "cathode": "11E"
+          },
+          "supportPlacements": {
+            "resistor": {
+              "pin0": "11D",
+              "pin1": "9D"
+            }
+          }
+        }
+      ]
+    },
+    "button-tactile-6mm": {
+      "description": "Tactile button: legs in adjacent columns, row J. Pull-down resistor horizontal in row I, one pin in leg1's bus.",
+      "pinCount": 2,
+      "slots": [
+        {
+          "slot": 0,
+          "placement": {
+            "leg0": "1J",
+            "leg1": "2J"
+          },
+          "supportPlacements": {
+            "resistor": {
+              "pin0": "2I",
+              "pin1": "4I"
+            }
+          }
+        },
+        {
+          "slot": 1,
+          "placement": {
+            "leg0": "6J",
+            "leg1": "7J"
+          },
+          "supportPlacements": {
+            "resistor": {
+              "pin0": "7I",
+              "pin1": "9I"
+            }
+          }
+        }
+      ]
+    },
+    "photocell-ldr": {
+      "description": "Photocell: pins in adjacent columns, row J. Voltage divider resistor horizontal in row I, one pin in pin1's bus.",
+      "pinCount": 2,
+      "slots": [
+        {
+          "slot": 0,
+          "placement": {
+            "pin0": "10J",
+            "pin1": "11J"
+          },
+          "supportPlacements": {
+            "resistor": {
+              "pin0": "11I",
+              "pin1": "13I"
+            }
+          }
+        },
+        {
+          "slot": 1,
+          "placement": {
+            "pin0": "26J",
+            "pin1": "27J"
+          },
+          "supportPlacements": {
+            "resistor": {
+              "pin0": "27I",
+              "pin1": "29I"
+            }
+          }
+        }
+      ]
+    },
+    "us100-ultrasonic": {
+      "description": "US-100 ultrasonic sensor: 5 pins spanning consecutive columns, row J.",
+      "pinCount": 5,
+      "slots": [
+        {
+          "slot": 0,
+          "placement": {
+            "vcc": "25J",
+            "trig": "26J",
+            "echo": "27J",
+            "gnd": "28J",
+            "gnd2": "29J"
+          },
+          "supportPlacements": {}
+        }
+      ]
+    },
+    "tb6612-motor-driver": {
+      "description": "TB6612 motor driver: control pins spanning columns on the right side, row J. Motor output pins in row A.",
+      "pinCount": 14,
+      "slots": [
+        {
+          "slot": 0,
+          "placement": {
+            "vm": "15G",
+            "vcc": "16G",
+            "gnd": "17G",
+            "stby": "18G",
+            "ain1": "19G",
+            "ain2": "20G",
+            "pwma": "21G",
+            "bin1": "19C",
+            "bin2": "20C",
+            "pwmb": "21C",
+            "motora1": "15C",
+            "motora2": "16C",
+            "motorb1": "22C",
+            "motorb2": "23C"
+          },
+          "supportPlacements": {}
+        }
+      ]
+    }
+  }
+}
