@@ -53,7 +53,7 @@ class BreadboardPlacementSystem {
      * @param {Array} functionalGroups - Groups from buildFunctionalGroupsFromParser()
      * @returns {Map} componentId → { placement, position, formFactor, slot }
      */
-    assignPlacements(functionalGroups) {
+    assignPlacements(functionalGroups, componentMetadata) {
         this.clear();
 
         if (!this.loaded || !this.placements) {
@@ -62,11 +62,6 @@ class BreadboardPlacementSystem {
         }
 
         for (const group of functionalGroups) {
-            const primaryId = group.primaryComponent;
-            const primaryType = group.primaryMetadata?.component?.metadata?.id
-                || group.primaryMetadata?.id
-                || primaryId.replace(/-\d+$/, '');
-
             // Get the actual component type from the group's metadata
             const componentType = this._getComponentType(group);
             const formFactor = this.normalizeType(componentType);
@@ -88,11 +83,11 @@ class BreadboardPlacementSystem {
             const slotDef = placementDef.slots[slotIndex];
 
             // Assign primary component
-            this._assignComponent(primaryId, slotDef.placement, formFactor, slotIndex);
+            this._assignComponent(group.primaryComponent, slotDef.placement, formFactor, slotIndex);
 
             // Assign support components (resistors, etc.)
             for (const supportId of (group.supportComponents || [])) {
-                const supportType = this._getSupportType(supportId, group);
+                const supportType = this._getSupportType(supportId, componentMetadata);
                 const supportFormFactor = this.normalizeType(supportType);
 
                 if (slotDef.supportPlacements && slotDef.supportPlacements[supportFormFactor]) {
@@ -149,10 +144,12 @@ class BreadboardPlacementSystem {
      * Extract component type from a functional group
      */
     _getComponentType(group) {
-        // Try metadata paths
-        if (group.primaryMetadata?.component?.metadata?.id) {
-            return group.primaryMetadata.component.metadata.id;
+        // Try metadata paths — primaryMetadata is the component object from library JSON
+        // Structure: { metadata: { id: "led-red-5mm" }, functionalGroup: {...}, ... }
+        if (group.primaryMetadata?.metadata?.id) {
+            return group.primaryMetadata.metadata.id;
         }
+        // Graphics test groups use a flat { id: "led-red-5mm" } shorthand
         if (group.primaryMetadata?.id) {
             return group.primaryMetadata.id;
         }
@@ -162,9 +159,16 @@ class BreadboardPlacementSystem {
 
     /**
      * Extract support component type from its ID
+     * @param {string} supportId - e.g., "led-resistor" or "resistor-220-0"
+     * @param {Map} [componentMetadata] - Optional metadata map for type lookup
      */
-    _getSupportType(supportId, group) {
-        // Strip instance suffix
+    _getSupportType(supportId, componentMetadata) {
+        // Try componentMetadata first (has the actual type, e.g., "resistor-220")
+        if (componentMetadata?.get) {
+            const compData = componentMetadata.get(supportId);
+            if (compData?.type) return compData.type;
+        }
+        // Fallback: strip instance suffix (works for graphics test IDs like "resistor-220-0")
         return supportId.replace(/-\d+$/, '');
     }
 

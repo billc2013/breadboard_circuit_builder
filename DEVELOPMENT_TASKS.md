@@ -2,9 +2,56 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: March 15, 2026
-**Current Phase**: parse_to_breadboard Branch — Physical Breadboard Component Placement
+**Last Updated**: March 16, 2026
+**Current Phase**: parse_to_breadboard Branch — Physical Breadboard Rendering Pipeline
 **Branch**: `parse_to_breadboard` (created from `explorer-only`)
+
+---
+
+## Recently Completed (March 16, 2026 Session)
+
+### ✅ Phase 3: Rendering Pipeline — MicroPython → Breadboard Visualization
+**Completed**: March 16, 2026
+
+**Goal**: Wire up the full pipeline so that pasting MicroPython code renders components on the physical breadboard with Bezier curve wires from Pico pins.
+
+**What was delivered**:
+
+**1. BreadboardRenderer class** — `breadboard-renderer.js`
+- `renderComponents()` — places `<image>` SVGs at breadboard hole positions (0.5x scale)
+- `renderWires()` — Bezier curves from Pico pins to component pins on breadboard
+  - Wire endpoint resolution chain: direct pin match → wireLabels pinConnection → support component external pin
+  - Support component "external pin" detection: finds the resistor pin NOT sharing a bus column with the primary component
+- `renderGroupHighlights()` — subtle highlight rectangles around each group's breadboard region
+  - Populates `groupBoundaries` Map for interaction compatibility
+
+**2. Pipeline integration** — `explorer-app.js`
+- `_renderOnBreadboard()` — new method replacing abstract layout pipeline
+  - `placementSystem.assignPlacements()` → `bbRenderer.renderGroupHighlights()` → `renderComponents()` → `renderWires()`
+  - Breadboard fully visible (no fade overlay)
+- `_renderAbstract()` — fallback when breadboard system unavailable
+- `BreadboardPlacementSystem` and `BreadboardRenderer` initialized in `init()`
+- Passes `componentMetadata` through to placement system for support type resolution
+
+**3. Bug fixes during integration**
+- Fixed `_getComponentType()` metadata path: `primaryMetadata.metadata.id` (was checking wrong nesting)
+- Fixed `_getSupportType()` to use `componentMetadata` Map for LLM parser output (variable-name IDs like `"led-resistor"` instead of standardized `"resistor-220-0"`)
+- Removed dead `llmResponse.js` script tag (file was archived, causing 404)
+
+**Test Results**:
+- LED blink (1 group, 2 components, 2 wires): ✓ — LED + resistor at correct breadboard holes
+- Wall-follower (3 groups, 4 components, 15 wires): ✓ — US-100 + TB6612 + LED all rendered with correct wire routing
+- Group click highlighting: ✓ — activates group wires + Pico pins
+- Wire tooltips: ✓ — educational content displays on click
+
+**Known issues for future phases**:
+- TB6612 motor driver breadboard layout needs revisiting (pin positions, DIP package representation)
+- Dense circuits (15+ wires) are visually complex — cognitive load reduction needed
+- Header shows duplicate component name for support components (display name resolution)
+- Wire count display ("Wires: 0") still doesn't update
+
+**Files created**: `breadboard-renderer.js`
+**Files modified**: `explorer-app.js`, `breadboard-placement.js`, `circuit-explorer.html`
 
 ---
 

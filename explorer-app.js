@@ -74,16 +74,31 @@ class ExplorerApp {
         // Get the group boundaries layer
         this.groupBoundariesLayer = document.getElementById('group-boundaries-layer');
 
-        // Initialize abstract layout system
+        // Initialize abstract layout system (fallback)
         if (typeof AbstractLayoutSystem !== 'undefined') {
             this.abstractLayout = new AbstractLayoutSystem({
                 canvasWidth: 400,
                 canvasHeight: 200,
                 picoAreaWidth: 85
             });
-            console.log('[Explorer] Abstract layout system initialized');
-        } else {
-            console.warn('[Explorer] AbstractLayoutSystem not loaded');
+        }
+
+        // Initialize breadboard placement system + renderer (Phase 3)
+        if (typeof BreadboardPlacementSystem !== 'undefined') {
+            this.placementSystem = new BreadboardPlacementSystem();
+            await this.placementSystem.load();
+            console.log('[Explorer] Breadboard placement system initialized');
+        }
+
+        if (typeof BreadboardRenderer !== 'undefined') {
+            this.bbRenderer = new BreadboardRenderer({
+                componentsLayer: this.componentsLayer,
+                wiresLayer: this.wiresLayer,
+                groupBoundariesLayer: this.groupBoundariesLayer,
+                wireLabelsLayer: this.wireLabelsLayer,
+                picoPins: this.picoPins
+            });
+            console.log('[Explorer] Breadboard renderer initialized');
         }
 
         this.renderPicoPins();
@@ -1630,7 +1645,61 @@ class ExplorerApp {
     }
 
 
-        /**
+    // ==================== Rendering Pipelines ====================
+
+    /**
+     * Breadboard rendering pipeline (Phase 3)
+     * Places components at breadboard holes, draws Bezier wires from Pico pins
+     */
+    _renderOnBreadboard(circuitData, componentMetadata) {
+        console.log('[Explorer] Rendering on physical breadboard');
+
+        // Assign placements (pass componentMetadata for support type resolution)
+        this.placementSystem.clear();
+        this.placementSystem.assignPlacements(this.functionalGroups, componentMetadata);
+
+        // Remove breadboard fade — breadboard is fully visible
+        this.removeBreadboardFade();
+
+        // Render group highlight regions
+        this.clearGroupBoundaries();
+        const groupBounds = this.bbRenderer.renderGroupHighlights(this.functionalGroups, this.placementSystem);
+        for (const [groupId, boundary] of groupBounds) {
+            this.groupBoundaries.set(groupId, boundary);
+        }
+
+        // Render components
+        const positions = this.bbRenderer.renderComponents(this.functionalGroups, componentMetadata, this.placementSystem);
+        for (const [compId, pos] of positions) {
+            this.componentPositions.set(compId, pos);
+        }
+
+        // Render wires
+        this.wireToGroup = this.bbRenderer.renderWires(
+            circuitData.circuit.wires,
+            this.functionalGroups,
+            componentMetadata,
+            this.placementSystem
+        );
+    }
+
+    /**
+     * Abstract layout rendering pipeline (fallback when breadboard system unavailable)
+     */
+    _renderAbstract(circuitData, componentMetadata) {
+        console.log('[Explorer] Rendering with abstract layout (fallback)');
+
+        if (!this.abstractLayout) {
+            this.abstractLayout = new AbstractLayoutSystem();
+        }
+        this.abstractLayout.calculateSlots(this.functionalGroups);
+        this.renderGroupBoundariesAbstract();
+        this.renderMicroPythonComponents(componentMetadata);
+        this.renderMicroPythonWires(circuitData.circuit.wires);
+        this.applyBreadboardFade();
+    }
+
+    /**
      * Load circuit from MicroPython code
      * @param {string} micropythonCode - Annotated MicroPython code
      * @returns {Promise<{success: boolean, errors: array, warnings: array, components?: number, wires?: number}>}
@@ -1692,23 +1761,12 @@ class ExplorerApp {
             // 2. Build functional groups from parser output
             this.buildFunctionalGroupsFromParser(parseResult.circuitData, componentMetadata);
 
-            // 3. Initialize abstract layout and calculate slots
-            if (!this.abstractLayout) {
-                this.abstractLayout = new AbstractLayoutSystem();
+            // 3-7. Render on breadboard (Phase 3) or fall back to abstract layout
+            if (this.bbRenderer && this.placementSystem?.loaded) {
+                this._renderOnBreadboard(parseResult.circuitData, componentMetadata);
+            } else {
+                this._renderAbstract(parseResult.circuitData, componentMetadata);
             }
-            this.abstractLayout.calculateSlots(this.functionalGroups);
-
-            // 4. Render group boundaries
-            this.renderGroupBoundariesAbstract();
-
-            // 5. Render components at abstract positions
-            this.renderMicroPythonComponents(componentMetadata);
-
-            // 6. Render wires from Pico to functional groups
-            this.renderMicroPythonWires(parseResult.circuitData.circuit.wires);
-
-            // 7. Apply breadboard fade for abstract view
-            this.applyBreadboardFade();
 
             // 8. Enable interactions
             this.enableGroupInteraction();
