@@ -10,10 +10,24 @@
     "resistor-10k": "resistor",
     "resistor-220-raw": "resistor"
   },
+  "supportRendering": {
+    "resistor": {
+      "offsetX": 0,
+      "offsetY": 0,
+      "scale": 0.5,
+      "rotation": 0
+    }
+  },
   "placements": {
     "led-5mm": {
       "description": "5mm LED: anode and cathode in adjacent columns, row J. Resistor horizontal in row I, one pin in cathode's bus.",
       "pinCount": 2,
+      "rendering": {
+        "offsetX": 0,
+        "offsetY": 0,
+        "scale": 0.5,
+        "rotation": 0
+      },
       "slots": [
         {
           "slot": 0,
@@ -59,6 +73,12 @@
     "button-tactile-6mm": {
       "description": "Tactile button: legs in adjacent columns, row J. Pull-down resistor horizontal in row I, one pin in leg1's bus.",
       "pinCount": 2,
+      "rendering": {
+        "offsetX": 0,
+        "offsetY": 0,
+        "scale": 0.5,
+        "rotation": 0
+      },
       "slots": [
         {
           "slot": 0,
@@ -91,6 +111,12 @@
     "photocell-ldr": {
       "description": "Photocell: pins in adjacent columns, row J. Voltage divider resistor horizontal in row I, one pin in pin1's bus.",
       "pinCount": 2,
+      "rendering": {
+        "offsetX": 0,
+        "offsetY": 0,
+        "scale": 0.5,
+        "rotation": 0
+      },
       "slots": [
         {
           "slot": 0,
@@ -123,6 +149,12 @@
     "us100-ultrasonic": {
       "description": "US-100 ultrasonic sensor: 5 pins spanning consecutive columns, row J.",
       "pinCount": 5,
+      "rendering": {
+        "offsetX": 0,
+        "offsetY": 0,
+        "scale": 0.5,
+        "rotation": 0
+      },
       "slots": [
         {
           "slot": 0,
@@ -140,24 +172,32 @@
     "tb6612-motor-driver": {
       "description": "TB6612 motor driver: control pins spanning columns on the right side, row J. Motor output pins in row A.",
       "pinCount": 14,
+      "rendering": {
+        "offsetX": 0,
+        "offsetY": 4.5,
+        "scale": 1.2500000000000007,
+        "rotation": 90
+      },
       "slots": [
         {
           "slot": 0,
           "placement": {
-            "vm": "15G",
-            "vcc": "16G",
-            "gnd": "17G",
+            "pwma": "15G",
+            "ain2": "16G",
+            "ain1": "17G",
             "stby": "18G",
-            "ain1": "19G",
-            "ain2": "20G",
-            "pwma": "21G",
-            "bin1": "19C",
-            "bin2": "20C",
-            "pwmb": "21C",
-            "motora1": "15C",
-            "motora2": "16C",
-            "motorb1": "22C",
-            "motorb2": "23C"
+            "bin1": "19G",
+            "bin2": "20G",
+            "pwmb": "21G",
+            "gnd": "22G",
+            "vcc": "23G",
+            "vm": "24G",
+            "motora1": "17C",
+            "motora2": "18C",
+            "gnd2": "19C",
+            "gnd3": "20C",
+            "motorb1": "21C",
+            "motorb2": "22C"
           },
           "supportPlacements": {}
         }

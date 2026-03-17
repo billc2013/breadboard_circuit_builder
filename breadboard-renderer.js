@@ -47,7 +47,9 @@ class BreadboardRenderer {
                     continue;
                 }
 
-                const scale = 0.5;
+                // Get per-formFactor rendering transforms
+                const transforms = placementSystem.getRenderingTransforms(placement.formFactor);
+                const scale = transforms.scale;
                 const renderWidth = rendering.width * scale;
                 const renderHeight = rendering.height * scale;
 
@@ -57,20 +59,27 @@ class BreadboardRenderer {
                 g.setAttribute('data-component-type', compData.type);
                 g.setAttribute('data-group-id', group.id);
 
+                const cx = placement.centerX + transforms.offsetX;
+                const cy = placement.centerY + transforms.offsetY;
+
                 const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
                 img.setAttribute('href', rendering.svg);
                 img.setAttribute('width', renderWidth);
                 img.setAttribute('height', renderHeight);
-                img.setAttribute('x', placement.centerX - renderWidth / 2);
-                img.setAttribute('y', placement.centerY - renderHeight / 2);
+                img.setAttribute('x', cx - renderWidth / 2);
+                img.setAttribute('y', cy - renderHeight / 2);
                 img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                // Apply rotation to the image only, not the group container
+                if (transforms.rotation % 360 !== 0) {
+                    img.setAttribute('transform', `rotate(${transforms.rotation}, ${cx}, ${cy})`);
+                }
                 g.appendChild(img);
 
                 groupG.appendChild(g);
 
                 componentPositions.set(compId, {
-                    centerX: placement.centerX,
-                    centerY: placement.centerY,
+                    centerX: cx,
+                    centerY: cy,
                     width: renderWidth,
                     height: renderHeight,
                     pinPositions: placement.pinPositions,

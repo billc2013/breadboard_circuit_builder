@@ -9,6 +9,7 @@
 1. **README.md** - Project overview, features, architecture
 2. **DEVELOPMENT_TASKS.md** - Current work, priorities, completed features
 3. **~/.claude/plans/*.md** - Active plan files for in-progress work
+4. **~/.claude/projects/-Users-williamchurch-Documents-CRCS-Tufts-Lily-Bot-2025-breadboard-circuit-builder/memory*.md** - Related memory files
 4. **components/library.json** - Component registry (the "One Truth" index)
 
 ### Key Directories
@@ -60,18 +61,20 @@ grep -n "renderMicroPython" explorer-app.js
 
 ---
 
-## Branch Context: `explorer-only`
+## Branch Context: `parse_to_breadboard`
 
-This branch was created March 2026 from `Pin_and_component`. It strips the codebase to just the MicroPython → Circuit Explorer workflow:
+This branch merges the LLM-based MicroPython parsing (from `explorer-only`) with physical breadboard component placement. Components are placed at specific breadboard holes instead of abstract boxes.
 
-- **Removed**: JSON circuit loading, guided wiring, physical layout, CircuitLoader, CircuitsManager, breadboard-data.js
-- **Archived**: 17 files in `archive/guided-wiring/` with restoration instructions
-- **Trimmed**: `explorer-app.js` from 3,401 → ~1,485 lines (56% reduction)
-- **6 scripts loaded**: `config.js`, `pico-geometry.js`, `abstract-layout.js`, `micropython-parser.js`, `llm-micropython-parser.js`, `llmResponse.js`, `explorer-app.js`
-- **LLM parser added** (March 12, 2026): Replaces regex extraction with LLM call via Modal serverless endpoint. No comment annotations needed.
+- **Phases 1-3 complete**: Cropped breadboard SVG, coordinate system, placement registry, `BreadboardPlacementSystem`, `BreadboardRenderer`, full rendering pipeline
+- **Graphics test panel**: Toggle components on/off, drag-and-drop to reposition, fine-tune with keyboard controls
+- **Fine-tune controls**: Click a component to select → arrow keys (nudge 0.5px), +/- (scale ±0.05), R (rotate SVG 90°), Esc (deselect). Rotation applies to the SVG image only, not pin/hole positions.
+- **Rendering transforms**: Per-formFactor `rendering` block in `breadboard-placements.json` (offsetX, offsetY, scale, rotation). Support components use `supportRendering` section.
+- **Copy Positions**: Exports all placements + rendering transforms to clipboard as JSON
+- **9 scripts loaded**: `config.js`, `pico-geometry.js`, `breadboard-data.js`, `breadboard-placement.js`, `breadboard-renderer.js`, `abstract-layout.js`, `micropython-parser.js`, `llm-micropython-parser.js`, `llmResponse.js`, `explorer-app.js`
 
-### Restoration
+### Prior branch: `explorer-only`
 
+Created March 2026 from `Pin_and_component`. Stripped to MicroPython → Circuit Explorer workflow. LLM parser added March 12, 2026.
 To restore guided wiring files: `git checkout Pin_and_component -- <filename>`
 See `archive/guided-wiring/README.md` for the full file list.
 
@@ -199,9 +202,10 @@ Wires Array
 Circuit Data Structure
     ↓ loadFromLLMCall() in explorer-app.js
     ↓ buildFunctionalGroupsFromParser()
-    ↓ abstractLayout.calculateSlots()
-    ↓ renderMicroPythonComponents()
-    ↓ renderMicroPythonWires()
+    ↓ placementSystem.assignPlacements() — hole-based positioning
+    ↓ bbRenderer.renderComponents() — SVG images with rendering transforms
+    ↓ bbRenderer.renderWires() — Bezier curves from Pico pins
+    ↓ bbRenderer.renderGroupHighlights() — bounding boxes
 Visual Output
 ```
 
@@ -211,16 +215,30 @@ Still loaded as a dependency — LLMParser delegates to its pipeline methods.
 Can be used directly via `loadFromMicroPython()` if LLM is unavailable.
 Requires `# component-type` inline comment annotations.
 
-### Abstract Layout System
+### Breadboard Placement & Rendering
 
 ```
-Functional Groups
-    ↓ categorize by functionalGroup.category
-Sensors (top) | Outputs (bottom)
-    ↓ calculateRegionSlots()
-Slot positions with bounds, wireEntry points
-    ↓ getAbstractPosition()
-Component positions within slots
+BreadboardPlacementSystem (breadboard-placement.js)
+    ↓ assignPlacements() — maps components to breadboard holes via slots
+    ↓ getRenderingTransforms(formFactor) — offsetX, offsetY, scale, rotation
+BreadboardRenderer (breadboard-renderer.js)
+    ↓ renderComponents() — <image> SVGs with per-formFactor transforms
+    ↓ renderWires() — Bezier curves from Pico pins to component pins
+    ↓ renderGroupHighlights() — bounding boxes around functional groups
+```
+
+### Graphics Test Fine-Tune System
+
+```
+Click component → _gtestSelect(componentId, formFactor)
+    ↓ Yellow dashed selection outline
+    ↓ Fine-tune panel shows current transforms
+Keyboard → _gtestHandleKey()
+    ↓ Arrows: offsetX/Y ±0.5px
+    ↓ +/-: scale ±0.05
+    ↓ R: rotation +90° (SVG image only, not pin positions)
+    ↓ setRenderingTransforms() → _gtestRedraw()
+Copy Positions → exports placements + rendering transforms to clipboard
 ```
 
 ---
@@ -314,6 +332,8 @@ The "Wires: 0" counter in the bottom-left does not update when loading via Micro
 | Modal serverless endpoint | Duncan's endpoint handles OpenAI API key and structured outputs server-side |
 | config.js for endpoint URL | Plain `<script>` pattern — no build tools needed; gitignored for safety |
 | Prefix-match for ADC pins | Gracefully handles GP26 vs GP26_ADC0 naming across parser and geometry |
+| Rendering transforms per formFactor | offsetX/Y, scale, rotation stored in `breadboard-placements.json` — visual tuning separate from electrical pin-to-hole mapping |
+| Rotation on SVG image only | R key rotates the component image, not pin markers or hole positions — keeps electrical model intact |
 
 ---
 

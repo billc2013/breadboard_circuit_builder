@@ -1163,3 +1163,20 @@
     pointer-events: none;
     font-family: 'Monaco', 'Menlo', monospace;
 }
+
+#gtest-finetune kbd {
+    display: inline-block;
+    padding: 1px 4px;
+    font-size: 10px;
+    font-family: 'Monaco', 'Menlo', monospace;
+    color: #ddd;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 3px;
+    min-width: 14px;
+    text-align: center;
+}
+
+.gtest-selection-rect {
+    pointer-events: none;
+}

@@ -1148,6 +1148,16 @@ class ExplorerApp {
 
         const copyBtn = document.getElementById('gtest-copy-btn');
         copyBtn?.addEventListener('click', () => this._gtestExportPlacements());
+
+        // Keyboard listener for fine-tune controls
+        document.addEventListener('keydown', (e) => this._gtestHandleKey(e));
+
+        // Click on SVG background to deselect
+        this.svg?.addEventListener('click', (e) => {
+            if (e.target === this.svg || e.target.tagName === 'image' && e.target.closest('#breadboard-image')) {
+                this._gtestDeselect();
+            }
+        });
     }
 
     async _gtestEnsurePlacementSystem() {
@@ -1224,6 +1234,12 @@ class ExplorerApp {
                 const svgInfo = allSvgMaps[componentType];
                 if (!svgInfo) continue;
                 this._gtestRenderComponent(componentId, placement, svgInfo, groupG);
+
+                // Store formFactor on the component element for click-to-select
+                const compG = groupG.querySelector(`[data-component-id="${componentId}"]`);
+                if (compG) {
+                    compG.dataset.formFactor = placement.formFactor;
+                }
             }
 
             this.componentsLayer.appendChild(groupG);
@@ -1247,9 +1263,15 @@ class ExplorerApp {
      * Render a single component into a parent SVG group
      */
     _gtestRenderComponent(componentId, placement, svgInfo, parentElement) {
-        const scale = 0.5;
+        // Get per-formFactor rendering transforms
+        const ps = this._gtestPlacementSystem;
+        const transforms = ps ? ps.getRenderingTransforms(placement.formFactor) : { offsetX: 0, offsetY: 0, scale: 0.5, rotation: 0 };
+        const scale = transforms.scale;
         const renderWidth = svgInfo.width * scale;
         const renderHeight = svgInfo.height * scale;
+
+        const cx = placement.centerX + transforms.offsetX;
+        const cy = placement.centerY + transforms.offsetY;
 
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.setAttribute('class', 'component test-component');
@@ -1260,15 +1282,19 @@ class ExplorerApp {
         img.setAttribute('href', svgInfo.svg);
         img.setAttribute('width', renderWidth);
         img.setAttribute('height', renderHeight);
-        img.setAttribute('x', placement.centerX - renderWidth / 2);
-        img.setAttribute('y', placement.centerY - renderHeight / 2);
+        img.setAttribute('x', cx - renderWidth / 2);
+        img.setAttribute('y', cy - renderHeight / 2);
         img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        // Apply rotation to the image only, not pin markers or labels
+        if (transforms.rotation % 360 !== 0) {
+            img.setAttribute('transform', `rotate(${transforms.rotation}, ${cx}, ${cy})`);
+        }
         g.appendChild(img);
 
         // Label below
         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        label.setAttribute('x', placement.centerX);
-        label.setAttribute('y', placement.centerY + renderHeight / 2 + 5);
+        label.setAttribute('x', cx);
+        label.setAttribute('y', cy + renderHeight / 2 + 5);
         label.setAttribute('text-anchor', 'middle');
         label.setAttribute('fill', '#00ccff');
         label.setAttribute('font-size', '4');
@@ -1473,7 +1499,9 @@ class ExplorerApp {
             startSvgX: svgPt.x,
             startSvgY: svgPt.y,
             lastSnapHoleId: anchorPinPos.holeId,
-            originalAnchorHoleId: anchorPinPos.holeId
+            originalAnchorHoleId: anchorPinPos.holeId,
+            hasMoved: false,
+            mousedownTarget: e.target
         };
 
         // Bind SVG-level handlers
@@ -1505,6 +1533,7 @@ class ExplorerApp {
         if (!nearestHole || nearestHole.id === this._dragState.lastSnapHoleId) return;
 
         this._dragState.lastSnapHoleId = nearestHole.id;
+        this._dragState.hasMoved = true;
 
         // Snap: translate group so anchor pin lands on this hole
         const snapDx = nearestHole.x - anchorOrigX;
@@ -1517,7 +1546,7 @@ class ExplorerApp {
         this._gtestRenderTargetHoles(targetHoles);
     }
 
-    /** Handle drag end — finalize position */
+    /** Handle drag end — finalize position or select for fine-tuning */
     _gtestOnDragEnd(e) {
         if (!this._dragState) return;
 
@@ -1526,7 +1555,27 @@ class ExplorerApp {
         this.svg.removeEventListener('mouseup', this._boundDragEnd);
         this.svg.removeEventListener('mouseleave', this._boundDragEnd);
 
-        const { relLayout, lastSnapHoleId, originalAnchorHoleId } = this._dragState;
+        const { relLayout, lastSnapHoleId, originalAnchorHoleId, hasMoved, mousedownTarget } = this._dragState;
+
+        if (!hasMoved) {
+            // No movement — treat as click-to-select for fine-tuning
+            // Find which component was clicked
+            const compEl = mousedownTarget?.closest('[data-component-id]');
+            if (compEl) {
+                const componentId = compEl.dataset.componentId;
+                const formFactor = compEl.dataset.formFactor;
+                if (componentId && formFactor) {
+                    // Clean up drag visuals first
+                    if (this._dragState.ghost) this._dragState.ghost.remove();
+                    if (this._dragState.highlightGroup) this._dragState.highlightGroup.remove();
+                    this._dragState = null;
+                    this._gtestRedraw().then(() => {
+                        this._gtestSelect(componentId, formFactor);
+                    });
+                    return;
+                }
+            }
+        }
 
         // Compute final positions
         const anchorParsed = this._gtestParseHoleId(lastSnapHoleId);
@@ -1612,6 +1661,139 @@ class ExplorerApp {
         console.log(`[GraphicsTest] Registry updated: ${formFactor} slot ${primaryPlacement.slotIndex}`, newPrimary, newSupport);
     }
 
+    // ==================== Fine-Tune Selection & Keyboard Controls ====================
+
+    /**
+     * Select a component for fine-tuning (click handler for graphics test)
+     * @param {string} componentId - e.g., "led-red-5mm-0"
+     * @param {string} formFactor - normalized form factor key
+     */
+    _gtestSelect(componentId, formFactor) {
+        // Deselect previous
+        this._gtestDeselect();
+
+        this._gtestSelection = { componentId, formFactor };
+
+        // Highlight selected component with a dashed outline
+        const compG = this.componentsLayer.querySelector(`[data-component-id="${componentId}"]`);
+        if (compG) {
+            const img = compG.querySelector('image');
+            if (img) {
+                const selRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                selRect.setAttribute('x', parseFloat(img.getAttribute('x')) - 1);
+                selRect.setAttribute('y', parseFloat(img.getAttribute('y')) - 1);
+                selRect.setAttribute('width', parseFloat(img.getAttribute('width')) + 2);
+                selRect.setAttribute('height', parseFloat(img.getAttribute('height')) + 2);
+                selRect.setAttribute('fill', 'none');
+                selRect.setAttribute('stroke', '#ff0');
+                selRect.setAttribute('stroke-width', '0.8');
+                selRect.setAttribute('stroke-dasharray', '2,1');
+                selRect.setAttribute('class', 'gtest-selection-rect');
+                // Apply same transform as parent if rotated
+                const parentTransform = compG.parentElement?.getAttribute('transform');
+                if (parentTransform) selRect.setAttribute('transform', parentTransform);
+                compG.appendChild(selRect);
+            }
+        }
+
+        // Show fine-tune panel
+        const panel = document.getElementById('gtest-finetune');
+        const label = document.getElementById('gtest-selected-label');
+        if (panel) panel.style.display = 'block';
+        if (label) label.textContent = `${formFactor} (${componentId})`;
+
+        this._gtestUpdateTransformInfo();
+        console.log(`[GraphicsTest] Selected ${componentId} (${formFactor}) for fine-tuning`);
+    }
+
+    /** Deselect current fine-tune selection */
+    _gtestDeselect() {
+        this._gtestSelection = null;
+
+        // Remove selection rectangles
+        this.componentsLayer.querySelectorAll('.gtest-selection-rect').forEach(r => r.remove());
+
+        // Hide fine-tune panel
+        const panel = document.getElementById('gtest-finetune');
+        if (panel) panel.style.display = 'none';
+    }
+
+    /** Update the transform info display */
+    _gtestUpdateTransformInfo() {
+        const infoEl = document.getElementById('gtest-transform-info');
+        if (!infoEl || !this._gtestSelection) return;
+
+        const ps = this._gtestPlacementSystem;
+        const t = ps.getRenderingTransforms(this._gtestSelection.formFactor);
+        infoEl.textContent = `offset(${t.offsetX.toFixed(1)}, ${t.offsetY.toFixed(1)}) scale(${t.scale.toFixed(2)}) rot(${t.rotation}°)`;
+    }
+
+    /** Handle keyboard input for fine-tuning */
+    _gtestHandleKey(e) {
+        if (!this._gtestSelection) return;
+        // Don't capture keys when typing in text inputs
+        const tag = document.activeElement?.tagName;
+        if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+
+        const ps = this._gtestPlacementSystem;
+        const ff = this._gtestSelection.formFactor;
+        const t = ps.getRenderingTransforms(ff);
+        const NUDGE = 0.5;
+        const SCALE_STEP = 0.05;
+
+        let changed = false;
+
+        switch (e.key) {
+            case 'ArrowLeft':
+                ps.setRenderingTransforms(ff, { offsetX: t.offsetX - NUDGE });
+                changed = true;
+                break;
+            case 'ArrowRight':
+                ps.setRenderingTransforms(ff, { offsetX: t.offsetX + NUDGE });
+                changed = true;
+                break;
+            case 'ArrowUp':
+                ps.setRenderingTransforms(ff, { offsetY: t.offsetY - NUDGE });
+                changed = true;
+                break;
+            case 'ArrowDown':
+                ps.setRenderingTransforms(ff, { offsetY: t.offsetY + NUDGE });
+                changed = true;
+                break;
+            case '+':
+            case '=':
+                ps.setRenderingTransforms(ff, { scale: Math.min(t.scale + SCALE_STEP, 3.0) });
+                changed = true;
+                break;
+            case '-':
+            case '_':
+                ps.setRenderingTransforms(ff, { scale: Math.max(t.scale - SCALE_STEP, 0.05) });
+                changed = true;
+                break;
+            case 'r':
+            case 'R':
+                ps.setRenderingTransforms(ff, { rotation: (t.rotation + 90) % 360 });
+                changed = true;
+                break;
+            case 'Escape':
+                this._gtestDeselect();
+                return;
+            default:
+                return; // Don't prevent default for unhandled keys
+        }
+
+        if (changed) {
+            e.preventDefault();
+            this._gtestUpdateTransformInfo();
+            this._gtestRedraw().then(() => {
+                // Re-select after redraw so the highlight persists
+                if (this._gtestSelection) {
+                    this._gtestSelect(this._gtestSelection.componentId, this._gtestSelection.formFactor);
+                }
+            });
+        }
+    }
+
     /** Clean up any active drag state */
     _gtestClearDragState() {
         if (this._dragState) {
@@ -1631,6 +1813,7 @@ class ExplorerApp {
         const exportData = {
             _description: "Breadboard placement registry — exported from graphics test drag-and-drop",
             typeNormalization: ps.typeNormalization,
+            supportRendering: ps.supportRendering,
             placements: ps.placements
         };
         const json = JSON.stringify(exportData, null, 2);

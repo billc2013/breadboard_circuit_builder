@@ -9,6 +9,7 @@ class BreadboardPlacementSystem {
     constructor() {
         this.placements = null;          // Loaded from breadboard-placements.json
         this.typeNormalization = {};      // e.g., "led-red-5mm" → "led-5mm"
+        this.supportRendering = {};      // formFactor → { offsetX, offsetY, scale, rotation }
         this.slotAllocation = new Map();  // formFactor → next available slot index
         this.assignedPlacements = new Map(); // componentId → { placement, position, formFactor, slot }
         this.loaded = false;
@@ -23,6 +24,7 @@ class BreadboardPlacementSystem {
             const data = await response.json();
             this.placements = data.placements;
             this.typeNormalization = data.typeNormalization || {};
+            this.supportRendering = data.supportRendering || {};
             this.loaded = true;
             console.log('[BreadboardPlacement] Loaded placement registry:', Object.keys(this.placements).join(', '));
         } catch (err) {
@@ -207,6 +209,40 @@ class BreadboardPlacementSystem {
      */
     isActive() {
         return this.assignedPlacements.size > 0;
+    }
+
+    /**
+     * Get rendering transforms for a form factor (offset, scale, rotation)
+     * Checks primary placements first, then supportRendering
+     * @param {string} formFactor - normalized form factor key
+     * @returns {{offsetX: number, offsetY: number, scale: number, rotation: number}}
+     */
+    getRenderingTransforms(formFactor) {
+        const defaults = { offsetX: 0, offsetY: 0, scale: 0.5, rotation: 0 };
+        const primary = this.placements?.[formFactor]?.rendering;
+        if (primary) return { ...defaults, ...primary };
+        const support = this.supportRendering[formFactor];
+        if (support) return { ...defaults, ...support };
+        return defaults;
+    }
+
+    /**
+     * Update rendering transforms for a form factor
+     * @param {string} formFactor
+     * @param {Object} transforms - partial { offsetX, offsetY, scale, rotation }
+     */
+    setRenderingTransforms(formFactor, transforms) {
+        if (this.placements?.[formFactor]) {
+            if (!this.placements[formFactor].rendering) {
+                this.placements[formFactor].rendering = { offsetX: 0, offsetY: 0, scale: 0.5, rotation: 0 };
+            }
+            Object.assign(this.placements[formFactor].rendering, transforms);
+        } else {
+            if (!this.supportRendering[formFactor]) {
+                this.supportRendering[formFactor] = { offsetX: 0, offsetY: 0, scale: 0.5, rotation: 0 };
+            }
+            Object.assign(this.supportRendering[formFactor], transforms);
+        }
     }
 }
 
