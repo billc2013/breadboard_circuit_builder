@@ -76,79 +76,129 @@
 
             <!-- Right: Sidebar Panels -->
             <div id="sidebar-panels">
-                <!-- MicroPython Input Panel -->
-                <div id="micropython-panel" class="input-panel">
-                    <div class="panel-header">
-                        <h3>Load from MicroPython</h3>
-                        <button id="micropython-toggle-btn" class="icon-btn" title="Toggle panel">
-                            <span class="toggle-icon">−</span>
-                        </button>
-                    </div>
-                    <div class="panel-content">
-                        <div class="input-instructions">
-                            Paste MicroPython code — components are identified automatically
-                        </div>
-                        <textarea
-                            id="micropython-input"
-                            class="code-input"
-                            placeholder="from machine import Pin, PWM, ADC
-                                led = Pin(15, Pin.OUT)  # led-red-5mm
-                                button = Pin(14, Pin.IN, Pin.PULL_DOWN)  # button-tactile-6mm
-                                sensor = ADC(Pin(26))  # photocell-ldr"
-                            spellcheck="false"
-                        ></textarea>
-                        <div class="panel-actions">
-                            <button id="parse-micropython-btn" class="action-btn primary">
-                                Parse & Visualize
-                            </button>
-                            <button id="clear-micropython-btn" class="action-btn secondary">
-                                Clear
-                            </button>
-                        </div>
-                        <div id="micropython-errors" class="error-display"></div>
-                        <div id="micropython-success" class="success-display"></div>
-                    </div>
+                <div class="tab-bar">
+                    <button class="tab-btn active" data-tab="code">Code</button>
+                    <button class="tab-btn" data-tab="components">Components</button>
+                    <button class="tab-btn" data-tab="comp-wires">Comp Wires</button>
+                    <button class="tab-btn" data-tab="pico-wires">Pico Wires</button>
                 </div>
 
-                <!-- Graphics Test Panel -->
-                <div id="graphics-test-panel" class="input-panel">
-                    <div class="panel-header">
-                        <h3>Graphics Test</h3>
-                        <button id="gtest-toggle-btn" class="icon-btn" title="Toggle panel">
-                            <span class="toggle-icon">−</span>
+                <!-- Tab: Code -->
+                <div class="tab-content active" data-tab-content="code">
+                    <div class="input-instructions">
+                        Paste MicroPython code — components are identified automatically
+                    </div>
+                    <textarea
+                        id="micropython-input"
+                        class="code-input"
+                        placeholder="from machine import Pin, PWM, ADC
+                            led = Pin(15, Pin.OUT)  # led-red-5mm
+                            button = Pin(14, Pin.IN, Pin.PULL_DOWN)  # button-tactile-6mm
+                            sensor = ADC(Pin(26))  # photocell-ldr"
+                        spellcheck="false"
+                    ></textarea>
+                    <div class="panel-actions">
+                        <button id="parse-micropython-btn" class="action-btn primary">
+                            Parse & Visualize
+                        </button>
+                        <button id="clear-micropython-btn" class="action-btn secondary">
+                            Clear
                         </button>
                     </div>
-                    <div class="panel-content">
-                        <div class="input-instructions">Toggle components to test breadboard placement</div>
-                        <div id="gtest-buttons" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
-                            <button class="gtest-toggle action-btn secondary" data-gtest="debug-holes" title="Show debug hole markers">Holes</button>
-                            <button class="gtest-toggle action-btn secondary" data-gtest="led" title="LED + resistor">LED</button>
-                            <button class="gtest-toggle action-btn secondary" data-gtest="button" title="Button + resistor">Button</button>
-                            <button class="gtest-toggle action-btn secondary" data-gtest="photocell" title="Photocell + resistor">Photocell</button>
-                            <button class="gtest-toggle action-btn secondary" data-gtest="us100" title="US-100 ultrasonic sensor">US-100</button>
-                            <button class="gtest-toggle action-btn secondary" data-gtest="tb6612" title="TB6612 motor driver">TB6612</button>
-                        </div>
-                        <div style="display: flex; gap: 4px;">
-                            <button id="gtest-all-btn" class="action-btn secondary" style="flex:1">Show All</button>
-                            <button id="gtest-clear-btn" class="action-btn secondary" style="flex:1">Clear All</button>
-                        </div>
-                        <div style="display: flex; gap: 4px; margin-top: 4px;">
-                            <button id="gtest-copy-btn" class="action-btn secondary" style="flex:1" title="Copy current placements as JSON to clipboard">Copy Positions</button>
-                        </div>
-                        <div id="gtest-finetune" style="display: none; margin-top: 8px; padding: 6px; border: 1px solid #444; border-radius: 4px; background: #1a1a2e;">
-                            <div style="color: #00ccff; font-size: 11px; font-weight: bold; margin-bottom: 4px;">
-                                Fine Tune: <span id="gtest-selected-label">—</span>
-                            </div>
-                            <div style="color: #aaa; font-size: 10px; line-height: 1.6;">
-                                <kbd>&#8592;</kbd><kbd>&#8593;</kbd><kbd>&#8594;</kbd><kbd>&#8595;</kbd> nudge &nbsp;
-                                <kbd>+</kbd><kbd>-</kbd> scale &nbsp;
-                                <kbd>R</kbd> rotate 90° &nbsp;
-                                <kbd>Esc</kbd> deselect
-                            </div>
-                            <div id="gtest-transform-info" style="color: #888; font-size: 10px; margin-top: 4px; font-family: monospace;"></div>
-                        </div>
-                        <div id="gtest-status" style="color: #888; font-size: 11px; margin-top: 6px;"></div>
+                    <div id="micropython-errors" class="error-display"></div>
+                    <div id="micropython-success" class="success-display"></div>
+                </div>
+
+                <!-- Tab: Components -->
+                <div class="tab-content" data-tab-content="components">
+                    <!-- Pico Position Controls -->
+                    <div id="pico-controls" class="tab-section">
+                        <div class="section-label">Pico Position</div>
+                        <div class="control-hint">Click Pico in SVG to select, then arrow keys / +/- to adjust</div>
+                        <div id="pico-position-info" class="transform-info"></div>
                     </div>
+                    <!-- Component Graphics Test -->
+                    <div class="input-instructions">Toggle components to test breadboard placement</div>
+                    <div id="gtest-buttons" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
+                        <button class="gtest-toggle action-btn secondary" data-gtest="debug-holes" title="Show debug hole markers">Holes</button>
+                        <button class="gtest-toggle action-btn secondary" data-gtest="led" title="LED + resistor">LED</button>
+                        <button class="gtest-toggle action-btn secondary" data-gtest="button" title="Button + resistor">Button</button>
+                        <button class="gtest-toggle action-btn secondary" data-gtest="photocell" title="Photocell + resistor">Photocell</button>
+                        <button class="gtest-toggle action-btn secondary" data-gtest="us100" title="US-100 ultrasonic sensor">US-100</button>
+                        <button class="gtest-toggle action-btn secondary" data-gtest="tb6612" title="TB6612 motor driver">TB6612</button>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <button id="gtest-all-btn" class="action-btn secondary" style="flex:1">Show All</button>
+                        <button id="gtest-clear-btn" class="action-btn secondary" style="flex:1">Clear All</button>
+                    </div>
+                    <div style="display: flex; gap: 4px; margin-top: 4px;">
+                        <button id="gtest-copy-btn" class="action-btn secondary" style="flex:1" title="Copy current placements as JSON to clipboard">Copy Positions</button>
+                    </div>
+                    <div id="gtest-finetune" style="display: none; margin-top: 8px; padding: 6px; border: 1px solid #444; border-radius: 4px; background: #1a1a2e;">
+                        <div style="color: #00ccff; font-size: 11px; font-weight: bold; margin-bottom: 4px;">
+                            Fine Tune: <span id="gtest-selected-label">—</span>
+                        </div>
+                        <div style="color: #aaa; font-size: 10px; line-height: 1.6;">
+                            <kbd>&#8592;</kbd><kbd>&#8593;</kbd><kbd>&#8594;</kbd><kbd>&#8595;</kbd> nudge &nbsp;
+                            <kbd>+</kbd><kbd>-</kbd> scale &nbsp;
+                            <kbd>R</kbd> rotate 90° &nbsp;
+                            <kbd>Esc</kbd> deselect
+                        </div>
+                        <div id="gtest-transform-info" style="color: #888; font-size: 10px; margin-top: 4px; font-family: monospace;"></div>
+                    </div>
+                    <div id="gtest-status" style="color: #888; font-size: 11px; margin-top: 6px;"></div>
+                </div>
+
+                <!-- Tab: Component Wires -->
+                <div class="tab-content" data-tab-content="comp-wires">
+                    <div class="input-instructions">Select component type to preview and tune wires</div>
+                    <div id="cwire-buttons" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
+                        <button class="cwire-toggle action-btn secondary" data-cwire="led" title="LED wires">LED</button>
+                        <button class="cwire-toggle action-btn secondary" data-cwire="button" title="Button wires">Button</button>
+                        <button class="cwire-toggle action-btn secondary" data-cwire="photocell" title="Photocell wires">Photocell</button>
+                        <button class="cwire-toggle action-btn secondary" data-cwire="us100" title="US-100 wires">US-100</button>
+                        <button class="cwire-toggle action-btn secondary" data-cwire="tb6612" title="TB6612 wires">TB6612</button>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <button id="cwire-all-btn" class="action-btn secondary" style="flex:1">Show All</button>
+                        <button id="cwire-clear-btn" class="action-btn secondary" style="flex:1">Clear All</button>
+                    </div>
+                    <div id="cwire-finetune" style="display: none; margin-top: 8px; padding: 6px; border: 1px solid #444; border-radius: 4px; background: #1a1a2e;">
+                        <div style="color: #ff9900; font-size: 11px; font-weight: bold; margin-bottom: 4px;">
+                            Wire Group: <span id="cwire-selected-label">—</span>
+                        </div>
+                        <div style="color: #aaa; font-size: 10px; line-height: 1.6;">
+                            <kbd>[</kbd><kbd>]</kbd> exit angle &nbsp;
+                            <kbd>&#8592;</kbd><kbd>&#8593;</kbd><kbd>&#8594;</kbd><kbd>&#8595;</kbd> CP offset &nbsp;
+                            <kbd>B</kbd>+<kbd>&#8593;</kbd><kbd>&#8595;</kbd> brightness &nbsp;
+                            <kbd>Esc</kbd> deselect
+                        </div>
+                        <div id="cwire-transform-info" style="color: #888; font-size: 10px; margin-top: 4px; font-family: monospace;"></div>
+                    </div>
+                    <div style="display: flex; gap: 4px; margin-top: 8px;">
+                        <button id="cwire-copy-btn" class="action-btn secondary" style="flex:1" title="Copy wire rendering overrides as JSON">Copy Wire Settings</button>
+                    </div>
+                    <div id="cwire-status" style="color: #888; font-size: 11px; margin-top: 6px;"></div>
+                </div>
+
+                <!-- Tab: Pico Wires -->
+                <div class="tab-content" data-tab-content="pico-wires">
+                    <div class="input-instructions">Select a Pico pin to adjust wire entry angle and control point</div>
+                    <div id="pwire-pin-list" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
+                        <!-- Dynamically populated with active Pico pin buttons -->
+                    </div>
+                    <div id="pwire-finetune" style="display: none; margin-top: 8px; padding: 6px; border: 1px solid #444; border-radius: 4px; background: #1a1a2e;">
+                        <div style="color: #33cc33; font-size: 11px; font-weight: bold; margin-bottom: 4px;">
+                            Pin: <span id="pwire-selected-label">—</span>
+                        </div>
+                        <div style="color: #aaa; font-size: 10px; line-height: 1.6;">
+                            <kbd>[</kbd><kbd>]</kbd> entry angle &nbsp;
+                            <kbd>&#8592;</kbd><kbd>&#8593;</kbd><kbd>&#8594;</kbd><kbd>&#8595;</kbd> CP offset &nbsp;
+                            <kbd>Esc</kbd> deselect
+                        </div>
+                        <div id="pwire-transform-info" style="color: #888; font-size: 10px; margin-top: 4px; font-family: monospace;"></div>
+                    </div>
+                    <div id="pwire-status" style="color: #888; font-size: 11px; margin-top: 6px;"></div>
                 </div>
 
             </div>

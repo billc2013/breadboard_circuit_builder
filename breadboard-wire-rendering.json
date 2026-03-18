@@ -1,0 +1,5 @@
+{
+  "_description": "Wire Bezier curve rendering overrides — per component type and per Pico pin. Angles: 0°=right, 90°=down, 180°=left, 270°=up (SVG coordinate space).",
+  "componentWires": {},
+  "picoWires": {}
+}

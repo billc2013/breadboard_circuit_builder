@@ -2,9 +2,44 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: March 17, 2026
+**Last Updated**: March 18, 2026
 **Current Phase**: parse_to_breadboard Branch — Physical Breadboard Rendering Pipeline
 **Branch**: `parse_to_breadboard` (created from `explorer-only`)
+
+---
+
+## Recently Completed (March 18, 2026 Session)
+
+### ✅ Tabbed sidebar + Wire rendering controls
+**Completed**: March 18, 2026
+
+**What was delivered**:
+
+**1. Tabbed sidebar** — replaces stacked collapsible panels
+- 4 tabs: Code, Components, Comp Wires, Pico Wires
+- CSS-driven show/hide, keyboard dispatcher routes keys to active tab
+
+**2. Pico position controls** (Components tab)
+- Click Pico SVG to select (yellow dashed outline)
+- Arrow keys nudge position, +/- adjusts scale
+- `updatePicoPosition()` + `regeneratePicoPins()` in pico-geometry.js
+
+**3. Component Wires tab** — wire preview + Bezier curve tuning
+- Toggle component types to render components + mock wires to Pico
+- Click component → select wire group → keyboard fine-tune:
+  - `[`/`]`: exit angle ±10°, arrows: CP offset, B+arrows: brightness
+- "Copy Wire Settings" exports overrides to clipboard
+
+**4. Pico Wires tab** — per-pin entry angle tuning
+- Select Pico pin → `[`/`]` entry angle, arrows CP offset
+
+**5. Wire rendering override system**
+- New `breadboard-wire-rendering.json` stores per-formFactor and per-Pico-pin overrides
+- `BreadboardRenderer` loads overrides and applies angle-based Bezier control points
+- Overrides apply to both wire preview and parsed MicroPython circuits
+
+**Files modified**: `circuit-explorer.html`, `styles/circuit-explorer.css`, `explorer-app.js`, `breadboard-renderer.js`, `pico-geometry.js`
+**Files created**: `breadboard-wire-rendering.json`
 
 ---
 

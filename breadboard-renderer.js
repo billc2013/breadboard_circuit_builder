@@ -12,6 +12,25 @@ class BreadboardRenderer {
         this.groupBoundariesLayer = options.groupBoundariesLayer;
         this.wireLabelsLayer = options.wireLabelsLayer;
         this.picoPins = options.picoPins;
+        this.wireOverrides = null; // { componentWires: {}, picoWires: {} }
+    }
+
+    /** Load wire rendering overrides from JSON */
+    async loadWireOverrides() {
+        try {
+            const res = await fetch('breadboard-wire-rendering.json');
+            if (res.ok) {
+                this.wireOverrides = await res.json();
+                console.log('[BreadboardRenderer] Wire overrides loaded');
+            }
+        } catch (err) {
+            console.log('[BreadboardRenderer] No wire overrides file, using defaults');
+        }
+    }
+
+    /** Set wire overrides at runtime (from UI tuning) */
+    setWireOverrides(overrides) {
+        this.wireOverrides = overrides;
     }
 
     // ==================== Component Rendering ====================
@@ -121,20 +140,30 @@ class BreadboardRenderer {
                     continue;
                 }
 
-                const { startX, startY, endX, endY, componentCenterY } = endpoints;
+                const { startX, startY, endX, endY, componentCenterY, picoPin, formFactor } = endpoints;
 
-                // Bezier control points:
-                // - Pico end: exits horizontally (rightward toward breadboard)
-                // - Breadboard end: exits perpendicularly AWAY from component body
-                //   Component above hole (centerY < pinY) → wire exits downward (+Y)
-                //   Component below hole (centerY > pinY) → wire exits upward (-Y)
-                const gap = endX - startX;
-                const cp1x = startX + Math.abs(gap) * 0.4;
-                const cp1y = startY;
-                const perpDist = 30;
-                const awayDir = (componentCenterY <= endY) ? 1 : -1; // +1 = down, -1 = up
-                const cp2x = endX;
-                const cp2y = endY + perpDist * awayDir;
+                // --- Bezier control points with wire rendering overrides ---
+                // Angle convention: 0°=right, 90°=down, 180°=left, 270°=up (SVG coords)
+                const DEG2RAD = Math.PI / 180;
+                const gap = Math.abs(endX - startX);
+
+                // Pico end (cp1): default exits horizontally rightward (0°)
+                const picoOverride = this.wireOverrides?.picoWires?.[picoPin] || {};
+                const pAngle = (picoOverride.entryAngleDeg ?? 0) * DEG2RAD;
+                const pDist = gap * 0.4;
+                const cp1x = startX + pDist * Math.cos(pAngle) + (picoOverride.cpOffsetX ?? 0);
+                const cp1y = startY + pDist * Math.sin(pAngle) + (picoOverride.cpOffsetY ?? 0);
+
+                // Component end (cp2): default exits perpendicular away from component body
+                const compOverride = this.wireOverrides?.componentWires?.[formFactor] || {};
+                const defaultExitDeg = (componentCenterY <= endY) ? 90 : 270; // down or up
+                const cAngle = (compOverride.exitAngleDeg ?? defaultExitDeg) * DEG2RAD;
+                const cDist = 30; // base control point distance
+                const cp2x = endX + cDist * Math.cos(cAngle) + (compOverride.cpOffsetX ?? 0);
+                const cp2y = endY + cDist * Math.sin(cAngle) + (compOverride.cpOffsetY ?? 0);
+
+                // Brightness override
+                const brightness = compOverride.brightness ?? null;
 
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 path.classList.add('bundled-wire');
@@ -142,6 +171,9 @@ class BreadboardRenderer {
                 path.setAttribute('data-wire-id', wire.id);
                 path.setAttribute('data-group-id', group.id);
                 path.style.stroke = wire.color || '#ffcc00';
+                if (brightness !== null) {
+                    path.style.opacity = brightness;
+                }
 
                 const d = `M ${startX} ${startY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endX} ${endY}`;
                 path.setAttribute('d', d);
@@ -175,9 +207,9 @@ class BreadboardRenderer {
 
         // Resolve Pico pin position
         const pinName = picoEndpoint.split('.')[1];
-        const picoPin = this.picoPins.find(p => p.pinKey === pinName) ||
+        const picoPinObj = this.picoPins.find(p => p.pinKey === pinName) ||
                         this.picoPins.find(p => p.pinKey.startsWith(pinName + '_'));
-        if (!picoPin) {
+        if (!picoPinObj) {
             console.warn(`[BreadboardRenderer] Pico pin ${pinName} not found`);
             return null;
         }
@@ -193,12 +225,17 @@ class BreadboardRenderer {
         const componentId = componentEndpoint.substring(0, componentEndpoint.indexOf('.'));
         const compCenter = placementSystem.getComponentPosition(componentId);
 
+        // Get formFactor for wire override lookup
+        const formFactor = compCenter?.formFactor || componentId.replace(/-\d+$/, '');
+
         return {
-            startX: picoPin.x,
-            startY: picoPin.y,
+            startX: picoPinObj.x,
+            startY: picoPinObj.y,
             endX: componentPos.x,
             endY: componentPos.y,
-            componentCenterY: compCenter ? compCenter.centerY : componentPos.y
+            componentCenterY: compCenter ? compCenter.centerY : componentPos.y,
+            picoPin: picoPinObj.pinKey,
+            formFactor: formFactor
         };
     }
 

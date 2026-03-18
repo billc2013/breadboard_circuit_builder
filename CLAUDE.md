@@ -66,10 +66,13 @@ grep -n "renderMicroPython" explorer-app.js
 This branch merges the LLM-based MicroPython parsing (from `explorer-only`) with physical breadboard component placement. Components are placed at specific breadboard holes instead of abstract boxes.
 
 - **Phases 1-3 complete**: Cropped breadboard SVG, coordinate system, placement registry, `BreadboardPlacementSystem`, `BreadboardRenderer`, full rendering pipeline
-- **Graphics test panel**: Toggle components on/off, drag-and-drop to reposition, fine-tune with keyboard controls
-- **Fine-tune controls**: Click a component to select → arrow keys (nudge 0.5px), +/- (scale ±0.05), R (rotate SVG 90°), Esc (deselect). Rotation applies to the SVG image only, not pin/hole positions.
+- **Tabbed sidebar**: Four tabs — Code (MicroPython input), Components (graphics test + Pico position), Comp Wires (wire preview + Bezier tuning), Pico Wires (per-pin entry angle tuning)
+- **Components tab**: Toggle components on/off, drag-and-drop to reposition, fine-tune with keyboard (arrows=nudge, +/-=scale, R=rotate). Click Pico to select and reposition/rescale.
+- **Comp Wires tab**: Toggle component type → renders component + mock wires to Pico. Click component to select wire group → `[`/`]` exit angle (10° increments), arrows=CP offset, B+arrows=brightness. "Copy Wire Settings" exports overrides to clipboard.
+- **Pico Wires tab**: Select Pico pin → `[`/`]` entry angle, arrows=CP offset. Controls the Pico end of Bezier curves.
+- **Wire rendering overrides**: `breadboard-wire-rendering.json` stores per-formFactor and per-Pico-pin Bezier curve overrides (exitAngleDeg, entryAngleDeg, cpOffsetX/Y, brightness). Applied to both wire preview and parsed circuits.
 - **Rendering transforms**: Per-formFactor `rendering` block in `breadboard-placements.json` (offsetX, offsetY, scale, rotation). Support components use `supportRendering` section.
-- **Wire Bezier curves**: Wires exit breadboard holes perpendicularly, away from the component body. Component center Y vs pin Y determines direction: component above → wire exits downward, component below → wire exits upward. Pico end exits horizontally.
+- **Wire Bezier curves**: Angle-based control points. Component end: exit angle (default perpendicular away from body). Pico end: entry angle (default 0° = horizontal). Both adjustable via wire tuning tabs.
 - **Copy Positions**: Exports all placements + rendering transforms to clipboard as JSON
 - **9 scripts loaded**: `config.js`, `pico-geometry.js`, `breadboard-data.js`, `breadboard-placement.js`, `breadboard-renderer.js`, `abstract-layout.js`, `micropython-parser.js`, `llm-micropython-parser.js`, `llmResponse.js`, `explorer-app.js`
 
@@ -223,23 +226,32 @@ BreadboardPlacementSystem (breadboard-placement.js)
     ↓ assignPlacements() — maps components to breadboard holes via slots
     ↓ getRenderingTransforms(formFactor) — offsetX, offsetY, scale, rotation
 BreadboardRenderer (breadboard-renderer.js)
+    ↓ loadWireOverrides() — reads breadboard-wire-rendering.json
     ↓ renderComponents() — <image> SVGs with per-formFactor transforms
-    ↓ renderWires() — Bezier curves, perpendicular exit from holes away from component body
+    ↓ renderWires() — Bezier curves with angle-based control points + overrides
     ↓ renderGroupHighlights() — bounding boxes around functional groups
 ```
 
-### Graphics Test Fine-Tune System
+### Tabbed Sidebar System
 
 ```
-Click component → _gtestSelect(componentId, formFactor)
-    ↓ Yellow dashed selection outline
-    ↓ Fine-tune panel shows current transforms
-Keyboard → _gtestHandleKey()
-    ↓ Arrows: offsetX/Y ±0.5px
-    ↓ +/-: scale ±0.05
-    ↓ R: rotation +90° (SVG image only, not pin positions)
-    ↓ setRenderingTransforms() → _gtestRedraw()
-Copy Positions → exports placements + rendering transforms to clipboard
+Tab bar: Code | Components | Comp Wires | Pico Wires
+    ↓ setupTabUI() — CSS show/hide via .tab-content.active
+    ↓ _handleGlobalKey() dispatches to active tab's handler
+
+Components tab:
+    _gtestHandleKey() — component fine-tune (arrows, +/-, R)
+    _handlePicoKey() — Pico position/scale (when Pico selected)
+    Copy Positions → breadboard-placements.json to clipboard
+
+Comp Wires tab:
+    _cwireToggle() → _cwireRedraw() — renders component + mock wires
+    _cwireHandleKey() — [/] exit angle, arrows CP offset, B brightness
+    Copy Wire Settings → breadboard-wire-rendering.json to clipboard
+
+Pico Wires tab:
+    _pwireHandleKey() — [/] entry angle, arrows CP offset
+    Controls Pico-side Bezier control points
 ```
 
 ---

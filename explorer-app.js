@@ -98,12 +98,15 @@ class ExplorerApp {
                 wireLabelsLayer: this.wireLabelsLayer,
                 picoPins: this.picoPins
             });
+            await this.bbRenderer.loadWireOverrides();
+            this.wireOverrides = this.bbRenderer.wireOverrides || { componentWires: {}, picoWires: {} };
             console.log('[Explorer] Breadboard renderer initialized');
         }
 
         this.renderPicoPins();
         this.attachEventListeners();
         this.setupKeyboardListeners();
+        this.setupTabUI();
         this.setupMicroPythonUI();
 
         // Enable bundled wire mode styling
@@ -952,20 +955,44 @@ class ExplorerApp {
 
     // ==================== MicroPython Parser Integration ====================
 
+    // ==================== Tab System ====================
+
+    setupTabUI() {
+        this._activeTab = 'code';
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.dataset.tab;
+
+                // Deactivate all
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+
+                // Activate target
+                btn.classList.add('active');
+                const content = document.querySelector(`[data-tab-content="${targetTab}"]`);
+                if (content) content.classList.add('active');
+
+                this._activeTab = targetTab;
+
+                // Tab-specific activation hooks
+                if (targetTab === 'pico-wires') {
+                    this._pwirePopulatePinList?.();
+                }
+
+                console.log('[Explorer] Switched to tab:', targetTab);
+            });
+        });
+
+        console.log('[Explorer] Tab UI initialized');
+    }
+
     setupMicroPythonUI() {
-        const toggleBtn = document.getElementById('micropython-toggle-btn');
         const parseBtn = document.getElementById('parse-micropython-btn');
         const clearBtn = document.getElementById('clear-micropython-btn');
-        const panel = document.getElementById('micropython-panel');
         const textarea = document.getElementById('micropython-input');
-
-        toggleBtn?.addEventListener('click', () => {
-            panel.classList.toggle('collapsed');
-            const icon = toggleBtn.querySelector('.toggle-icon');
-            if (icon) {
-                icon.textContent = panel.classList.contains('collapsed') ? '+' : '−';
-            }
-        });
 
         parseBtn?.addEventListener('click', async () => {
             const code = textarea?.value?.trim();
@@ -1008,8 +1035,11 @@ class ExplorerApp {
 
         console.log('[Explorer] MicroPython UI initialized');
 
-        // Graphics test panel
+        // Graphics test panel + Pico controls + Wire tabs
         this.setupGraphicsTestUI();
+        this.setupPicoControls();
+        this.setupComponentWiresUI();
+        this.setupPicoWiresUI();
     }
 
     // ==================== Graphics Test (Phase 2) ====================
@@ -1119,14 +1149,6 @@ class ExplorerApp {
         const toggleBtns = document.querySelectorAll('.gtest-toggle');
         const allBtn = document.getElementById('gtest-all-btn');
         const clearBtn = document.getElementById('gtest-clear-btn');
-        const panelToggle = document.getElementById('gtest-toggle-btn');
-        const panel = document.getElementById('graphics-test-panel');
-
-        panelToggle?.addEventListener('click', () => {
-            panel.classList.toggle('collapsed');
-            const icon = panelToggle.querySelector('.toggle-icon');
-            if (icon) icon.textContent = panel.classList.contains('collapsed') ? '+' : '−';
-        });
 
         toggleBtns.forEach(btn => {
             btn.addEventListener('click', () => this._gtestToggle(btn.dataset.gtest, btn));
@@ -1149,8 +1171,8 @@ class ExplorerApp {
         const copyBtn = document.getElementById('gtest-copy-btn');
         copyBtn?.addEventListener('click', () => this._gtestExportPlacements());
 
-        // Keyboard listener for fine-tune controls
-        document.addEventListener('keydown', (e) => this._gtestHandleKey(e));
+        // Global keyboard listener — dispatches to active tab handler
+        document.addEventListener('keydown', (e) => this._handleGlobalKey(e));
 
         // Click on SVG background to deselect
         this.svg?.addEventListener('click', (e) => {
@@ -1158,6 +1180,554 @@ class ExplorerApp {
                 this._gtestDeselect();
             }
         });
+    }
+
+    /** Global keyboard dispatcher — routes to the active tab's handler */
+    _handleGlobalKey(e) {
+        const tag = document.activeElement?.tagName;
+        if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+
+        switch (this._activeTab) {
+            case 'components':
+                this._gtestHandleKey(e);
+                break;
+            case 'comp-wires':
+                this._cwireHandleKey?.(e);
+                break;
+            case 'pico-wires':
+                this._pwireHandleKey?.(e);
+                break;
+        }
+    }
+
+    // ==================== Pico Position Controls ====================
+
+    setupPicoControls() {
+        this._picoSelected = false;
+        this._picoPosition = {
+            x: parseFloat(document.getElementById('pico-board')?.getAttribute('x') || 20),
+            y: parseFloat(document.getElementById('pico-board')?.getAttribute('y') || 20),
+            scale: 1.0
+        };
+
+        // Click Pico board image to select
+        const picoImg = document.getElementById('pico-board');
+        picoImg?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (this._activeTab === 'components') {
+                this._picoSelected = !this._picoSelected;
+                this._gtestDeselect(); // deselect any component
+                this._updatePicoSelectionUI();
+            }
+        });
+
+        this._updatePicoPositionInfo();
+    }
+
+    _updatePicoSelectionUI() {
+        const picoImg = document.getElementById('pico-board');
+        if (!picoImg) return;
+
+        // Remove existing selection rect
+        const existing = document.getElementById('pico-selection-rect');
+        existing?.remove();
+
+        if (this._picoSelected) {
+            const x = parseFloat(picoImg.getAttribute('x'));
+            const y = parseFloat(picoImg.getAttribute('y'));
+            const w = parseFloat(picoImg.getAttribute('width'));
+            const h = parseFloat(picoImg.getAttribute('height'));
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.id = 'pico-selection-rect';
+            rect.setAttribute('x', x - 1);
+            rect.setAttribute('y', y - 1);
+            rect.setAttribute('width', w + 2);
+            rect.setAttribute('height', h + 2);
+            rect.setAttribute('fill', 'none');
+            rect.setAttribute('stroke', '#ff0');
+            rect.setAttribute('stroke-width', '1');
+            rect.setAttribute('stroke-dasharray', '3,2');
+            picoImg.parentNode.insertBefore(rect, picoImg.nextSibling);
+        }
+    }
+
+    _updatePicoPositionInfo() {
+        const el = document.getElementById('pico-position-info');
+        if (!el) return;
+        const p = this._picoPosition;
+        el.textContent = `x:${p.x.toFixed(1)} y:${p.y.toFixed(1)} scale:${p.scale.toFixed(2)}`;
+    }
+
+    _handlePicoKey(e) {
+        if (!this._picoSelected) return false;
+
+        const NUDGE = 0.5;
+        const SCALE_STEP = 0.05;
+        let changed = false;
+
+        switch (e.key) {
+            case 'ArrowLeft':
+                this._picoPosition.x -= NUDGE;
+                changed = true;
+                break;
+            case 'ArrowRight':
+                this._picoPosition.x += NUDGE;
+                changed = true;
+                break;
+            case 'ArrowUp':
+                this._picoPosition.y -= NUDGE;
+                changed = true;
+                break;
+            case 'ArrowDown':
+                this._picoPosition.y += NUDGE;
+                changed = true;
+                break;
+            case '+':
+            case '=':
+                this._picoPosition.scale = Math.min(this._picoPosition.scale + SCALE_STEP, 3.0);
+                changed = true;
+                break;
+            case '-':
+                this._picoPosition.scale = Math.max(this._picoPosition.scale - SCALE_STEP, 0.3);
+                changed = true;
+                break;
+            case 'Escape':
+                this._picoSelected = false;
+                this._updatePicoSelectionUI();
+                return true;
+        }
+
+        if (changed) {
+            e.preventDefault();
+            updatePicoPosition(this._picoPosition.x, this._picoPosition.y, this._picoPosition.scale);
+            this._updatePicoSelectionUI();
+            this._updatePicoPositionInfo();
+            // Re-render Pico pin overlays
+            this.picoPinsLayer.innerHTML = '';
+            this.renderPicoPins();
+        }
+
+        return changed;
+    }
+
+    // ==================== Component Wires Tab ====================
+
+    /** Default wire definitions for wire preview (mock wires without parsing) */
+    _getDefaultWireDefs() {
+        return {
+            'led': [
+                { id: 'led-0-signal', from: 'pico1.GP15', to: 'led-red-5mm-0.signal', role: 'signal', color: '#ffcc00' },
+                { id: 'led-0-ground', from: 'pico1.GND_3', to: 'led-red-5mm-0.ground', role: 'ground', color: '#333333' }
+            ],
+            'button': [
+                { id: 'button-0-signal', from: 'pico1.GP14', to: 'button-tactile-6mm-0.signal', role: 'signal', color: '#ffcc00' },
+                { id: 'button-0-ground', from: 'pico1.GND_8', to: 'button-tactile-6mm-0.ground', role: 'ground', color: '#333333' }
+            ],
+            'photocell': [
+                { id: 'photocell-0-signal', from: 'pico1.GP26_ADC0', to: 'photocell-ldr-0.signal', role: 'signal', color: '#33cc33' },
+                { id: 'photocell-0-ground', from: 'pico1.GND_33', to: 'photocell-ldr-0.ground', role: 'ground', color: '#333333' },
+                { id: 'photocell-0-power', from: 'pico1.3V3_OUT', to: 'photocell-ldr-0.power', role: 'power', color: '#ff4444' }
+            ],
+            'us100': [
+                { id: 'us100-0-trig', from: 'pico1.GP3', to: 'us100-ultrasonic-0.trig', role: 'signal', color: '#ffcc00' },
+                { id: 'us100-0-echo', from: 'pico1.GP2', to: 'us100-ultrasonic-0.echo', role: 'signal', color: '#33cc33' },
+                { id: 'us100-0-power', from: 'pico1.3V3_OUT', to: 'us100-ultrasonic-0.vcc', role: 'power', color: '#ff4444' },
+                { id: 'us100-0-gnd', from: 'pico1.GND_33', to: 'us100-ultrasonic-0.gnd', role: 'ground', color: '#333333' }
+            ],
+            'tb6612': [
+                { id: 'tb6612-0-ain1', from: 'pico1.GP6', to: 'tb6612-motor-driver-0.ain1', role: 'signal', color: '#ffcc00' },
+                { id: 'tb6612-0-ain2', from: 'pico1.GP7', to: 'tb6612-motor-driver-0.ain2', role: 'signal', color: '#ffcc00' },
+                { id: 'tb6612-0-pwma', from: 'pico1.GP8', to: 'tb6612-motor-driver-0.pwma', role: 'signal', color: '#9944ff' },
+                { id: 'tb6612-0-bin1', from: 'pico1.GP4', to: 'tb6612-motor-driver-0.bin1', role: 'signal', color: '#33cc33' },
+                { id: 'tb6612-0-bin2', from: 'pico1.GP5', to: 'tb6612-motor-driver-0.bin2', role: 'signal', color: '#33cc33' },
+                { id: 'tb6612-0-pwmb', from: 'pico1.GP9', to: 'tb6612-motor-driver-0.pwmb', role: 'signal', color: '#9944ff' },
+                { id: 'tb6612-0-stby', from: 'pico1.GP10', to: 'tb6612-motor-driver-0.stby', role: 'signal', color: '#ff8800' },
+                { id: 'tb6612-0-vcc', from: 'pico1.3V3_OUT', to: 'tb6612-motor-driver-0.vcc', role: 'power', color: '#ff4444' },
+                { id: 'tb6612-0-gnd', from: 'pico1.GND_3', to: 'tb6612-motor-driver-0.gnd', role: 'ground', color: '#333333' }
+            ]
+        };
+    }
+
+    setupComponentWiresUI() {
+        this._cwireActive = new Set();
+        this._cwireSelection = null; // { formFactor, testKey }
+
+        // Ensure wireOverrides is initialized
+        if (!this.wireOverrides) {
+            this.wireOverrides = { componentWires: {}, picoWires: {} };
+        }
+
+        const toggleBtns = document.querySelectorAll('.cwire-toggle');
+        const allBtn = document.getElementById('cwire-all-btn');
+        const clearBtn = document.getElementById('cwire-clear-btn');
+        const copyBtn = document.getElementById('cwire-copy-btn');
+
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => this._cwireToggle(btn.dataset.cwire, btn));
+        });
+
+        allBtn?.addEventListener('click', () => {
+            toggleBtns.forEach(btn => {
+                if (!this._cwireActive.has(btn.dataset.cwire)) {
+                    this._cwireToggle(btn.dataset.cwire, btn);
+                }
+            });
+        });
+
+        clearBtn?.addEventListener('click', () => {
+            this._cwireActive.clear();
+            toggleBtns.forEach(btn => btn.classList.remove('cwire-on'));
+            this._cwireRedraw();
+        });
+
+        copyBtn?.addEventListener('click', () => this._cwireExportOverrides());
+
+        console.log('[Explorer] Component Wires UI initialized');
+    }
+
+    async _cwireToggle(testKey, btn) {
+        if (this._cwireActive.has(testKey)) {
+            this._cwireActive.delete(testKey);
+            btn?.classList.remove('cwire-on');
+        } else {
+            this._cwireActive.add(testKey);
+            btn?.classList.add('cwire-on');
+        }
+        await this._cwireRedraw();
+    }
+
+    async _cwireRedraw() {
+        // Clear SVG layers
+        this.componentsLayer.innerHTML = '';
+        this.wiresLayer.innerHTML = '';
+        this.holesLayer.innerHTML = '';
+
+        const defs = this._getGraphicsTestDefs();
+        const wireDefs = this._getDefaultWireDefs();
+        const placementSystem = await this._gtestEnsurePlacementSystem();
+        placementSystem.clear();
+
+        const allGroups = [];
+        const allSvgMaps = {};
+        const allWires = [];
+        const groupRegistry = [];
+
+        for (const testKey of this._cwireActive) {
+            const def = defs[testKey];
+            if (!def || def.type === 'debug') continue;
+
+            // Collect groups
+            for (const group of def.groups) {
+                // Add wire IDs to group (needed for renderWires)
+                const testWires = wireDefs[testKey] || [];
+                group.wires = testWires.map(w => w.id);
+                allGroups.push(group);
+                groupRegistry.push({ testKey, group });
+            }
+            Object.assign(allSvgMaps, def.svgMap);
+
+            // Collect wires
+            const testWires = wireDefs[testKey] || [];
+            allWires.push(...testWires);
+        }
+
+        // Assign placements
+        if (allGroups.length > 0) {
+            placementSystem.assignPlacements(allGroups);
+        }
+
+        // Render components (simplified — no drag, just visual)
+        for (const { testKey, group } of groupRegistry) {
+            const groupG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            groupG.setAttribute('class', 'cwire-group');
+            groupG.setAttribute('data-group-id', group.id);
+
+            for (const componentId of group.allComponents) {
+                const placement = placementSystem.getComponentPosition(componentId);
+                if (!placement) continue;
+                const componentType = componentId.replace(/-\d+$/, '');
+                const svgInfo = allSvgMaps[componentType];
+                if (!svgInfo) continue;
+                this._gtestRenderComponent(componentId, placement, svgInfo, groupG);
+            }
+
+            this.componentsLayer.appendChild(groupG);
+
+            // Click component to select its wire group for tuning
+            groupG.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const primaryId = group.primaryComponent;
+                const placement = placementSystem.getComponentPosition(primaryId);
+                if (placement) {
+                    this._cwireSelect(placement.formFactor, testKey);
+                }
+            });
+        }
+
+        // Build componentMetadata map for renderWires
+        const componentMetadata = new Map();
+        for (const { group } of groupRegistry) {
+            for (const compId of group.allComponents) {
+                const compType = compId.replace(/-\d+$/, '');
+                componentMetadata.set(compId, {
+                    type: compType,
+                    metadata: { functionalGroup: {} }
+                });
+            }
+        }
+
+        // Render wires with current overrides
+        if (allWires.length > 0 && this.bbRenderer) {
+            this.bbRenderer.setWireOverrides(this.wireOverrides);
+            this.bbRenderer.renderWires(allWires, allGroups, componentMetadata, placementSystem);
+        }
+
+        // Update status
+        const statusEl = document.getElementById('cwire-status');
+        if (statusEl) {
+            const active = [...this._cwireActive];
+            statusEl.textContent = active.length > 0
+                ? `${allWires.length} wires (${active.join(', ')})`
+                : '';
+        }
+    }
+
+    _cwireSelect(formFactor, testKey) {
+        this._cwireSelection = { formFactor, testKey };
+
+        // Show fine-tune panel
+        const panel = document.getElementById('cwire-finetune');
+        if (panel) panel.style.display = 'block';
+
+        const label = document.getElementById('cwire-selected-label');
+        if (label) label.textContent = `${formFactor} (${testKey})`;
+
+        this._cwireUpdateTransformInfo();
+    }
+
+    _cwireDeselect() {
+        this._cwireSelection = null;
+        const panel = document.getElementById('cwire-finetune');
+        if (panel) panel.style.display = 'none';
+    }
+
+    _cwireUpdateTransformInfo() {
+        const el = document.getElementById('cwire-transform-info');
+        if (!el || !this._cwireSelection) return;
+
+        const ff = this._cwireSelection.formFactor;
+        const o = this.wireOverrides?.componentWires?.[ff] || {};
+        el.textContent = `exit:${o.exitAngleDeg ?? 'auto'}° cpX:${(o.cpOffsetX ?? 0).toFixed(1)} cpY:${(o.cpOffsetY ?? 0).toFixed(1)} bright:${(o.brightness ?? 0.5).toFixed(2)}`;
+    }
+
+    _cwireHandleKey(e) {
+        if (!this._cwireSelection) return;
+
+        const ff = this._cwireSelection.formFactor;
+        if (!this.wireOverrides.componentWires[ff]) {
+            this.wireOverrides.componentWires[ff] = {};
+        }
+        const o = this.wireOverrides.componentWires[ff];
+        let changed = false;
+
+        switch (e.key) {
+            case '[':
+                o.exitAngleDeg = ((o.exitAngleDeg ?? 270) - 10 + 360) % 360;
+                changed = true;
+                break;
+            case ']':
+                o.exitAngleDeg = ((o.exitAngleDeg ?? 270) + 10) % 360;
+                changed = true;
+                break;
+            case 'ArrowLeft':
+                o.cpOffsetX = (o.cpOffsetX ?? 0) - 1;
+                changed = true;
+                break;
+            case 'ArrowRight':
+                o.cpOffsetX = (o.cpOffsetX ?? 0) + 1;
+                changed = true;
+                break;
+            case 'ArrowUp':
+                o.cpOffsetY = (o.cpOffsetY ?? 0) - 1;
+                changed = true;
+                break;
+            case 'ArrowDown':
+                o.cpOffsetY = (o.cpOffsetY ?? 0) + 1;
+                changed = true;
+                break;
+            case 'b':
+            case 'B':
+                // B is a mode toggle — next up/down adjusts brightness
+                this._cwireBrightnessMode = true;
+                e.preventDefault();
+                return;
+            case 'Escape':
+                this._cwireDeselect();
+                return;
+        }
+
+        // Brightness mode: B was pressed, now up/down adjusts brightness
+        if (this._cwireBrightnessMode && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+            const step = e.key === 'ArrowUp' ? 0.05 : -0.05;
+            o.brightness = Math.max(0.05, Math.min(1.0, (o.brightness ?? 0.5) + step));
+            changed = true;
+            this._cwireBrightnessMode = false;
+        }
+
+        if (e.key !== 'b' && e.key !== 'B') {
+            this._cwireBrightnessMode = false;
+        }
+
+        if (changed) {
+            e.preventDefault();
+            this.bbRenderer?.setWireOverrides(this.wireOverrides);
+            this._cwireRedraw();
+            this._cwireUpdateTransformInfo();
+        }
+    }
+
+    _cwireExportOverrides() {
+        const json = JSON.stringify(this.wireOverrides, null, 2);
+        navigator.clipboard.writeText(json).then(() => {
+            const statusEl = document.getElementById('cwire-status');
+            if (statusEl) statusEl.textContent = 'Wire settings copied to clipboard!';
+            console.log('[Explorer] Wire overrides copied to clipboard');
+        }).catch(err => {
+            console.error('[Explorer] Clipboard write failed:', err);
+            console.log('[Explorer] Wire overrides JSON:\n', json);
+        });
+    }
+
+    // ==================== Pico Wires Tab ====================
+
+    setupPicoWiresUI() {
+        this._pwireSelection = null; // { pinKey }
+
+        // Pin list gets populated when wires are rendered
+        console.log('[Explorer] Pico Wires UI initialized');
+    }
+
+    /** Populate the Pico pin list with buttons for pins that have active wires */
+    _pwirePopulatePinList() {
+        const container = document.getElementById('pwire-pin-list');
+        if (!container) return;
+        container.innerHTML = '';
+
+        // Collect unique Pico pin names from active wire defs
+        const wireDefs = this._getDefaultWireDefs();
+        const activePins = new Set();
+
+        for (const testKey of this._cwireActive) {
+            const wires = wireDefs[testKey] || [];
+            for (const w of wires) {
+                const picoEnd = w.from?.startsWith('pico1.') ? w.from : w.to;
+                if (picoEnd?.startsWith('pico1.')) {
+                    activePins.add(picoEnd.split('.')[1]);
+                }
+            }
+        }
+
+        // If no active component wires, show all common pins
+        if (activePins.size === 0) {
+            ['GP15', 'GP14', 'GP26_ADC0', 'GP3', 'GP2', 'GP6', 'GP7', 'GP8', 'GND_3', '3V3_OUT'].forEach(p => activePins.add(p));
+        }
+
+        for (const pinKey of [...activePins].sort()) {
+            const btn = document.createElement('button');
+            btn.className = 'action-btn secondary';
+            btn.style.fontSize = '10px';
+            btn.style.padding = '4px 8px';
+            btn.textContent = pinKey;
+            btn.dataset.pinKey = pinKey;
+
+            if (this._pwireSelection?.pinKey === pinKey) {
+                btn.style.borderColor = '#33cc33';
+                btn.style.color = '#33cc33';
+            }
+
+            btn.addEventListener('click', () => {
+                this._pwireSelect(pinKey);
+            });
+            container.appendChild(btn);
+        }
+    }
+
+    _pwireSelect(pinKey) {
+        this._pwireSelection = { pinKey };
+
+        const panel = document.getElementById('pwire-finetune');
+        if (panel) panel.style.display = 'block';
+
+        const label = document.getElementById('pwire-selected-label');
+        if (label) label.textContent = pinKey;
+
+        this._pwireUpdateTransformInfo();
+        this._pwirePopulatePinList(); // refresh highlight
+    }
+
+    _pwireDeselect() {
+        this._pwireSelection = null;
+        const panel = document.getElementById('pwire-finetune');
+        if (panel) panel.style.display = 'none';
+        this._pwirePopulatePinList();
+    }
+
+    _pwireUpdateTransformInfo() {
+        const el = document.getElementById('pwire-transform-info');
+        if (!el || !this._pwireSelection) return;
+
+        const pk = this._pwireSelection.pinKey;
+        const o = this.wireOverrides?.picoWires?.[pk] || {};
+        el.textContent = `entry:${o.entryAngleDeg ?? 0}° cpX:${(o.cpOffsetX ?? 0).toFixed(1)} cpY:${(o.cpOffsetY ?? 0).toFixed(1)}`;
+    }
+
+    _pwireHandleKey(e) {
+        if (!this._pwireSelection) return;
+
+        const pk = this._pwireSelection.pinKey;
+        if (!this.wireOverrides.picoWires[pk]) {
+            this.wireOverrides.picoWires[pk] = {};
+        }
+        const o = this.wireOverrides.picoWires[pk];
+        let changed = false;
+
+        switch (e.key) {
+            case '[':
+                o.entryAngleDeg = ((o.entryAngleDeg ?? 0) - 10 + 360) % 360;
+                changed = true;
+                break;
+            case ']':
+                o.entryAngleDeg = ((o.entryAngleDeg ?? 0) + 10) % 360;
+                changed = true;
+                break;
+            case 'ArrowLeft':
+                o.cpOffsetX = (o.cpOffsetX ?? 0) - 1;
+                changed = true;
+                break;
+            case 'ArrowRight':
+                o.cpOffsetX = (o.cpOffsetX ?? 0) + 1;
+                changed = true;
+                break;
+            case 'ArrowUp':
+                o.cpOffsetY = (o.cpOffsetY ?? 0) - 1;
+                changed = true;
+                break;
+            case 'ArrowDown':
+                o.cpOffsetY = (o.cpOffsetY ?? 0) + 1;
+                changed = true;
+                break;
+            case 'Escape':
+                this._pwireDeselect();
+                return;
+        }
+
+        if (changed) {
+            e.preventDefault();
+            this.bbRenderer?.setWireOverrides(this.wireOverrides);
+            this._cwireRedraw(); // re-render wires with updated Pico overrides
+            this._pwireUpdateTransformInfo();
+        }
     }
 
     async _gtestEnsurePlacementSystem() {
@@ -1730,6 +2300,11 @@ class ExplorerApp {
 
     /** Handle keyboard input for fine-tuning */
     _gtestHandleKey(e) {
+        // Pico selection takes priority
+        if (this._picoSelected) {
+            this._handlePicoKey(e);
+            return;
+        }
         if (!this._gtestSelection) return;
         // Don't capture keys when typing in text inputs
         const tag = document.activeElement?.tagName;

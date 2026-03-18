@@ -297,6 +297,35 @@ function calculatePicoPosition(placement, breadboardHoles) {
     };
 }
 
+/**
+ * Update the Pico board position in the DOM and regenerate pin coordinates
+ * @param {number} x - New X position
+ * @param {number} y - New Y position
+ * @param {number} [scale=1.0] - Scale factor for Pico SVG
+ */
+function updatePicoPosition(x, y, scale) {
+    const img = document.getElementById(PICO_CONFIG.svg_element_id);
+    if (!img) return;
+
+    const s = scale ?? 1.0;
+    img.setAttribute('x', x);
+    img.setAttribute('y', y);
+    img.setAttribute('width', PICO_CONFIG.svg.width * s);
+    img.setAttribute('height', PICO_CONFIG.svg.height * s);
+
+    regeneratePicoPins();
+}
+
+/**
+ * Regenerate PICO_PINS in place from current DOM position
+ * Call this after changing the Pico <image> element's x/y/width/height
+ */
+function regeneratePicoPins() {
+    PICO_PINS.length = 0;
+    const newPins = generatePicoConnectablePoints();
+    PICO_PINS.push(...newPins);
+}
+
 // Generate pin positions (this gets called during app initialization)
 const PICO_PINS = generatePicoConnectablePoints();
 
