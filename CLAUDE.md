@@ -69,6 +69,7 @@ This branch merges the LLM-based MicroPython parsing (from `explorer-only`) with
 - **Graphics test panel**: Toggle components on/off, drag-and-drop to reposition, fine-tune with keyboard controls
 - **Fine-tune controls**: Click a component to select → arrow keys (nudge 0.5px), +/- (scale ±0.05), R (rotate SVG 90°), Esc (deselect). Rotation applies to the SVG image only, not pin/hole positions.
 - **Rendering transforms**: Per-formFactor `rendering` block in `breadboard-placements.json` (offsetX, offsetY, scale, rotation). Support components use `supportRendering` section.
+- **Wire Bezier curves**: Wires exit breadboard holes perpendicularly, away from the component body. Component center Y vs pin Y determines direction: component above → wire exits downward, component below → wire exits upward. Pico end exits horizontally.
 - **Copy Positions**: Exports all placements + rendering transforms to clipboard as JSON
 - **9 scripts loaded**: `config.js`, `pico-geometry.js`, `breadboard-data.js`, `breadboard-placement.js`, `breadboard-renderer.js`, `abstract-layout.js`, `micropython-parser.js`, `llm-micropython-parser.js`, `llmResponse.js`, `explorer-app.js`
 
@@ -223,7 +224,7 @@ BreadboardPlacementSystem (breadboard-placement.js)
     ↓ getRenderingTransforms(formFactor) — offsetX, offsetY, scale, rotation
 BreadboardRenderer (breadboard-renderer.js)
     ↓ renderComponents() — <image> SVGs with per-formFactor transforms
-    ↓ renderWires() — Bezier curves from Pico pins to component pins
+    ↓ renderWires() — Bezier curves, perpendicular exit from holes away from component body
     ↓ renderGroupHighlights() — bounding boxes around functional groups
 ```
 

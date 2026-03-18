@@ -2,9 +2,39 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: March 16, 2026
+**Last Updated**: March 17, 2026
 **Current Phase**: parse_to_breadboard Branch — Physical Breadboard Rendering Pipeline
 **Branch**: `parse_to_breadboard` (created from `explorer-only`)
+
+---
+
+## Recently Completed (March 17, 2026 Session)
+
+### ✅ Component placement tuning & perpendicular wire Bezier curves
+**Completed**: March 17, 2026
+
+**What was delivered**:
+
+**1. Repositioned all component placements** — `breadboard-placements.json`
+- LEDs moved to columns 14-21 (row E) with resistors in row D
+- Buttons moved to columns 13-20 (row J) with resistors in row I
+- Photocell slot 0 moved to row E (columns 26/28) for variety
+- US-100 pins moved to row I (columns 26-30)
+- TB6612 control pins moved to row J (columns 1-10), motor outputs to row D (columns 3-8)
+- All rendering transforms fine-tuned (offsets, scales) via graphics test panel
+
+**2. Perpendicular wire Bezier curves** — `breadboard-renderer.js`
+- Wires now exit breadboard holes **perpendicularly, away from the component body**
+- Direction determined by comparing component center Y to pin hole Y:
+  - Component above hole → wire exits downward (+Y)
+  - Component below hole → wire exits upward (-Y)
+- Pico end still exits horizontally (rightward toward breadboard)
+- TB6612 wires now fan out from both sides of the chip (row J wires down, row D wires up)
+
+**3. Scale limit increase** — `explorer-app.js`
+- Graphics test fine-tune max scale increased from 3.0 to 4.0
+
+**Files modified**: `breadboard-placements.json`, `breadboard-renderer.js`, `explorer-app.js`
 
 ---
 

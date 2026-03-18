@@ -1762,7 +1762,7 @@ class ExplorerApp {
                 break;
             case '+':
             case '=':
-                ps.setRenderingTransforms(ff, { scale: Math.min(t.scale + SCALE_STEP, 3.0) });
+                ps.setRenderingTransforms(ff, { scale: Math.min(t.scale + SCALE_STEP, 4.0) });
                 changed = true;
                 break;
             case '-':

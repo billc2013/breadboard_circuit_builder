@@ -121,14 +121,20 @@ class BreadboardRenderer {
                     continue;
                 }
 
-                const { startX, startY, endX, endY } = endpoints;
+                const { startX, startY, endX, endY, componentCenterY } = endpoints;
 
-                // Bezier control points — smooth S-curve from Pico to breadboard
+                // Bezier control points:
+                // - Pico end: exits horizontally (rightward toward breadboard)
+                // - Breadboard end: exits perpendicularly AWAY from component body
+                //   Component above hole (centerY < pinY) → wire exits downward (+Y)
+                //   Component below hole (centerY > pinY) → wire exits upward (-Y)
                 const gap = endX - startX;
-                const cp1x = startX + gap * 0.4;
+                const cp1x = startX + Math.abs(gap) * 0.4;
                 const cp1y = startY;
-                const cp2x = endX - gap * 0.4;
-                const cp2y = endY;
+                const perpDist = 30;
+                const awayDir = (componentCenterY <= endY) ? 1 : -1; // +1 = down, -1 = up
+                const cp2x = endX;
+                const cp2y = endY + perpDist * awayDir;
 
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 path.classList.add('bundled-wire');
@@ -183,11 +189,16 @@ class BreadboardRenderer {
             return null;
         }
 
+        // Get component center for wire direction (away from component body)
+        const componentId = componentEndpoint.substring(0, componentEndpoint.indexOf('.'));
+        const compCenter = placementSystem.getComponentPosition(componentId);
+
         return {
             startX: picoPin.x,
             startY: picoPin.y,
             endX: componentPos.x,
-            endY: componentPos.y
+            endY: componentPos.y,
+            componentCenterY: compCenter ? compCenter.centerY : componentPos.y
         };
     }
 

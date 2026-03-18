@@ -23,48 +23,48 @@
       "description": "5mm LED: anode and cathode in adjacent columns, row J. Resistor horizontal in row I, one pin in cathode's bus.",
       "pinCount": 2,
       "rendering": {
-        "offsetX": 0,
-        "offsetY": 0,
-        "scale": 0.5,
+        "offsetX": -0.5,
+        "offsetY": -19.5,
+        "scale": 1.0000000000000004,
         "rotation": 0
       },
       "slots": [
         {
           "slot": 0,
           "placement": {
-            "anode": "2E",
-            "cathode": "3E"
+            "anode": "14E",
+            "cathode": "15E"
           },
           "supportPlacements": {
             "resistor": {
-              "pin0": "3D",
-              "pin1": "1D"
+              "pin0": "15D",
+              "pin1": "13D"
             }
           }
         },
         {
           "slot": 1,
           "placement": {
-            "anode": "6E",
-            "cathode": "7E"
+            "anode": "17E",
+            "cathode": "18E"
           },
           "supportPlacements": {
             "resistor": {
-              "pin0": "7D",
-              "pin1": "5D"
+              "pin0": "18D",
+              "pin1": "16D"
             }
           }
         },
         {
           "slot": 2,
           "placement": {
-            "anode": "10E",
-            "cathode": "11E"
+            "anode": "20E",
+            "cathode": "21E"
           },
           "supportPlacements": {
             "resistor": {
-              "pin0": "11D",
-              "pin1": "9D"
+              "pin0": "21D",
+              "pin1": "19D"
             }
           }
         }
@@ -74,35 +74,35 @@
       "description": "Tactile button: legs in adjacent columns, row J. Pull-down resistor horizontal in row I, one pin in leg1's bus.",
       "pinCount": 2,
       "rendering": {
-        "offsetX": 0,
-        "offsetY": 0,
-        "scale": 0.5,
+        "offsetX": 0.5,
+        "offsetY": -33.5,
+        "scale": 1.2500000000000007,
         "rotation": 0
       },
       "slots": [
         {
           "slot": 0,
           "placement": {
-            "leg0": "1J",
-            "leg1": "2J"
+            "leg0": "13J",
+            "leg1": "14J"
           },
           "supportPlacements": {
             "resistor": {
-              "pin0": "2I",
-              "pin1": "4I"
+              "pin0": "14I",
+              "pin1": "16I"
             }
           }
         },
         {
           "slot": 1,
           "placement": {
-            "leg0": "6J",
-            "leg1": "7J"
+            "leg0": "17J",
+            "leg1": "18J"
           },
           "supportPlacements": {
             "resistor": {
-              "pin0": "7I",
-              "pin1": "9I"
+              "pin0": "18I",
+              "pin1": "20I"
             }
           }
         }
@@ -113,21 +113,21 @@
       "pinCount": 2,
       "rendering": {
         "offsetX": 0,
-        "offsetY": 0,
-        "scale": 0.5,
+        "offsetY": -4,
+        "scale": 0.8000000000000003,
         "rotation": 0
       },
       "slots": [
         {
           "slot": 0,
           "placement": {
-            "pin0": "10J",
-            "pin1": "11J"
+            "pin0": "26E",
+            "pin1": "28E"
           },
           "supportPlacements": {
             "resistor": {
-              "pin0": "11I",
-              "pin1": "13I"
+              "pin0": "28D",
+              "pin1": "30D"
             }
           }
         },
@@ -135,12 +135,12 @@
           "slot": 1,
           "placement": {
             "pin0": "26J",
-            "pin1": "27J"
+            "pin1": "28J"
           },
           "supportPlacements": {
             "resistor": {
-              "pin0": "27I",
-              "pin1": "29I"
+              "pin0": "28I",
+              "pin1": "30I"
             }
           }
         }
@@ -150,20 +150,20 @@
       "description": "US-100 ultrasonic sensor: 5 pins spanning consecutive columns, row J.",
       "pinCount": 5,
       "rendering": {
-        "offsetX": 0,
-        "offsetY": 0,
-        "scale": 0.5,
+        "offsetX": 0.5,
+        "offsetY": -53,
+        "scale": 3.449999999999996,
         "rotation": 0
       },
       "slots": [
         {
           "slot": 0,
           "placement": {
-            "vcc": "25J",
-            "trig": "26J",
-            "echo": "27J",
-            "gnd": "28J",
-            "gnd2": "29J"
+            "vcc": "26I",
+            "trig": "27I",
+            "echo": "28I",
+            "gnd": "29I",
+            "gnd2": "30I"
           },
           "supportPlacements": {}
         }
@@ -174,7 +174,7 @@
       "pinCount": 14,
       "rendering": {
         "offsetX": 0,
-        "offsetY": 4.5,
+        "offsetY": 7,
         "scale": 1.2500000000000007,
         "rotation": 90
       },
@@ -182,22 +182,22 @@
         {
           "slot": 0,
           "placement": {
-            "pwma": "15G",
-            "ain2": "16G",
-            "ain1": "17G",
-            "stby": "18G",
-            "bin1": "19G",
-            "bin2": "20G",
-            "pwmb": "21G",
-            "gnd": "22G",
-            "vcc": "23G",
-            "vm": "24G",
-            "motora1": "17C",
-            "motora2": "18C",
-            "gnd2": "19C",
-            "gnd3": "20C",
-            "motorb1": "21C",
-            "motorb2": "22C"
+            "pwma": "1J",
+            "ain2": "2J",
+            "ain1": "3J",
+            "stby": "4J",
+            "bin1": "5J",
+            "bin2": "6J",
+            "pwmb": "7J",
+            "gnd": "8J",
+            "vcc": "9J",
+            "vm": "10J",
+            "motora1": "3D",
+            "motora2": "4D",
+            "gnd2": "5D",
+            "gnd3": "6D",
+            "motorb1": "7D",
+            "motorb2": "8D"
           },
           "supportPlacements": {}
         }
