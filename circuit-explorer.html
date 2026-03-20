@@ -81,6 +81,7 @@
                     <button class="tab-btn" data-tab="components">Components</button>
                     <button class="tab-btn" data-tab="comp-wires">Comp Wires</button>
                     <button class="tab-btn" data-tab="pico-wires">Pico Wires</button>
+                    <button class="tab-btn" data-tab="drag-wires">Drag Wires</button>
                 </div>
 
                 <!-- Tab: Code -->
@@ -199,6 +200,31 @@
                         <div id="pwire-transform-info" style="color: #888; font-size: 10px; margin-top: 4px; font-family: monospace;"></div>
                     </div>
                     <div id="pwire-status" style="color: #888; font-size: 11px; margin-top: 6px;"></div>
+                </div>
+
+                <!-- Tab: Drag Wires -->
+                <div class="tab-content" data-tab-content="drag-wires">
+                    <div class="input-instructions">Select a component, then drag wires from Pico to breadboard</div>
+                    <div id="dwire-buttons" style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px;">
+                        <button class="dwire-toggle action-btn secondary" data-dwire="led" title="LED wires">LED</button>
+                        <button class="dwire-toggle action-btn secondary" data-dwire="button" title="Button wires">Button</button>
+                        <button class="dwire-toggle action-btn secondary" data-dwire="photocell" title="Photocell wires">Photocell</button>
+                        <button class="dwire-toggle action-btn secondary" data-dwire="us100" title="US-100 wires">US-100</button>
+                        <button class="dwire-toggle action-btn secondary" data-dwire="tb6612" title="TB6612 wires">TB6612</button>
+                    </div>
+                    <div id="dwire-wire-info" style="margin-top: 6px; padding: 6px; border: 1px solid #444; border-radius: 4px; background: #1a1a2e; display: none;">
+                        <div style="color: #ff66cc; font-size: 11px; font-weight: bold; margin-bottom: 4px;">
+                            Current Wire: <span id="dwire-current-label">—</span>
+                        </div>
+                        <div style="color: #aaa; font-size: 10px;">
+                            Click the strobing Pico pin, drag to the strobing breadboard hole
+                        </div>
+                        <div id="dwire-progress" style="color: #888; font-size: 10px; margin-top: 4px; font-family: monospace;"></div>
+                    </div>
+                    <div style="display: flex; gap: 4px; margin-top: 8px;">
+                        <button id="dwire-reset-btn" class="action-btn secondary" style="flex:1">Reset Wires</button>
+                    </div>
+                    <div id="dwire-status" style="color: #888; font-size: 11px; margin-top: 6px;"></div>
                 </div>
 
             </div>

@@ -1180,3 +1180,67 @@
 .gtest-selection-rect {
     pointer-events: none;
 }
+
+/* ==================== Drag Wires Tab ==================== */
+
+/* Pico pin strobe — glow ring around the pin marker */
+@keyframes pin-glow {
+    0%, 100% { opacity: 0.9; r: 5; }
+    50% { opacity: 0.4; r: 3.5; }
+}
+.pin-strobe rect {
+    fill: #00ccff !important;
+}
+.pin-strobe .pin-strobe-ring {
+    fill: none;
+    stroke: #00ffff;
+    stroke-width: 1;
+    animation: pin-glow 0.8s ease-in-out infinite;
+}
+.pin-strobe {
+    cursor: pointer;
+}
+
+/* Breadboard hole strobe — SVG circle at target hole */
+@keyframes hole-strobe {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.3; }
+}
+.hole-strobe {
+    fill: #00ccff;
+    animation: hole-strobe 0.8s ease-in-out infinite;
+}
+
+/* Target hole label */
+.hole-target-label {
+    fill: #00ccff;
+    font-size: 5px;
+    font-weight: bold;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+/* Drag preview wire — dashed, semi-transparent */
+.wire-drag-preview {
+    fill: none;
+    stroke-width: 2;
+    stroke-dasharray: 4 3;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Placed wire flash on snap */
+@keyframes wire-snap {
+    0% { stroke-width: 4; opacity: 1; }
+    100% { stroke-width: 2.5; opacity: 0.85; }
+}
+.wire-just-placed {
+    animation: wire-snap 0.3s ease-out forwards;
+}
+
+/* Dwire toggle button active state */
+.dwire-toggle.dwire-on {
+    background: linear-gradient(135deg, #ff66cc 0%, #cc3399 100%) !important;
+    color: #fff !important;
+    border-color: #ff66cc !important;
+}

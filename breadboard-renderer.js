@@ -134,57 +134,80 @@ class BreadboardRenderer {
                 const wire = wires.find(w => w.id === wireId);
                 if (!wire) continue;
 
-                const endpoints = this._resolveWireEndpoints(wire, group, componentMetadata, placementSystem);
-                if (!endpoints) {
-                    console.warn(`[BreadboardRenderer] Could not resolve endpoints for wire ${wireId}`);
-                    continue;
+                const result = this.renderSingleWire(wire, group, componentMetadata, placementSystem);
+                if (result) {
+                    this.wiresLayer.appendChild(result.path);
+                    wireToGroup.set(wire.id, group.id);
                 }
-
-                const { startX, startY, endX, endY, componentCenterY, picoPin, formFactor } = endpoints;
-
-                // --- Bezier control points with wire rendering overrides ---
-                // Angle convention: 0°=right, 90°=down, 180°=left, 270°=up (SVG coords)
-                const DEG2RAD = Math.PI / 180;
-                const gap = Math.abs(endX - startX);
-
-                // Pico end (cp1): default exits horizontally rightward (0°)
-                const picoOverride = this.wireOverrides?.picoWires?.[picoPin] || {};
-                const pAngle = (picoOverride.entryAngleDeg ?? 0) * DEG2RAD;
-                const pDist = gap * 0.4;
-                const cp1x = startX + pDist * Math.cos(pAngle) + (picoOverride.cpOffsetX ?? 0);
-                const cp1y = startY + pDist * Math.sin(pAngle) + (picoOverride.cpOffsetY ?? 0);
-
-                // Component end (cp2): default exits perpendicular away from component body
-                const compOverride = this.wireOverrides?.componentWires?.[formFactor] || {};
-                const defaultExitDeg = (componentCenterY <= endY) ? 90 : 270; // down or up
-                const cAngle = (compOverride.exitAngleDeg ?? defaultExitDeg) * DEG2RAD;
-                const cDist = 30; // base control point distance
-                const cp2x = endX + cDist * Math.cos(cAngle) + (compOverride.cpOffsetX ?? 0);
-                const cp2y = endY + cDist * Math.sin(cAngle) + (compOverride.cpOffsetY ?? 0);
-
-                // Brightness override
-                const brightness = compOverride.brightness ?? null;
-
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.classList.add('bundled-wire');
-                path.classList.add(`wire-${wire.role || 'signal'}`);
-                path.setAttribute('data-wire-id', wire.id);
-                path.setAttribute('data-group-id', group.id);
-                path.style.stroke = wire.color || '#ffcc00';
-                if (brightness !== null) {
-                    path.style.opacity = brightness;
-                }
-
-                const d = `M ${startX} ${startY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endX} ${endY}`;
-                path.setAttribute('d', d);
-
-                this.wiresLayer.appendChild(path);
-                wireToGroup.set(wire.id, group.id);
             }
         }
 
         console.log('[BreadboardRenderer] Rendered', wireToGroup.size, 'wires');
         return wireToGroup;
+    }
+
+    /**
+     * Render a single wire as a Bezier curve SVG path.
+     * Does NOT append to DOM — caller decides when/where to insert.
+     * @param {Object} wire - Wire definition { id, from, to, role, color }
+     * @param {Object} group - Functional group { id, wires, ... }
+     * @param {Map} componentMetadata
+     * @param {BreadboardPlacementSystem} placementSystem
+     * @returns {{ path: SVGPathElement, endpoints: Object } | null}
+     */
+    renderSingleWire(wire, group, componentMetadata, placementSystem) {
+        const endpoints = this._resolveWireEndpoints(wire, group, componentMetadata, placementSystem);
+        if (!endpoints) {
+            console.warn(`[BreadboardRenderer] Could not resolve endpoints for wire ${wire.id}`);
+            return null;
+        }
+
+        const { startX, startY, endX, endY, componentCenterY, picoPin, formFactor } = endpoints;
+
+        // --- Bezier control points with wire rendering overrides ---
+        // Angle convention: 0°=right, 90°=down, 180°=left, 270°=up (SVG coords)
+        const DEG2RAD = Math.PI / 180;
+        const gap = Math.abs(endX - startX);
+
+        // Pico end (cp1): default exits horizontally rightward (0°)
+        const picoOverride = this.wireOverrides?.picoWires?.[picoPin] || {};
+        const pAngle = (picoOverride.entryAngleDeg ?? 0) * DEG2RAD;
+        const pDist = gap * 0.4;
+        const cp1x = startX + pDist * Math.cos(pAngle) + (picoOverride.cpOffsetX ?? 0);
+        const cp1y = startY + pDist * Math.sin(pAngle) + (picoOverride.cpOffsetY ?? 0);
+
+        // Component end (cp2): default exits perpendicular away from component body
+        const compOverride = this.wireOverrides?.componentWires?.[formFactor] || {};
+        const defaultExitDeg = (componentCenterY <= endY) ? 90 : 270; // down or up
+        const cAngle = (compOverride.exitAngleDeg ?? defaultExitDeg) * DEG2RAD;
+        const cDist = 30; // base control point distance
+        const cp2x = endX + cDist * Math.cos(cAngle) + (compOverride.cpOffsetX ?? 0);
+        const cp2y = endY + cDist * Math.sin(cAngle) + (compOverride.cpOffsetY ?? 0);
+
+        // Brightness override
+        const brightness = compOverride.brightness ?? null;
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.classList.add('bundled-wire');
+        path.classList.add(`wire-${wire.role || 'signal'}`);
+        path.setAttribute('data-wire-id', wire.id);
+        path.setAttribute('data-group-id', group.id);
+        path.style.stroke = wire.color || '#ffcc00';
+        if (brightness !== null) {
+            path.style.opacity = brightness;
+        }
+
+        const d = `M ${startX} ${startY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endX} ${endY}`;
+        path.setAttribute('d', d);
+
+        return {
+            path,
+            endpoints: {
+                startX, startY, endX, endY,
+                cp1x, cp1y, cp2x, cp2y,
+                componentCenterY, picoPin, formFactor
+            }
+        };
     }
 
     /**

@@ -66,15 +66,17 @@ grep -n "renderMicroPython" explorer-app.js
 This branch merges the LLM-based MicroPython parsing (from `explorer-only`) with physical breadboard component placement. Components are placed at specific breadboard holes instead of abstract boxes.
 
 - **Phases 1-3 complete**: Cropped breadboard SVG, coordinate system, placement registry, `BreadboardPlacementSystem`, `BreadboardRenderer`, full rendering pipeline
-- **Tabbed sidebar**: Four tabs — Code (MicroPython input), Components (graphics test + Pico position), Comp Wires (wire preview + Bezier tuning), Pico Wires (per-pin entry angle tuning)
+- **Tabbed sidebar**: Five tabs — Code (MicroPython input), Components (graphics test + Pico position), Comp Wires (wire preview + Bezier tuning), Pico Wires (per-pin entry angle tuning), Drag Wires (interactive wire placement test)
 - **Components tab**: Toggle components on/off, drag-and-drop to reposition, fine-tune with keyboard (arrows=nudge, +/-=scale, R=rotate). Click Pico to select and reposition/rescale. Pico position/scale persists in `breadboard-placements.json` (`picoPosition` field) and loads on init. Pin markers scale with Pico via `pico-geometry.js`.
 - **Comp Wires tab**: Toggle component type → renders component + mock wires to Pico. Click component to select wire group → `[`/`]` exit angle (10° increments), arrows=CP offset, B+arrows=brightness. "Copy Wire Settings" exports overrides to clipboard.
 - **Pico Wires tab**: Select Pico pin → `[`/`]` entry angle, arrows=CP offset. Controls the Pico end of Bezier curves.
 - **Wire rendering overrides**: `breadboard-wire-rendering.json` stores per-formFactor and per-Pico-pin Bezier curve overrides (exitAngleDeg, entryAngleDeg, cpOffsetX/Y, brightness). Applied to both wire preview and parsed circuits.
 - **Rendering transforms**: Per-formFactor `rendering` block in `breadboard-placements.json` (offsetX, offsetY, scale, rotation). Support components use `supportRendering` section.
 - **Wire Bezier curves**: Angle-based control points. Component end: exit angle (default perpendicular away from body). Pico end: entry angle (default 0° = horizontal). Both adjustable via wire tuning tabs.
+- **Drag Wires tab**: Select a component type → component renders at breadboard slot → Pico pins strobe one at a time (cyan glow ring) → click and drag wire from Pico pin to strobing breadboard hole → wire preview (dashed Bezier) follows cursor, blending into final curve shape near target → release to snap wire into place → next pin strobes. Uses `renderSingleWire()` extracted from `BreadboardRenderer`. Foundation for post-parse guided/auto wiring modes (see plan file).
 - **Copy Positions**: Exports all placements + rendering transforms to clipboard as JSON
 - **9 scripts loaded**: `config.js`, `pico-geometry.js`, `breadboard-data.js`, `breadboard-placement.js`, `breadboard-renderer.js`, `abstract-layout.js`, `micropython-parser.js`, `llm-micropython-parser.js`, `llmResponse.js`, `explorer-app.js`
+- **Active plan**: `~/.claude/plans/polymorphic-popping-sonnet.md` — Drag Wire Test Tab + foundation for post-parse wiring modes (guided wiring, auto one-by-one, quick render all, shift+click isolation). Drag Wires tab is implemented; remaining modes are future work.
 
 ### Prior branch: `explorer-only`
 
@@ -228,7 +230,8 @@ BreadboardPlacementSystem (breadboard-placement.js)
 BreadboardRenderer (breadboard-renderer.js)
     ↓ loadWireOverrides() — reads breadboard-wire-rendering.json
     ↓ renderComponents() — <image> SVGs with per-formFactor transforms
-    ↓ renderWires() — Bezier curves with angle-based control points + overrides
+    ↓ renderSingleWire() — creates one Bezier path (does NOT append to DOM)
+    ↓ renderWires() — calls renderSingleWire() for each wire, appends to wiresLayer
     ↓ renderGroupHighlights() — bounding boxes around functional groups
 ```
 

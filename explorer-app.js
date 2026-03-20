@@ -1040,6 +1040,7 @@ class ExplorerApp {
         this.setupPicoControls();
         this.setupComponentWiresUI();
         this.setupPicoWiresUI();
+        this.setupDragWiresUI();
     }
 
     // ==================== Graphics Test (Phase 2) ====================
@@ -1196,6 +1197,9 @@ class ExplorerApp {
                 break;
             case 'pico-wires':
                 this._pwireHandleKey?.(e);
+                break;
+            case 'drag-wires':
+                this._dwireHandleKey?.(e);
                 break;
         }
     }
@@ -1936,6 +1940,478 @@ class ExplorerApp {
 
         this.holesLayer.appendChild(debugGroup);
         console.log(`[GraphicsTest] ${BREADBOARD_HOLES.length} debug holes rendered`);
+    }
+
+    // ==================== Drag Wires Tab ====================
+
+    setupDragWiresUI() {
+        this._dwireState = {
+            testKey: null,
+            wireList: [],
+            currentIndex: 0,
+            placedPaths: [],
+            isDragging: false,
+            previewPath: null,
+            currentPicoPin: null,
+            currentTargetHole: null,
+            strobeElements: [],
+            placementSystem: null,
+            componentMetadata: null,
+            allGroups: null
+        };
+
+        // Bound handlers for add/remove
+        this._dwireDragBound = (e) => this._dwireDrag(e);
+        this._dwireEndDragBound = (e) => this._dwireEndDrag(e);
+
+        const toggleBtns = document.querySelectorAll('.dwire-toggle');
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Only one component at a time — deselect others
+                toggleBtns.forEach(b => b.classList.remove('dwire-on'));
+                if (this._dwireState.testKey === btn.dataset.dwire) {
+                    this._dwireClear();
+                } else {
+                    btn.classList.add('dwire-on');
+                    this._dwireSelect(btn.dataset.dwire);
+                }
+            });
+        });
+
+        document.getElementById('dwire-reset-btn')?.addEventListener('click', () => this._dwireReset());
+
+        console.log('[Explorer] Drag Wires UI initialized');
+    }
+
+    /** Select a component type — render it + Pico, build wire list, show first target */
+    async _dwireSelect(testKey) {
+        this._dwireClear();
+        this._dwireState.testKey = testKey;
+
+        const defs = this._getGraphicsTestDefs();
+        const wireDefs = this._getDefaultWireDefs();
+        const def = defs[testKey];
+        if (!def || def.type === 'debug') return;
+
+        // Set up placement system
+        const placementSystem = await this._gtestEnsurePlacementSystem();
+        placementSystem.clear();
+
+        const allGroups = [];
+        const allSvgMaps = {};
+
+        for (const group of def.groups) {
+            const testWires = wireDefs[testKey] || [];
+            group.wires = testWires.map(w => w.id);
+            allGroups.push(group);
+        }
+        Object.assign(allSvgMaps, def.svgMap);
+
+        placementSystem.assignPlacements(allGroups);
+
+        // Render components
+        this.componentsLayer.innerHTML = '';
+        this.wiresLayer.innerHTML = '';
+        this.holesLayer.innerHTML = '';
+
+        for (const group of allGroups) {
+            const groupG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            groupG.setAttribute('class', 'dwire-group');
+            groupG.setAttribute('data-group-id', group.id);
+
+            for (const componentId of group.allComponents) {
+                const placement = placementSystem.getComponentPosition(componentId);
+                if (!placement) continue;
+                const componentType = componentId.replace(/-\d+$/, '');
+                const svgInfo = allSvgMaps[componentType];
+                if (!svgInfo) continue;
+                this._gtestRenderComponent(componentId, placement, svgInfo, groupG);
+            }
+            this.componentsLayer.appendChild(groupG);
+        }
+
+        // Build componentMetadata for renderSingleWire
+        const componentMetadata = new Map();
+        for (const group of allGroups) {
+            for (const compId of group.allComponents) {
+                const compType = compId.replace(/-\d+$/, '');
+                componentMetadata.set(compId, {
+                    type: compType,
+                    metadata: { functionalGroup: {} }
+                });
+            }
+        }
+
+        // Build wire list — one entry per wire
+        const testWires = wireDefs[testKey] || [];
+        const wireList = testWires.map((wire, i) => {
+            // Find which group this wire belongs to
+            const group = allGroups.find(g => g.wires.includes(wire.id)) || allGroups[0];
+            // Extract readable info
+            const picoEnd = wire.from.startsWith('pico1.') ? wire.from : wire.to;
+            const compEnd = wire.from.startsWith('pico1.') ? wire.to : wire.from;
+            const pinKey = picoEnd.split('.')[1];
+            const compPin = compEnd.split('.')[1];
+            return { wire, group, pinKey, compPin, index: i };
+        });
+
+        this._dwireState.wireList = wireList;
+        this._dwireState.currentIndex = 0;
+        this._dwireState.placedPaths = [];
+        this._dwireState.placementSystem = placementSystem;
+        this._dwireState.componentMetadata = componentMetadata;
+        this._dwireState.allGroups = allGroups;
+
+        // Show wire info panel
+        const infoPanel = document.getElementById('dwire-wire-info');
+        if (infoPanel) infoPanel.style.display = 'block';
+
+        this._dwireUpdateStatus();
+        this._dwireShowNextTarget();
+    }
+
+    /** Clear everything — reset to no component selected */
+    _dwireClear() {
+        this._dwireClearTarget();
+        this._dwireRemovePreview();
+        this.componentsLayer.innerHTML = '';
+        this.wiresLayer.innerHTML = '';
+        this.holesLayer.innerHTML = '';
+
+        this._dwireState.testKey = null;
+        this._dwireState.wireList = [];
+        this._dwireState.currentIndex = 0;
+        this._dwireState.placedPaths = [];
+        this._dwireState.isDragging = false;
+
+        const infoPanel = document.getElementById('dwire-wire-info');
+        if (infoPanel) infoPanel.style.display = 'none';
+        const statusEl = document.getElementById('dwire-status');
+        if (statusEl) statusEl.textContent = '';
+    }
+
+    /** Reset wires only — keep component rendered, restart from first wire */
+    _dwireReset() {
+        if (!this._dwireState.testKey) return;
+        this._dwireClearTarget();
+        this._dwireRemovePreview();
+
+        // Remove placed wire paths
+        for (const path of this._dwireState.placedPaths) {
+            path.remove();
+        }
+        this._dwireState.placedPaths = [];
+        this._dwireState.currentIndex = 0;
+        this._dwireState.isDragging = false;
+
+        this._dwireUpdateStatus();
+        this._dwireShowNextTarget();
+    }
+
+    /** Show strobe on current Pico pin + target breadboard hole + label */
+    _dwireShowNextTarget() {
+        this._dwireClearTarget();
+
+        const { wireList, currentIndex } = this._dwireState;
+        if (currentIndex >= wireList.length) {
+            // All wires placed!
+            const statusEl = document.getElementById('dwire-status');
+            if (statusEl) statusEl.textContent = `All ${wireList.length} wires placed!`;
+            const labelEl = document.getElementById('dwire-current-label');
+            if (labelEl) labelEl.textContent = 'Complete!';
+            return;
+        }
+
+        const entry = wireList[currentIndex];
+        const { wire, group, pinKey, compPin } = entry;
+
+        // Resolve endpoints to get coordinates
+        if (this.bbRenderer) {
+            this.bbRenderer.setWireOverrides(this.wireOverrides);
+        }
+        const result = this.bbRenderer?.renderSingleWire(
+            wire, group,
+            this._dwireState.componentMetadata,
+            this._dwireState.placementSystem
+        );
+        if (!result) {
+            console.warn(`[DragWires] Could not resolve wire ${wire.id}`);
+            return;
+        }
+
+        // Store resolved endpoints for snap detection
+        entry.endpoints = result.endpoints;
+        // Don't append the path — student will drag to create it
+
+        // Strobe Pico pin
+        let pinEl = document.querySelector(`[data-pin-id="pico1.${pinKey}"]`);
+        if (!pinEl) {
+            pinEl = document.querySelector(`[data-pin-id^="pico1.${pinKey}_"]`);
+        }
+        if (pinEl) {
+            pinEl.classList.add('pin-strobe');
+            this._dwireState.strobeElements.push(pinEl);
+
+            // Add a visible glow ring around the pin
+            const pinRect = pinEl.querySelector('rect');
+            if (pinRect) {
+                const px = parseFloat(pinRect.getAttribute('x')) + parseFloat(pinRect.getAttribute('width')) / 2;
+                const py = parseFloat(pinRect.getAttribute('y')) + parseFloat(pinRect.getAttribute('height')) / 2;
+                const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                ring.classList.add('pin-strobe-ring');
+                ring.setAttribute('cx', px);
+                ring.setAttribute('cy', py);
+                ring.setAttribute('r', '5');
+                pinEl.appendChild(ring);
+            }
+
+            this._dwireState.currentPicoPin = {
+                x: result.endpoints.startX,
+                y: result.endpoints.startY,
+                pinKey: pinKey,
+                element: pinEl
+            };
+
+            // Add mousedown listener for drag start
+            pinEl.style.cursor = 'pointer';
+            pinEl._dwireMousedown = (e) => this._dwireStartDrag(e);
+            pinEl.addEventListener('mousedown', pinEl._dwireMousedown);
+        }
+
+        // Strobe target breadboard hole
+        const targetX = result.endpoints.endX;
+        const targetY = result.endpoints.endY;
+
+        const strobeCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        strobeCircle.setAttribute('cx', targetX);
+        strobeCircle.setAttribute('cy', targetY);
+        strobeCircle.setAttribute('r', '3');
+        strobeCircle.classList.add('hole-strobe');
+        this.holesLayer.appendChild(strobeCircle);
+        this._dwireState.strobeElements.push(strobeCircle);
+
+        // Label near target hole
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.classList.add('hole-target-label');
+        label.setAttribute('x', targetX);
+        label.setAttribute('y', targetY - 5);
+        label.textContent = compPin;
+        this.holesLayer.appendChild(label);
+        this._dwireState.strobeElements.push(label);
+
+        this._dwireState.currentTargetHole = { x: targetX, y: targetY };
+
+        // Update current wire label
+        const labelEl = document.getElementById('dwire-current-label');
+        if (labelEl) labelEl.textContent = `${compPin} (${pinKey} → ${compPin})`;
+    }
+
+    /** Remove all strobe markers and listeners */
+    _dwireClearTarget() {
+        for (const el of this._dwireState.strobeElements) {
+            if (el.classList) {
+                el.classList.remove('pin-strobe');
+                // Remove glow ring we added
+                const ring = el.querySelector?.('.pin-strobe-ring');
+                if (ring) ring.remove();
+            }
+            // Remove mousedown listener if it was a Pico pin
+            if (el._dwireMousedown) {
+                el.removeEventListener('mousedown', el._dwireMousedown);
+                delete el._dwireMousedown;
+                el.style.cursor = '';
+            }
+            // Remove SVG elements we added (circles, labels)
+            if (el.classList.contains('hole-strobe') || el.classList.contains('hole-target-label')) {
+                el.remove();
+            }
+        }
+        this._dwireState.strobeElements = [];
+        this._dwireState.currentPicoPin = null;
+        this._dwireState.currentTargetHole = null;
+    }
+
+    /** Convert mouse event to SVG coordinates */
+    _svgPointFromEvent(event) {
+        const svg = this.svg;
+        const pt = svg.createSVGPoint();
+        pt.x = event.clientX;
+        pt.y = event.clientY;
+        return pt.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
+    /** Mousedown on strobing Pico pin — start drag */
+    _dwireStartDrag(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const { currentPicoPin, wireList, currentIndex } = this._dwireState;
+        if (!currentPicoPin || currentIndex >= wireList.length) return;
+
+        const entry = wireList[currentIndex];
+        this._dwireState.isDragging = true;
+
+        // Create preview path
+        const preview = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        preview.classList.add('wire-drag-preview');
+        preview.style.stroke = entry.wire.color || '#ffcc00';
+        this.wiresLayer.appendChild(preview);
+        this._dwireState.previewPath = preview;
+
+        // Attach move + up listeners to SVG
+        this.svg.addEventListener('mousemove', this._dwireDragBound);
+        this.svg.addEventListener('mouseup', this._dwireEndDragBound);
+        // Also listen on window in case mouse leaves SVG
+        window.addEventListener('mouseup', this._dwireEndDragBound);
+    }
+
+    /** Mousemove during drag — update preview Bezier, blending into final curve near target */
+    _dwireDrag(e) {
+        if (!this._dwireState.isDragging || !this._dwireState.previewPath) return;
+
+        const pt = this._svgPointFromEvent(e);
+        const pin = this._dwireState.currentPicoPin;
+        const target = this._dwireState.currentTargetHole;
+        const entry = this._dwireState.wireList[this._dwireState.currentIndex];
+        const finalEp = entry?.endpoints;
+
+        // Distance from cursor to target hole
+        const distToTarget = target
+            ? Math.sqrt((pt.x - target.x) ** 2 + (pt.y - target.y) ** 2)
+            : Infinity;
+
+        // Blend radius: within this distance, start transitioning to final Bezier
+        const BLEND_RADIUS = 25;
+        // t=0 means fully "free drag", t=1 means fully "final curve"
+        const t = target && finalEp
+            ? Math.max(0, Math.min(1, 1 - distToTarget / BLEND_RADIUS))
+            : 0;
+
+        // Free-drag control points (simple horizontal exit from Pico)
+        const freeGap = Math.abs(pt.x - pin.x);
+        const freeCp1x = pin.x + freeGap * 0.4;
+        const freeCp1y = pin.y;
+        const freeCp2x = pt.x;
+        const freeCp2y = pt.y;
+        const freeEndX = pt.x;
+        const freeEndY = pt.y;
+
+        // Blend: lerp between free-drag and final curve
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const cp1x = finalEp ? lerp(freeCp1x, finalEp.cp1x, t) : freeCp1x;
+        const cp1y = finalEp ? lerp(freeCp1y, finalEp.cp1y, t) : freeCp1y;
+        const cp2x = finalEp ? lerp(freeCp2x, finalEp.cp2x, t) : freeCp2x;
+        const cp2y = finalEp ? lerp(freeCp2y, finalEp.cp2y, t) : freeCp2y;
+        const endX = finalEp ? lerp(freeEndX, finalEp.endX, t) : freeEndX;
+        const endY = finalEp ? lerp(freeEndY, finalEp.endY, t) : freeEndY;
+
+        const d = `M ${pin.x} ${pin.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endX} ${endY}`;
+        this._dwireState.previewPath.setAttribute('d', d);
+
+        // Visual feedback: make preview more solid as it approaches
+        this._dwireState.previewPath.style.opacity = 0.4 + t * 0.5;
+        if (t > 0.8) {
+            this._dwireState.previewPath.style.strokeDasharray = 'none';
+        } else {
+            this._dwireState.previewPath.style.strokeDasharray = '4 3';
+        }
+    }
+
+    /** Mouseup — check proximity to target hole, snap or retry */
+    _dwireEndDrag(e) {
+        if (!this._dwireState.isDragging) return;
+
+        // Remove listeners
+        this.svg.removeEventListener('mousemove', this._dwireDragBound);
+        this.svg.removeEventListener('mouseup', this._dwireEndDragBound);
+        window.removeEventListener('mouseup', this._dwireEndDragBound);
+
+        this._dwireState.isDragging = false;
+
+        const pt = this._svgPointFromEvent(e);
+        const target = this._dwireState.currentTargetHole;
+        const SNAP_THRESHOLD = 8; // SVG coordinate units
+
+        if (target) {
+            const dist = Math.sqrt((pt.x - target.x) ** 2 + (pt.y - target.y) ** 2);
+
+            if (dist <= SNAP_THRESHOLD) {
+                // Success — snap wire
+                this._dwireSnapWire();
+                return;
+            }
+        }
+
+        // Miss — remove preview, keep strobing for retry
+        this._dwireRemovePreview();
+        const statusEl = document.getElementById('dwire-status');
+        if (statusEl) statusEl.textContent = 'Missed! Try again — drag closer to the strobing hole';
+    }
+
+    /** Place the final wire using renderSingleWire, advance queue */
+    _dwireSnapWire() {
+        this._dwireRemovePreview();
+
+        const { wireList, currentIndex } = this._dwireState;
+        const entry = wireList[currentIndex];
+
+        // Render the real wire
+        const result = this.bbRenderer?.renderSingleWire(
+            entry.wire, entry.group,
+            this._dwireState.componentMetadata,
+            this._dwireState.placementSystem
+        );
+
+        if (result) {
+            result.path.classList.add('wire-just-placed');
+            this.wiresLayer.appendChild(result.path);
+            this._dwireState.placedPaths.push(result.path);
+        }
+
+        // Advance
+        this._dwireState.currentIndex++;
+        this._dwireUpdateStatus();
+        this._dwireShowNextTarget();
+    }
+
+    /** Remove the drag preview path */
+    _dwireRemovePreview() {
+        if (this._dwireState.previewPath) {
+            this._dwireState.previewPath.remove();
+            this._dwireState.previewPath = null;
+        }
+    }
+
+    /** Update progress display */
+    _dwireUpdateStatus() {
+        const { wireList, currentIndex } = this._dwireState;
+        const progressEl = document.getElementById('dwire-progress');
+        if (progressEl) {
+            progressEl.textContent = `Wire ${Math.min(currentIndex + 1, wireList.length)} / ${wireList.length}`;
+        }
+        const statusEl = document.getElementById('dwire-status');
+        if (statusEl && currentIndex < wireList.length) {
+            statusEl.textContent = 'Drag from the strobing Pico pin to the strobing breadboard hole';
+        }
+    }
+
+    /** Keyboard handler for Drag Wires tab */
+    _dwireHandleKey(e) {
+        if (e.key === 'Escape') {
+            if (this._dwireState.isDragging) {
+                // Cancel drag
+                this.svg.removeEventListener('mousemove', this._dwireDragBound);
+                this.svg.removeEventListener('mouseup', this._dwireEndDragBound);
+                window.removeEventListener('mouseup', this._dwireEndDragBound);
+                this._dwireState.isDragging = false;
+                this._dwireRemovePreview();
+            } else {
+                // Deselect component
+                this._dwireClear();
+                document.querySelectorAll('.dwire-toggle').forEach(b => b.classList.remove('dwire-on'));
+            }
+            e.preventDefault();
+        }
     }
 
     // ==================== Drag-and-Drop System ====================

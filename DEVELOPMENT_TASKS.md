@@ -8,6 +8,26 @@
 
 ---
 
+## In Progress
+
+### Drag Wire Test Tab + Post-Parse Wiring Modes
+**Plan file**: `~/.claude/plans/polymorphic-popping-sonnet.md`
+
+**Completed so far**:
+- Drag Wires tab — interactive click-and-drag wire placement test
+- `renderSingleWire()` extracted from `BreadboardRenderer` (foundation for all modes)
+- Strobe animations (Pico pin glow ring + breadboard hole pulse)
+- Drag preview Bezier that blends into final curve shape near target
+
+**Remaining (from plan)**:
+- Post-parse modal (guided wiring / auto one-by-one / quick render all)
+- Auto one-by-one mode (spacebar advances, wire animation)
+- Guided wiring mode (strobing pins, click-and-drag with queue)
+- Shift+click wire isolation (fade all, highlight one)
+- Completion state + interaction enable
+
+---
+
 ## Recently Completed (March 20, 2026 Session)
 
 ### ✅ Pico scale-aware pins + persistent position + export fix
