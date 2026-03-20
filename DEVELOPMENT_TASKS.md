@@ -2,9 +2,36 @@
 
 > Internal task tracking for breadboard circuit builder POC refinement and expansion
 
-**Last Updated**: March 18, 2026
+**Last Updated**: March 20, 2026
 **Current Phase**: parse_to_breadboard Branch — Physical Breadboard Rendering Pipeline
 **Branch**: `parse_to_breadboard` (created from `explorer-only`)
+
+---
+
+## Recently Completed (March 20, 2026 Session)
+
+### ✅ Pico scale-aware pins + persistent position + export fix
+**Completed**: March 20, 2026
+
+**What was delivered**:
+
+**1. Scale-aware Pico pin markers** — `pico-geometry.js`
+- `generatePicoConnectablePoints()` now reads scale from DOM and multiplies offsets/spacing
+- Pin markers stay aligned with Pico image at any scale
+
+**2. Persistent Pico position** — `explorer-app.js`, `breadboard-placements.json`
+- `picoPosition` (x, y, scale) saved to `breadboard-placements.json` via Copy Positions
+- Loaded on init — Pico position survives page reload
+- `updatePicoPosition()` + `renderPicoPins()` called on load
+
+**3. Copy Positions export fix** — `explorer-app.js`
+- No longer fails when no components have been toggled (lazy-inits placement system)
+- Always includes `picoPosition` in export
+
+**4. Wire rendering overrides tuned** — `breadboard-wire-rendering.json`
+- Per-component Bezier curve overrides tuned for TB6612, LED, button, US-100, photocell
+
+**Files modified**: `pico-geometry.js`, `explorer-app.js`, `breadboard-placements.json`, `breadboard-wire-rendering.json`
 
 ---
 

@@ -1202,13 +1202,31 @@ class ExplorerApp {
 
     // ==================== Pico Position Controls ====================
 
-    setupPicoControls() {
+    async setupPicoControls() {
         this._picoSelected = false;
-        this._picoPosition = {
+
+        // Load saved Pico position from breadboard-placements.json
+        let savedPos = null;
+        try {
+            const res = await fetch('breadboard-placements.json');
+            if (res.ok) {
+                const data = await res.json();
+                savedPos = data.picoPosition;
+            }
+        } catch (e) { /* ignore */ }
+
+        this._picoPosition = savedPos || {
             x: parseFloat(document.getElementById('pico-board')?.getAttribute('x') || 20),
             y: parseFloat(document.getElementById('pico-board')?.getAttribute('y') || 20),
             scale: 1.0
         };
+
+        // Apply saved position on load
+        if (savedPos) {
+            updatePicoPosition(this._picoPosition.x, this._picoPosition.y, this._picoPosition.scale);
+            this.picoPinsLayer.innerHTML = '';
+            this.renderPicoPins();
+        }
 
         // Click Pico board image to select
         const picoImg = document.getElementById('pico-board');
@@ -2379,14 +2397,12 @@ class ExplorerApp {
     }
 
     /** Export current placements to clipboard as JSON */
-    _gtestExportPlacements() {
-        const ps = this._gtestPlacementSystem;
-        if (!ps || !ps.placements) {
-            console.warn('[GraphicsTest] No placements to export');
-            return;
-        }
+    async _gtestExportPlacements() {
+        // Ensure placement system is loaded even if no components were toggled
+        const ps = await this._gtestEnsurePlacementSystem();
         const exportData = {
             _description: "Breadboard placement registry — exported from graphics test drag-and-drop",
+            picoPosition: this._picoPosition ? { ...this._picoPosition } : undefined,
             typeNormalization: ps.typeNormalization,
             supportRendering: ps.supportRendering,
             placements: ps.placements

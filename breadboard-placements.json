@@ -1,5 +1,10 @@
 {
   "_description": "Breadboard placement registry — exported from graphics test drag-and-drop",
+  "picoPosition": {
+    "x": 15.5,
+    "y": -17,
+    "scale": 1.4000000000000004
+  },
   "typeNormalization": {
     "led-red-5mm": "led-5mm",
     "led-green-5mm": "led-5mm",

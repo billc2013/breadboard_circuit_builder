@@ -119,56 +119,58 @@ const PICO_CONFIG = {
 };
 
 /**
- * Initialize Pico board position
- * Reads actual position from DOM for reporting
- * @returns {Object} {x, y} actual position from DOM
+ * Initialize Pico board position and scale from DOM
+ * @returns {Object} {x, y, scale} actual position and scale from DOM
  */
 function initializePico() {
     const img = document.getElementById(PICO_CONFIG.svg_element_id);
-    
+
     if (!img) {
         console.error('Pico board image not found! Check svg_element_id:', PICO_CONFIG.svg_element_id);
-        return { x: 0, y: 0 };
+        return { x: 0, y: 0, scale: 1.0 };
     }
-    
+
     const actualX = parseFloat(img.getAttribute('x'));
     const actualY = parseFloat(img.getAttribute('y'));
-    
-    console.log('✓ Pico board initialized at:', { x: actualX, y: actualY });
-    return { x: actualX, y: actualY };
+    const actualWidth = parseFloat(img.getAttribute('width'));
+    const scale = actualWidth / PICO_CONFIG.svg.width;
+
+    return { x: actualX, y: actualY, scale: scale };
 }
 
 /**
  * Generate all pin connection points (geometry only)
- * This creates the 40 pin position objects that get merged into app.connectablePoints
+ * Accounts for current Pico position AND scale from the DOM.
  * @returns {Array} Array of pin position objects
  */
 function generatePicoConnectablePoints() {
     const points = [];
     const { internal_offset, pin_spacing, pin_layout } = PICO_CONFIG;
-    
-    // Get actual board position from DOM
+
+    // Get actual board position + scale from DOM
     const boardPos = initializePico();
-    
-    // Calculate absolute positions for pin centers
-    const leftPinX = boardPos.x + internal_offset.left_pins_x;
-    const rightPinX = boardPos.x + internal_offset.right_pins_x;
-    const firstPinY = boardPos.y + internal_offset.first_pin_y;
-    
+    const s = boardPos.scale;
+
+    // Scale offsets and spacing to match current Pico image size
+    const leftPinX = boardPos.x + internal_offset.left_pins_x * s;
+    const rightPinX = boardPos.x + internal_offset.right_pins_x * s;
+    const firstPinY = boardPos.y + internal_offset.first_pin_y * s;
+    const scaledSpacing = pin_spacing * s;
+
     // Generate left side pins (top to bottom)
     pin_layout.left.forEach((pinKey, index) => {
         points.push({
-            id: `pico1.${pinKey}`,           // Full reference for wiring (e.g., "pico1.GP0")
+            id: `pico1.${pinKey}`,
             componentId: 'pico1',
             componentType: PICO_CONFIG.component_type,
-            pinKey: pinKey,                  // Key to lookup in pico.json (e.g., "GP0", "GND_3")
+            pinKey: pinKey,
             x: leftPinX,
-            y: firstPinY + (index * pin_spacing),
+            y: firstPinY + (index * scaledSpacing),
             side: 'left',
-            index: index                     // Position in side array
+            index: index
         });
     });
-    
+
     // Generate right side pins (top to bottom)
     pin_layout.right.forEach((pinKey, index) => {
         points.push({
@@ -177,12 +179,12 @@ function generatePicoConnectablePoints() {
             componentType: PICO_CONFIG.component_type,
             pinKey: pinKey,
             x: rightPinX,
-            y: firstPinY + (index * pin_spacing),
+            y: firstPinY + (index * scaledSpacing),
             side: 'right',
             index: index
         });
     });
-    
+
     return points;
 }
 

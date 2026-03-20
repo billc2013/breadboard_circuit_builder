@@ -67,7 +67,7 @@ This branch merges the LLM-based MicroPython parsing (from `explorer-only`) with
 
 - **Phases 1-3 complete**: Cropped breadboard SVG, coordinate system, placement registry, `BreadboardPlacementSystem`, `BreadboardRenderer`, full rendering pipeline
 - **Tabbed sidebar**: Four tabs — Code (MicroPython input), Components (graphics test + Pico position), Comp Wires (wire preview + Bezier tuning), Pico Wires (per-pin entry angle tuning)
-- **Components tab**: Toggle components on/off, drag-and-drop to reposition, fine-tune with keyboard (arrows=nudge, +/-=scale, R=rotate). Click Pico to select and reposition/rescale.
+- **Components tab**: Toggle components on/off, drag-and-drop to reposition, fine-tune with keyboard (arrows=nudge, +/-=scale, R=rotate). Click Pico to select and reposition/rescale. Pico position/scale persists in `breadboard-placements.json` (`picoPosition` field) and loads on init. Pin markers scale with Pico via `pico-geometry.js`.
 - **Comp Wires tab**: Toggle component type → renders component + mock wires to Pico. Click component to select wire group → `[`/`]` exit angle (10° increments), arrows=CP offset, B+arrows=brightness. "Copy Wire Settings" exports overrides to clipboard.
 - **Pico Wires tab**: Select Pico pin → `[`/`]` entry angle, arrows=CP offset. Controls the Pico end of Bezier curves.
 - **Wire rendering overrides**: `breadboard-wire-rendering.json` stores per-formFactor and per-Pico-pin Bezier curve overrides (exitAngleDeg, entryAngleDeg, cpOffsetX/Y, brightness). Applied to both wire preview and parsed circuits.

@@ -1,5 +1,29 @@
 {
   "_description": "Wire Bezier curve rendering overrides — per component type and per Pico pin. Angles: 0°=right, 90°=down, 180°=left, 270°=up (SVG coordinate space).",
-  "componentWires": {},
+  "componentWires": {
+    "tb6612-motor-driver": {
+      "cpOffsetY": -97,
+      "brightness": 0.6500000000000001,
+      "cpOffsetX": -88
+    },
+    "led-5mm": {
+      "cpOffsetY": 39
+    },
+    "button-tactile-6mm": {
+      "cpOffsetY": -11,
+      "exitAngleDeg": 260,
+      "cpOffsetX": 18
+    },
+    "us100-ultrasonic": {
+      "cpOffsetY": 18,
+      "exitAngleDeg": 40,
+      "cpOffsetX": 27
+    },
+    "photocell-ldr": {
+      "cpOffsetY": 6,
+      "cpOffsetX": 15,
+      "exitAngleDeg": 60
+    }
+  },
   "picoWires": {}
 }
