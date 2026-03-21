@@ -8,27 +8,63 @@
 
 ---
 
-## In Progress
+## Future Work
 
-### Drag Wire Test Tab + Post-Parse Wiring Modes
-**Plan file**: `~/.claude/plans/polymorphic-popping-sonnet.md`
-
-**Completed so far**:
-- Drag Wires tab — interactive click-and-drag wire placement test
-- `renderSingleWire()` extracted from `BreadboardRenderer` (foundation for all modes)
-- Strobe animations (Pico pin glow ring + breadboard hole pulse)
-- Drag preview Bezier that blends into final curve shape near target
-
-**Remaining (from plan)**:
-- Post-parse modal (guided wiring / auto one-by-one / quick render all)
-- Auto one-by-one mode (spacebar advances, wire animation)
-- Guided wiring mode (strobing pins, click-and-drag with queue)
-- Shift+click wire isolation (fade all, highlight one)
-- Completion state + interaction enable
+- **Power rail system**: 3V3/GND wires should route through breadboard power rails instead of point-to-point from Pico pins. Currently both US-100 and TB6612 wire directly to `pico1.3V3_OUT` — bandaid fix allows this but real breadboards use power rails.
+- **TB6612 motor driver layout**: Pin positions and visual complexity need revisiting for dense circuits.
+- **Wire count display**: "Wires: 0" counter doesn't update when loading via MicroPython.
 
 ---
 
 ## Recently Completed (March 20, 2026 Session)
+
+### ✅ Post-Parse Wiring Mode System
+**Completed**: March 20, 2026
+**Plan file**: `~/.claude/plans/vivid-sniffing-cookie.md`
+
+**What was delivered**:
+
+**1. Post-parse wiring modal** — `explorer-app.js`, `circuit-explorer.html`, `circuit-explorer.css`
+- After parsing, components render instantly, then modal appears: Quick Render / Step Through / Guided Wiring
+- `_renderOnBreadboardComponentsOnly()` splits component rendering from wire rendering
+- `_showWiringModeModal()` returns Promise resolving to chosen mode
+- Parse button stays disabled until wiring completes
+
+**2. Quick Render mode** — `_executeQuickWiring()`
+- All wires render instantly (same as previous behavior)
+
+**3. Step Through mode** — `_executeAutoWiring()`
+- Wires appear one at a time with strobe animations on Pico pin + target hole
+- SPACE to place next wire, ESC to render all remaining instantly
+- Wire progress bar: "Wire 3/7 — Press SPACE to place next wire"
+
+**4. Guided Wiring mode** — `_executeGuidedWiring()`
+- Click-and-drag each wire from strobing Pico pin to target breadboard hole
+- Preview Bezier blends into final curve shape near target (same as Drag Wires tab)
+- Snap-to-hole on mouseup if within threshold, retry on miss
+- `pointer-events: none` on placed wires so shared pins (3V3) stay clickable
+
+**5. Shift+click wire isolation** — `isolateWire()`, `clearWireIsolation()`
+- Shift+click any wire → fade all others, highlight clicked wire with glow + tooltip
+- Shift+click same wire again or ESC to clear
+- Uses settings from `breadboard-wire-styles.json`
+
+**6. Wire Styles tuning tab** — 6th sidebar tab
+- Two preview modes: Group Fade / Wire Isolation
+- Renders test components with wires, applies fade/glow effect
+- Keyboard: `[`/`]` fade opacity, Up/Down active opacity, `+`/`-` stroke width, G+arrows glow radius
+- "Copy Wire Styles" exports to clipboard → `breadboard-wire-styles.json`
+- Settings applied in production by `activateGroup()`, `fadeNonActiveWires()`, `isolateWire()`
+
+**7. 3V3 pin multi-wire fix**
+- Multiple components can share `pico1.3V3_OUT` during guided wiring
+- Placed wires use `pointer-events: none` (re-enabled on completion)
+- Noted as bandaid — power rail system is future work
+
+**Files modified**: `explorer-app.js`, `circuit-explorer.html`, `circuit-explorer.css`
+**Files created**: `breadboard-wire-styles.json`
+
+---
 
 ### ✅ Pico scale-aware pins + persistent position + export fix
 **Completed**: March 20, 2026

@@ -15,13 +15,13 @@
 ### Key Directories
 
 ```
-├── explorer-app.js              # Circuit Explorer application (~1,485 lines)
+├── explorer-app.js              # Circuit Explorer application (~2,000 lines)
 ├── llm-micropython-parser.js    # LLM-based parser — sends code to Modal endpoint (~316 lines)
 ├── llmResponse.js               # Streaming utility for Modal (kept for future use)
 ├── micropython-parser.js        # Regex-based parser — used as pipeline delegate by LLMParser (~860 lines)
 ├── abstract-layout.js           # Slot-based positioning system (~377 lines)
 ├── config.js                    # Runtime config (gitignored) — Modal endpoint URL
-├── circuit-explorer.html        # Main HTML (loads 6 scripts)
+├── circuit-explorer.html        # Main HTML (loads 9 scripts)
 ├── index.html                   # Redirect → circuit-explorer.html
 ├── components/                  # Component library ("One Truth")
 │   ├── library.json             # Master index
@@ -66,17 +66,22 @@ grep -n "renderMicroPython" explorer-app.js
 This branch merges the LLM-based MicroPython parsing (from `explorer-only`) with physical breadboard component placement. Components are placed at specific breadboard holes instead of abstract boxes.
 
 - **Phases 1-3 complete**: Cropped breadboard SVG, coordinate system, placement registry, `BreadboardPlacementSystem`, `BreadboardRenderer`, full rendering pipeline
-- **Tabbed sidebar**: Five tabs — Code (MicroPython input), Components (graphics test + Pico position), Comp Wires (wire preview + Bezier tuning), Pico Wires (per-pin entry angle tuning), Drag Wires (interactive wire placement test)
+- **Tabbed sidebar**: Six tabs — Code (MicroPython input), Components (graphics test + Pico position), Comp Wires (wire preview + Bezier tuning), Pico Wires (per-pin entry angle tuning), Drag Wires (interactive wire placement test), Wire Styles (fade/glow tuning for group selection + wire isolation)
 - **Components tab**: Toggle components on/off, drag-and-drop to reposition, fine-tune with keyboard (arrows=nudge, +/-=scale, R=rotate). Click Pico to select and reposition/rescale. Pico position/scale persists in `breadboard-placements.json` (`picoPosition` field) and loads on init. Pin markers scale with Pico via `pico-geometry.js`.
 - **Comp Wires tab**: Toggle component type → renders component + mock wires to Pico. Click component to select wire group → `[`/`]` exit angle (10° increments), arrows=CP offset, B+arrows=brightness. "Copy Wire Settings" exports overrides to clipboard.
 - **Pico Wires tab**: Select Pico pin → `[`/`]` entry angle, arrows=CP offset. Controls the Pico end of Bezier curves.
 - **Wire rendering overrides**: `breadboard-wire-rendering.json` stores per-formFactor and per-Pico-pin Bezier curve overrides (exitAngleDeg, entryAngleDeg, cpOffsetX/Y, brightness). Applied to both wire preview and parsed circuits.
 - **Rendering transforms**: Per-formFactor `rendering` block in `breadboard-placements.json` (offsetX, offsetY, scale, rotation). Support components use `supportRendering` section.
 - **Wire Bezier curves**: Angle-based control points. Component end: exit angle (default perpendicular away from body). Pico end: entry angle (default 0° = horizontal). Both adjustable via wire tuning tabs.
-- **Drag Wires tab**: Select a component type → component renders at breadboard slot → Pico pins strobe one at a time (cyan glow ring) → click and drag wire from Pico pin to strobing breadboard hole → wire preview (dashed Bezier) follows cursor, blending into final curve shape near target → release to snap wire into place → next pin strobes. Uses `renderSingleWire()` extracted from `BreadboardRenderer`. Foundation for post-parse guided/auto wiring modes (see plan file).
+- **Drag Wires tab**: Select a component type → component renders at breadboard slot → Pico pins strobe one at a time (cyan glow ring) → click and drag wire from Pico pin to strobing breadboard hole → wire preview (dashed Bezier) follows cursor, blending into final curve shape near target → release to snap wire into place → next pin strobes. Uses `renderSingleWire()` extracted from `BreadboardRenderer`.
+- **Wire Styles tab**: Two preview modes (Group Fade / Wire Isolation). Renders test components with wires, applies fade/glow effect. Keyboard: `[`/`]` fade opacity, Up/Down active opacity, `+`/`-` stroke width, G+arrows glow radius. "Copy Wire Styles" exports to clipboard → `breadboard-wire-styles.json`.
+- **Post-parse wiring modal**: After MicroPython code is parsed, a modal offers three wiring modes: Quick Render (instant), Step Through (SPACE to advance one wire at a time with strobe animations), Guided Wiring (click-and-drag each wire from Pico to component). Components render first, then the modal appears. The parse button stays disabled until wiring completes.
+- **Shift+click wire isolation**: Shift+click any wire to fade all others and highlight the clicked wire with glow. Shift+click again or ESC to clear. Uses settings from `breadboard-wire-styles.json`.
+- **Wire style overrides**: `breadboard-wire-styles.json` stores separate `groupSelection` and `wireIsolation` settings (fadedOpacity, activeOpacity, activeStrokeWidth, glowRadius). Applied as inline styles by `activateGroup()`, `fadeNonActiveWires()`, `isolateWire()`.
+- **3V3 pin sharing**: Multiple components (US-100, TB6612) can share `pico1.3V3_OUT`. During guided wiring, placed wires use `pointer-events: none` so the pin stays clickable for subsequent wires. Bandaid — real fix is a power rail system (future work).
 - **Copy Positions**: Exports all placements + rendering transforms to clipboard as JSON
 - **9 scripts loaded**: `config.js`, `pico-geometry.js`, `breadboard-data.js`, `breadboard-placement.js`, `breadboard-renderer.js`, `abstract-layout.js`, `micropython-parser.js`, `llm-micropython-parser.js`, `llmResponse.js`, `explorer-app.js`
-- **Active plan**: `~/.claude/plans/polymorphic-popping-sonnet.md` — Drag Wire Test Tab + foundation for post-parse wiring modes (guided wiring, auto one-by-one, quick render all, shift+click isolation). Drag Wires tab is implemented; remaining modes are future work.
+- **Active plan**: `~/.claude/plans/vivid-sniffing-cookie.md` — Wire Styles tuning tab (implemented).
 
 ### Prior branch: `explorer-only`
 
@@ -208,10 +213,12 @@ Wires Array
 Circuit Data Structure
     ↓ loadFromLLMCall() in explorer-app.js
     ↓ buildFunctionalGroupsFromParser()
-    ↓ placementSystem.assignPlacements() — hole-based positioning
-    ↓ bbRenderer.renderComponents() — SVG images with rendering transforms
-    ↓ bbRenderer.renderWires() — Bezier curves from Pico pins
-    ↓ bbRenderer.renderGroupHighlights() — bounding boxes
+    ↓ _renderOnBreadboardComponentsOnly() — placements, highlights, components (no wires)
+    ↓ _showWiringModeModal() — student chooses: Quick / Step Through / Guided
+    ↓ Quick: bbRenderer.renderWires() — all wires at once
+    ↓ Step Through: _autoShowNextWire() — SPACE to advance, strobe animations
+    ↓ Guided: _guidedShowNextTarget() — click-and-drag each wire
+    ↓ enableGroupInteraction() + enableWireInteraction()
 Visual Output
 ```
 
@@ -238,9 +245,10 @@ BreadboardRenderer (breadboard-renderer.js)
 ### Tabbed Sidebar System
 
 ```
-Tab bar: Code | Components | Comp Wires | Pico Wires
+Tab bar: Code | Components | Comp Wires | Pico Wires | Drag Wires | Wire Styles
     ↓ setupTabUI() — CSS show/hide via .tab-content.active
     ↓ _handleGlobalKey() dispatches to active tab's handler
+    ↓ _wiringState?.active takes priority (during post-parse wiring)
 
 Components tab:
     _gtestHandleKey() — component fine-tune (arrows, +/-, R)
@@ -255,6 +263,16 @@ Comp Wires tab:
 Pico Wires tab:
     _pwireHandleKey() — [/] entry angle, arrows CP offset
     Controls Pico-side Bezier control points
+
+Drag Wires tab:
+    _dwireSelect() — render component + build wire queue
+    _dwireShowNextTarget() — strobe pin + hole, attach mousedown
+    _dwireStartDrag/Drag/EndDrag/SnapWire — click-and-drag flow
+
+Wire Styles tab:
+    _wstyleActivateMode('group'|'isolation') — render test + apply fade/glow
+    _wstyleHandleKey() — [/] fade, arrows active, +/- stroke, G glow
+    Copy Wire Styles → breadboard-wire-styles.json to clipboard
 ```
 
 ---
@@ -308,6 +326,9 @@ const pin = this.picoPins.find(p => p.pinKey === name) ||
 ### Wire Count Display
 The "Wires: 0" counter in the bottom-left does not update when loading via MicroPython. This is a known minor UI issue.
 
+### 3V3 Pin Shared by Multiple Components
+When parsing circuits with multiple power-needing components (e.g., US-100 + TB6612), both generate wires to `pico1.3V3_OUT`. Quick Render handles this fine. Guided wiring uses `pointer-events: none` on placed wires so the pin stays clickable. The real fix is a power rail system where 3V3/GND wires route through breadboard power rails — future work.
+
 ---
 
 ## Session Workflow
@@ -350,6 +371,10 @@ The "Wires: 0" counter in the bottom-left does not update when loading via Micro
 | Prefix-match for ADC pins | Gracefully handles GP26 vs GP26_ADC0 naming across parser and geometry |
 | Rendering transforms per formFactor | offsetX/Y, scale, rotation stored in `breadboard-placements.json` — visual tuning separate from electrical pin-to-hole mapping |
 | Rotation on SVG image only | R key rotates the component image, not pin markers or hole positions — keeps electrical model intact |
+| Post-parse wiring modal | Components render first, then student chooses wiring mode — educational value scales with interactivity |
+| renderSingleWire() doesn't append | Caller decides when/where to insert SVG path — enables drag preview, animation, and batch rendering |
+| pointer-events:none during guided wiring | Placed wires don't block mousedown on Pico pins below (3V3 shared by multiple components) |
+| Wire style overrides as inline styles | CSS classes remain as fallbacks; JSON-tuned values applied on top via JS for group selection + isolation |
 
 ---
 

@@ -1,0 +1,14 @@
+{
+  "groupSelection": {
+    "fadedOpacity": 0.15000000000000002,
+    "activeOpacity": 1,
+    "activeStrokeWidth": 6,
+    "glowRadius": 3
+  },
+  "wireIsolation": {
+    "fadedOpacity": 0.15,
+    "activeOpacity": 1,
+    "activeStrokeWidth": 6,
+    "glowRadius": 4
+  }
+}

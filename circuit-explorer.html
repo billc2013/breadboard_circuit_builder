@@ -82,6 +82,7 @@
                     <button class="tab-btn" data-tab="comp-wires">Comp Wires</button>
                     <button class="tab-btn" data-tab="pico-wires">Pico Wires</button>
                     <button class="tab-btn" data-tab="drag-wires">Drag Wires</button>
+                    <button class="tab-btn" data-tab="wire-styles">Wire Styles</button>
                 </div>
 
                 <!-- Tab: Code -->
@@ -227,6 +228,32 @@
                     <div id="dwire-status" style="color: #888; font-size: 11px; margin-top: 6px;"></div>
                 </div>
 
+                <!-- Tab: Wire Styles -->
+                <div class="tab-content" data-tab-content="wire-styles">
+                    <div class="input-instructions">Preview and tune wire fade/glow styles</div>
+                    <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                        <button class="wstyle-mode-btn action-btn secondary" data-wstyle="group">Group Fade</button>
+                        <button class="wstyle-mode-btn action-btn secondary" data-wstyle="isolation">Wire Isolation</button>
+                    </div>
+                    <div id="wstyle-finetune" style="display: none; margin-top: 8px; padding: 6px; border: 1px solid #444; border-radius: 4px; background: #1a1a2e;">
+                        <div style="color: #ff9900; font-size: 11px; font-weight: bold; margin-bottom: 4px;">
+                            Mode: <span id="wstyle-mode-label">—</span>
+                        </div>
+                        <div style="color: #aaa; font-size: 10px; line-height: 1.6;">
+                            <kbd>[</kbd><kbd>]</kbd> fade opacity &nbsp;
+                            <kbd>&#8593;</kbd><kbd>&#8595;</kbd> active opacity &nbsp;
+                            <kbd>+</kbd><kbd>-</kbd> stroke width &nbsp;
+                            <kbd>G</kbd>+<kbd>&#8593;</kbd><kbd>&#8595;</kbd> glow &nbsp;
+                            <kbd>Esc</kbd> deselect
+                        </div>
+                        <div id="wstyle-values" style="color: #888; font-size: 10px; margin-top: 4px; font-family: monospace;"></div>
+                    </div>
+                    <div style="display: flex; gap: 4px; margin-top: 8px;">
+                        <button id="wstyle-copy-btn" class="action-btn secondary" style="flex:1">Copy Wire Styles</button>
+                    </div>
+                    <div id="wstyle-status" style="color: #888; font-size: 11px; margin-top: 6px;"></div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -255,6 +282,39 @@
     <div id="component-info-box" style="display: none;">
         <div id="info-box-title"></div>
         <div id="info-box-details"></div>
+    </div>
+
+    <!-- Wiring Mode Modal (shown after parsing, before wires render) -->
+    <div id="wiring-mode-modal" class="wiring-modal-overlay">
+        <div class="wiring-modal">
+            <div class="wiring-modal-title">How would you like to wire your circuit?</div>
+            <div class="wiring-modal-subtitle">
+                Components are placed on the breadboard. Choose how wires appear.
+            </div>
+            <div class="wiring-modal-options">
+                <button class="wiring-mode-btn" data-mode="quick">
+                    <div class="wiring-mode-icon">&#9889;</div>
+                    <div class="wiring-mode-name">Quick Render</div>
+                    <div class="wiring-mode-desc">Show all wires instantly</div>
+                </button>
+                <button class="wiring-mode-btn" data-mode="auto">
+                    <div class="wiring-mode-icon">&#9654;</div>
+                    <div class="wiring-mode-name">Step Through</div>
+                    <div class="wiring-mode-desc">Watch wires appear one by one (SPACE to advance)</div>
+                </button>
+                <button class="wiring-mode-btn" data-mode="guided">
+                    <div class="wiring-mode-icon">&#9997;</div>
+                    <div class="wiring-mode-name">Guided Wiring</div>
+                    <div class="wiring-mode-desc">Drag each wire from Pico to component</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wire Progress Bar (shown during Step Through / Guided modes) -->
+    <div id="wire-progress-bar" style="display: none;">
+        <span id="wire-progress-text">Wire 1 / 5</span>
+        <span id="wire-progress-hint"></span>
     </div>
 
     <script src="config.js"></script>

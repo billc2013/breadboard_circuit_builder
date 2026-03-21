@@ -317,6 +317,13 @@ class ExplorerApp {
         const wireId = wireElement.getAttribute('data-wire-id');
         if (!wireId) return;
 
+        // Shift+click → isolate this single wire (fade all others)
+        if (event.shiftKey) {
+            console.log('[Explorer] Shift+click wire isolation:', wireId);
+            this.isolateWire(wireId);
+            return;
+        }
+
         console.log('[Explorer] Wire clicked:', wireId);
         this.handleSingleWireClick(wireId);
     }
@@ -448,6 +455,67 @@ class ExplorerApp {
 
         this.pinnedTooltips.clear();
         this.hoveredWireId = null;
+    }
+
+    // ==================== Wire Isolation (Shift+Click) ====================
+
+    /**
+     * Isolate a single wire — fade all others, highlight this one.
+     * Shift+click again on the same wire (or press ESC) to clear.
+     */
+    isolateWire(wireId) {
+        // If already isolating this wire, toggle off
+        if (this._isolatedWireId === wireId) {
+            this.clearWireIsolation();
+            return;
+        }
+
+        // Clear any previous isolation or group selection
+        this.clearWireIsolation();
+        if (this.activeGroup) {
+            this.deactivateGroup();
+        }
+
+        this._isolatedWireId = wireId;
+
+        const s = this.wireStyleOverrides?.wireIsolation;
+
+        // Fade all wires, then highlight the isolated one
+        const allWires = document.querySelectorAll('.bundled-wire');
+        for (const wireEl of allWires) {
+            const id = wireEl.getAttribute('data-wire-id');
+            if (id === wireId) {
+                wireEl.classList.add('wire-active');
+                wireEl.classList.remove('wire-faded');
+                if (s) {
+                    wireEl.style.opacity = s.activeOpacity;
+                    wireEl.style.strokeWidth = s.activeStrokeWidth + 'px';
+                    wireEl.style.filter = `drop-shadow(0 0 ${s.glowRadius}px currentColor)`;
+                }
+            } else {
+                wireEl.classList.add('wire-faded');
+                wireEl.classList.remove('wire-active');
+                if (s) {
+                    wireEl.style.opacity = s.fadedOpacity;
+                }
+            }
+        }
+
+        // Highlight connected Pico pin
+        this.highlightConnectedPicoPins([wireId]);
+
+        // Show tooltip for the isolated wire
+        this.showTooltip(wireId);
+    }
+
+    /** Clear wire isolation — restore all wires to normal. */
+    clearWireIsolation() {
+        if (!this._isolatedWireId) return;
+
+        this._isolatedWireId = null;
+        this.resetAllWireFade();
+        this.unhighlightAllPicoPins();
+        this.hideTooltip();
     }
 
     // ==================== Group Info Panel ====================
@@ -805,12 +873,18 @@ class ExplorerApp {
         boundary.rect.classList.add('group-active');
         boundary.label.classList.add('label-active');
 
+        const s = this.wireStyleOverrides?.groupSelection;
         const group = boundary.group;
         for (const wireId of group.wires) {
             const wireEl = document.querySelector(`[data-wire-id="${wireId}"]`);
             if (wireEl) {
                 wireEl.classList.add('wire-active');
                 wireEl.classList.remove('wire-faded');
+                if (s) {
+                    wireEl.style.opacity = s.activeOpacity;
+                    wireEl.style.strokeWidth = s.activeStrokeWidth + 'px';
+                    wireEl.style.filter = `drop-shadow(0 0 ${s.glowRadius}px currentColor)`;
+                }
             }
         }
 
@@ -836,6 +910,9 @@ class ExplorerApp {
             const wireEl = document.querySelector(`[data-wire-id="${wireId}"]`);
             if (wireEl) {
                 wireEl.classList.remove('wire-active');
+                wireEl.style.opacity = '';
+                wireEl.style.strokeWidth = '';
+                wireEl.style.filter = '';
             }
         }
 
@@ -853,11 +930,15 @@ class ExplorerApp {
         const activeGroup = this.groupBoundaries.get(activeGroupId)?.group;
         if (!activeGroup) return;
 
+        const s = this.wireStyleOverrides?.groupSelection;
         const allWires = document.querySelectorAll('.bundled-wire');
         for (const wireEl of allWires) {
             const wireId = wireEl.getAttribute('data-wire-id');
             if (!activeGroup.wires.includes(wireId)) {
                 wireEl.classList.add('wire-faded');
+                if (s) {
+                    wireEl.style.opacity = s.fadedOpacity;
+                }
             }
         }
     }
@@ -867,6 +948,9 @@ class ExplorerApp {
         for (const wireEl of allWires) {
             wireEl.classList.remove('wire-faded');
             wireEl.classList.remove('wire-active');
+            wireEl.style.opacity = '';
+            wireEl.style.strokeWidth = '';
+            wireEl.style.filter = '';
         }
     }
 
@@ -1041,6 +1125,8 @@ class ExplorerApp {
         this.setupComponentWiresUI();
         this.setupPicoWiresUI();
         this.setupDragWiresUI();
+        this.setupWireStylesUI();
+        this._loadWireStyleOverrides();
     }
 
     // ==================== Graphics Test (Phase 2) ====================
@@ -1188,6 +1274,19 @@ class ExplorerApp {
         const tag = document.activeElement?.tagName;
         if (tag === 'TEXTAREA' || tag === 'INPUT') return;
 
+        // Post-parse wiring mode takes priority over tab dispatch
+        if (this._wiringState?.active) {
+            this._wiringHandleKey(e);
+            return;
+        }
+
+        // ESC clears wire isolation
+        if (e.key === 'Escape' && this._isolatedWireId) {
+            e.preventDefault();
+            this.clearWireIsolation();
+            return;
+        }
+
         switch (this._activeTab) {
             case 'components':
                 this._gtestHandleKey(e);
@@ -1200,6 +1299,9 @@ class ExplorerApp {
                 break;
             case 'drag-wires':
                 this._dwireHandleKey?.(e);
+                break;
+            case 'wire-styles':
+                this._wstyleHandleKey?.(e);
                 break;
         }
     }
@@ -2414,6 +2516,332 @@ class ExplorerApp {
         }
     }
 
+    // ==================== Wire Styles Tab ====================
+
+    /** Load wire style overrides from JSON file */
+    async _loadWireStyleOverrides() {
+        try {
+            const res = await fetch('breadboard-wire-styles.json');
+            if (res.ok) {
+                this.wireStyleOverrides = await res.json();
+                console.log('[Explorer] Wire style overrides loaded');
+            }
+        } catch (e) {
+            console.warn('[Explorer] Could not load wire style overrides, using defaults');
+        }
+        // Ensure defaults exist
+        if (!this.wireStyleOverrides) {
+            this.wireStyleOverrides = {};
+        }
+        if (!this.wireStyleOverrides.groupSelection) {
+            this.wireStyleOverrides.groupSelection = {
+                fadedOpacity: 0.2, activeOpacity: 1.0,
+                activeStrokeWidth: 3.5, glowRadius: 3
+            };
+        }
+        if (!this.wireStyleOverrides.wireIsolation) {
+            this.wireStyleOverrides.wireIsolation = {
+                fadedOpacity: 0.15, activeOpacity: 1.0,
+                activeStrokeWidth: 4.0, glowRadius: 4
+            };
+        }
+    }
+
+    setupWireStylesUI() {
+        this._wstyleMode = null;       // 'group' | 'isolation' | null
+        this._wstyleGlowMode = false;  // G key modifier
+
+        // Store test render context
+        this._wstyleTestGroups = [];
+        this._wstyleTestWires = [];
+
+        const modeBtns = document.querySelectorAll('.wstyle-mode-btn');
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.dataset.wstyle;
+                if (this._wstyleMode === mode) {
+                    this._wstyleDeactivate();
+                    btn.classList.remove('wstyle-on');
+                } else {
+                    modeBtns.forEach(b => b.classList.remove('wstyle-on'));
+                    btn.classList.add('wstyle-on');
+                    this._wstyleActivateMode(mode);
+                }
+            });
+        });
+
+        document.getElementById('wstyle-copy-btn')?.addEventListener('click', () => {
+            this._wstyleExportSettings();
+        });
+
+        console.log('[Explorer] Wire Styles UI initialized');
+    }
+
+    /** Render all test components + wires, then apply fade/glow for the selected mode */
+    async _wstyleActivateMode(mode) {
+        this._wstyleMode = mode;
+
+        // Clear SVG layers
+        this.componentsLayer.innerHTML = '';
+        this.wiresLayer.innerHTML = '';
+        this.holesLayer.innerHTML = '';
+
+        const defs = this._getGraphicsTestDefs();
+        const wireDefs = this._getDefaultWireDefs();
+        const placementSystem = await this._gtestEnsurePlacementSystem();
+        placementSystem.clear();
+
+        const allGroups = [];
+        const allSvgMaps = {};
+        const allWires = [];
+        const groupRegistry = [];
+
+        // Render ALL component types to get a realistic multi-group scene
+        const testKeys = ['led', 'button', 'photocell', 'us100'];
+        for (const testKey of testKeys) {
+            const def = defs[testKey];
+            if (!def || def.type === 'debug') continue;
+
+            for (const group of def.groups) {
+                const testWires = wireDefs[testKey] || [];
+                group.wires = testWires.map(w => w.id);
+                allGroups.push(group);
+                groupRegistry.push({ testKey, group });
+            }
+            Object.assign(allSvgMaps, def.svgMap);
+
+            const testWires = wireDefs[testKey] || [];
+            allWires.push(...testWires);
+        }
+
+        if (allGroups.length > 0) {
+            placementSystem.assignPlacements(allGroups);
+        }
+
+        // Render components
+        for (const { testKey, group } of groupRegistry) {
+            const groupG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            groupG.setAttribute('class', 'wstyle-group');
+            groupG.setAttribute('data-group-id', group.id);
+
+            for (const componentId of group.allComponents) {
+                const placement = placementSystem.getComponentPosition(componentId);
+                if (!placement) continue;
+                const componentType = componentId.replace(/-\d+$/, '');
+                const svgInfo = allSvgMaps[componentType];
+                if (!svgInfo) continue;
+                this._gtestRenderComponent(componentId, placement, svgInfo, groupG);
+            }
+            this.componentsLayer.appendChild(groupG);
+        }
+
+        // Build componentMetadata for renderWires
+        const componentMetadata = new Map();
+        for (const { group } of groupRegistry) {
+            for (const compId of group.allComponents) {
+                const compType = compId.replace(/-\d+$/, '');
+                componentMetadata.set(compId, {
+                    type: compType,
+                    metadata: { functionalGroup: {} }
+                });
+            }
+        }
+
+        // Render all wires
+        if (allWires.length > 0 && this.bbRenderer) {
+            this.bbRenderer.setWireOverrides(this.wireOverrides);
+            this.bbRenderer.renderWires(allWires, allGroups, componentMetadata, placementSystem);
+        }
+
+        // Store for mode application
+        this._wstyleTestGroups = allGroups;
+        this._wstyleTestWires = allWires;
+
+        // Apply the selected mode's fade/glow
+        this._wstyleApplyCurrentSettings();
+
+        // Show finetune panel
+        const panel = document.getElementById('wstyle-finetune');
+        if (panel) panel.style.display = 'block';
+
+        const label = document.getElementById('wstyle-mode-label');
+        if (label) label.textContent = mode === 'group' ? 'Group Fade' : 'Wire Isolation';
+
+        this._wstyleUpdateInfo();
+    }
+
+    /** Apply current fade/glow settings to rendered test wires */
+    _wstyleApplyCurrentSettings() {
+        if (!this._wstyleMode) return;
+
+        const allWireEls = document.querySelectorAll('.bundled-wire');
+        if (allWireEls.length === 0) return;
+
+        const settingsKey = this._wstyleMode === 'group' ? 'groupSelection' : 'wireIsolation';
+        const s = this.wireStyleOverrides[settingsKey];
+
+        if (this._wstyleMode === 'group') {
+            // Activate the first group, fade the rest
+            const firstGroup = this._wstyleTestGroups[0];
+            if (!firstGroup) return;
+
+            for (const wireEl of allWireEls) {
+                const wireId = wireEl.getAttribute('data-wire-id');
+                if (firstGroup.wires.includes(wireId)) {
+                    wireEl.classList.add('wire-active');
+                    wireEl.classList.remove('wire-faded');
+                    wireEl.style.opacity = s.activeOpacity;
+                    wireEl.style.strokeWidth = s.activeStrokeWidth + 'px';
+                    wireEl.style.filter = `drop-shadow(0 0 ${s.glowRadius}px currentColor)`;
+                } else {
+                    wireEl.classList.add('wire-faded');
+                    wireEl.classList.remove('wire-active');
+                    wireEl.style.opacity = s.fadedOpacity;
+                    wireEl.style.strokeWidth = '';
+                    wireEl.style.filter = '';
+                }
+            }
+        } else {
+            // Isolate the first signal wire, fade all others
+            const firstSignalWire = this._wstyleTestWires.find(w => w.role === 'signal');
+            const isolatedId = firstSignalWire?.id;
+
+            for (const wireEl of allWireEls) {
+                const wireId = wireEl.getAttribute('data-wire-id');
+                if (wireId === isolatedId) {
+                    wireEl.classList.add('wire-active');
+                    wireEl.classList.remove('wire-faded');
+                    wireEl.style.opacity = s.activeOpacity;
+                    wireEl.style.strokeWidth = s.activeStrokeWidth + 'px';
+                    wireEl.style.filter = `drop-shadow(0 0 ${s.glowRadius}px currentColor)`;
+                } else {
+                    wireEl.classList.add('wire-faded');
+                    wireEl.classList.remove('wire-active');
+                    wireEl.style.opacity = s.fadedOpacity;
+                    wireEl.style.strokeWidth = '';
+                    wireEl.style.filter = '';
+                }
+            }
+        }
+    }
+
+    /** Update info display with current values */
+    _wstyleUpdateInfo() {
+        const el = document.getElementById('wstyle-values');
+        if (!el || !this._wstyleMode) return;
+
+        const settingsKey = this._wstyleMode === 'group' ? 'groupSelection' : 'wireIsolation';
+        const s = this.wireStyleOverrides[settingsKey];
+        el.textContent = `fade:${s.fadedOpacity.toFixed(2)} active:${s.activeOpacity.toFixed(2)} stroke:${s.activeStrokeWidth.toFixed(1)} glow:${s.glowRadius}px`;
+    }
+
+    /** Deactivate wire styles preview */
+    _wstyleDeactivate() {
+        this._wstyleMode = null;
+        this._wstyleGlowMode = false;
+
+        // Clear inline styles from test wires
+        const allWireEls = document.querySelectorAll('.bundled-wire');
+        for (const wireEl of allWireEls) {
+            wireEl.classList.remove('wire-active', 'wire-faded');
+            wireEl.style.opacity = '';
+            wireEl.style.strokeWidth = '';
+            wireEl.style.filter = '';
+        }
+
+        // Clear layers
+        this.componentsLayer.innerHTML = '';
+        this.wiresLayer.innerHTML = '';
+        this.holesLayer.innerHTML = '';
+
+        // Hide finetune panel
+        const panel = document.getElementById('wstyle-finetune');
+        if (panel) panel.style.display = 'none';
+
+        document.querySelectorAll('.wstyle-mode-btn').forEach(b => b.classList.remove('wstyle-on'));
+    }
+
+    /** Keyboard handler for Wire Styles tab */
+    _wstyleHandleKey(e) {
+        if (!this._wstyleMode) return;
+
+        const settingsKey = this._wstyleMode === 'group' ? 'groupSelection' : 'wireIsolation';
+        const s = this.wireStyleOverrides[settingsKey];
+        let changed = false;
+
+        // Glow mode: G was pressed, now arrows adjust glow radius
+        if (this._wstyleGlowMode && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+            const step = e.key === 'ArrowUp' ? 1 : -1;
+            s.glowRadius = Math.max(0, Math.min(20, s.glowRadius + step));
+            changed = true;
+            this._wstyleGlowMode = false;
+        } else {
+            switch (e.key) {
+                case '[':
+                    s.fadedOpacity = Math.max(0, Math.min(1, s.fadedOpacity - 0.05));
+                    changed = true;
+                    break;
+                case ']':
+                    s.fadedOpacity = Math.max(0, Math.min(1, s.fadedOpacity + 0.05));
+                    changed = true;
+                    break;
+                case 'ArrowUp':
+                    s.activeOpacity = Math.max(0.1, Math.min(1, s.activeOpacity + 0.05));
+                    changed = true;
+                    break;
+                case 'ArrowDown':
+                    s.activeOpacity = Math.max(0.1, Math.min(1, s.activeOpacity - 0.05));
+                    changed = true;
+                    break;
+                case '+':
+                case '=':
+                    s.activeStrokeWidth = Math.min(8, s.activeStrokeWidth + 0.5);
+                    changed = true;
+                    break;
+                case '-':
+                    s.activeStrokeWidth = Math.max(1, s.activeStrokeWidth - 0.5);
+                    changed = true;
+                    break;
+                case 'g':
+                case 'G':
+                    this._wstyleGlowMode = true;
+                    e.preventDefault();
+                    return;
+                case 'Escape':
+                    this._wstyleDeactivate();
+                    e.preventDefault();
+                    return;
+            }
+        }
+
+        if (e.key !== 'g' && e.key !== 'G') {
+            this._wstyleGlowMode = false;
+        }
+
+        if (changed) {
+            e.preventDefault();
+            this._wstyleApplyCurrentSettings();
+            this._wstyleUpdateInfo();
+        }
+    }
+
+    /** Export wire style settings to clipboard */
+    _wstyleExportSettings() {
+        const exportData = {
+            groupSelection: this.wireStyleOverrides.groupSelection,
+            wireIsolation: this.wireStyleOverrides.wireIsolation
+        };
+        const json = JSON.stringify(exportData, null, 2);
+        navigator.clipboard.writeText(json).then(() => {
+            const statusEl = document.getElementById('wstyle-status');
+            if (statusEl) statusEl.textContent = 'Wire styles copied to clipboard!';
+            console.log('[Explorer] Wire style overrides copied to clipboard');
+        }).catch(err => {
+            console.error('[Explorer] Clipboard write failed:', err);
+            console.log('[Explorer] Wire style overrides JSON:\n', json);
+        });
+    }
+
     // ==================== Drag-and-Drop System ====================
 
     /** Row order for offset calculations (J=0 top → A=9 bottom) */
@@ -2934,6 +3362,608 @@ class ExplorerApp {
     }
 
     /**
+     * Breadboard rendering — components only (no wires).
+     * Wires are deferred to the chosen wiring mode.
+     */
+    _renderOnBreadboardComponentsOnly(circuitData, componentMetadata) {
+        console.log('[Explorer] Rendering components on breadboard (wires deferred)');
+
+        this.placementSystem.clear();
+        this.placementSystem.assignPlacements(this.functionalGroups, componentMetadata);
+
+        this.removeBreadboardFade();
+
+        this.clearGroupBoundaries();
+        const groupBounds = this.bbRenderer.renderGroupHighlights(this.functionalGroups, this.placementSystem);
+        for (const [groupId, boundary] of groupBounds) {
+            this.groupBoundaries.set(groupId, boundary);
+        }
+
+        const positions = this.bbRenderer.renderComponents(this.functionalGroups, componentMetadata, this.placementSystem);
+        for (const [compId, pos] of positions) {
+            this.componentPositions.set(compId, pos);
+        }
+
+        // Store data for deferred wire rendering
+        this._pendingWiringData = { circuitData, componentMetadata };
+    }
+
+    /**
+     * Build an ordered wire queue from parsed circuit data.
+     * Each entry: { wire, group, pinKey, compPin, index }
+     */
+    _buildWireQueue(circuitData) {
+        const wires = circuitData.circuit.wires;
+        const queue = [];
+        for (const group of this.functionalGroups) {
+            for (const wireId of group.wires) {
+                const wire = wires.find(w => w.id === wireId);
+                if (!wire) continue;
+                const picoEnd = wire.from.startsWith('pico1.') ? wire.from : wire.to;
+                const compEnd = wire.from.startsWith('pico1.') ? wire.to : wire.from;
+                const pinKey = picoEnd.split('.')[1];
+                const compPin = compEnd.split('.')[1];
+                queue.push({ wire, group, pinKey, compPin, index: queue.length });
+            }
+        }
+        return queue;
+    }
+
+    // ==================== Wiring Mode System ====================
+
+    /**
+     * Show wiring mode modal. Returns Promise<string> resolving to 'quick'|'auto'|'guided'.
+     */
+    _showWiringModeModal() {
+        return new Promise(resolve => {
+            const modal = document.getElementById('wiring-mode-modal');
+            if (!modal) { resolve('quick'); return; }
+
+            modal.classList.add('visible');
+
+            const buttons = modal.querySelectorAll('.wiring-mode-btn');
+            const handler = (e) => {
+                const mode = e.currentTarget.dataset.mode;
+                modal.classList.remove('visible');
+                buttons.forEach(b => b.removeEventListener('click', handler));
+                resolve(mode);
+            };
+            buttons.forEach(b => b.addEventListener('click', handler));
+        });
+    }
+
+    /** Quick wiring — render all wires instantly (current behavior). */
+    _executeQuickWiring() {
+        const { circuitData, componentMetadata } = this._pendingWiringData;
+        this.wireToGroup = this.bbRenderer.renderWires(
+            circuitData.circuit.wires,
+            this.functionalGroups,
+            componentMetadata,
+            this.placementSystem
+        );
+        this._pendingWiringData = null;
+    }
+
+    // ==================== Step Through (Auto) Mode ====================
+
+    /**
+     * Step Through wiring — wires appear one at a time, SPACE to advance.
+     * Returns Promise that resolves when all wires are placed.
+     */
+    _executeAutoWiring() {
+        return new Promise(resolve => {
+            const { circuitData, componentMetadata } = this._pendingWiringData;
+            const queue = this._buildWireQueue(circuitData);
+
+            this._wiringState = {
+                mode: 'auto',
+                active: true,
+                queue,
+                currentIndex: 0,
+                placedPaths: [],
+                circuitData,
+                componentMetadata,
+                resolveComplete: resolve,
+                strobeElements: []
+            };
+
+            this._wireToGroupPending = new Map();
+            this._updateWireProgress();
+            this._autoShowNextWire();
+        });
+    }
+
+    /** Show strobe on next wire's Pico pin + target hole, wait for SPACE. */
+    _autoShowNextWire() {
+        this._clearWireStrobes();
+
+        const { queue, currentIndex } = this._wiringState;
+        if (currentIndex >= queue.length) {
+            this._wiringComplete();
+            return;
+        }
+
+        const entry = queue[currentIndex];
+        const { wire, group, pinKey, compPin } = entry;
+
+        // Resolve endpoints
+        if (this.bbRenderer) {
+            this.bbRenderer.setWireOverrides(this.wireOverrides);
+        }
+        const result = this.bbRenderer?.renderSingleWire(
+            wire, group,
+            this._wiringState.componentMetadata,
+            this.placementSystem
+        );
+        if (!result) {
+            console.warn(`[Wiring] Could not resolve wire ${wire.id}, skipping`);
+            this._wiringState.currentIndex++;
+            this._autoShowNextWire();
+            return;
+        }
+
+        entry.endpoints = result.endpoints;
+
+        // Strobe Pico pin (same pattern as _dwireShowNextTarget)
+        let pinEl = document.querySelector(`[data-pin-id="pico1.${pinKey}"]`);
+        if (!pinEl) {
+            pinEl = document.querySelector(`[data-pin-id^="pico1.${pinKey}_"]`);
+        }
+        if (pinEl) {
+            pinEl.classList.add('pin-strobe');
+            this._wiringState.strobeElements.push(pinEl);
+
+            const pinRect = pinEl.querySelector('rect');
+            if (pinRect) {
+                const px = parseFloat(pinRect.getAttribute('x')) + parseFloat(pinRect.getAttribute('width')) / 2;
+                const py = parseFloat(pinRect.getAttribute('y')) + parseFloat(pinRect.getAttribute('height')) / 2;
+                const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                ring.classList.add('pin-strobe-ring');
+                ring.setAttribute('cx', px);
+                ring.setAttribute('cy', py);
+                ring.setAttribute('r', '5');
+                pinEl.appendChild(ring);
+            }
+        }
+
+        // Strobe target breadboard hole
+        const targetX = result.endpoints.endX;
+        const targetY = result.endpoints.endY;
+        const strobeCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        strobeCircle.setAttribute('cx', targetX);
+        strobeCircle.setAttribute('cy', targetY);
+        strobeCircle.setAttribute('r', '3');
+        strobeCircle.classList.add('hole-strobe');
+        this.holesLayer.appendChild(strobeCircle);
+        this._wiringState.strobeElements.push(strobeCircle);
+
+        // Label near target
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.classList.add('hole-target-label');
+        label.setAttribute('x', targetX);
+        label.setAttribute('y', targetY - 5);
+        label.textContent = compPin;
+        this.holesLayer.appendChild(label);
+        this._wiringState.strobeElements.push(label);
+
+        this._updateWireProgress();
+    }
+
+    /** Place the current wire and advance (called on SPACE). */
+    _autoPlaceCurrentWire() {
+        this._clearWireStrobes();
+
+        const { queue, currentIndex } = this._wiringState;
+        if (currentIndex >= queue.length) return;
+
+        const entry = queue[currentIndex];
+        const result = this.bbRenderer?.renderSingleWire(
+            entry.wire, entry.group,
+            this._wiringState.componentMetadata,
+            this.placementSystem
+        );
+
+        if (result) {
+            result.path.classList.add('wire-just-placed');
+            this.wiresLayer.appendChild(result.path);
+            this._wiringState.placedPaths.push(result.path);
+            this._wireToGroupPending.set(entry.wire.id, entry.group.id);
+        }
+
+        this._wiringState.currentIndex++;
+        this._updateWireProgress();
+        this._autoShowNextWire();
+    }
+
+    /** Render all remaining wires instantly (ESC shortcut during Step Through). */
+    _autoRenderRemaining() {
+        this._clearWireStrobes();
+
+        const { queue, currentIndex } = this._wiringState;
+        for (let i = currentIndex; i < queue.length; i++) {
+            const entry = queue[i];
+            const result = this.bbRenderer?.renderSingleWire(
+                entry.wire, entry.group,
+                this._wiringState.componentMetadata,
+                this.placementSystem
+            );
+            if (result) {
+                this.wiresLayer.appendChild(result.path);
+                this._wiringState.placedPaths.push(result.path);
+                this._wireToGroupPending.set(entry.wire.id, entry.group.id);
+            }
+        }
+
+        this._wiringState.currentIndex = queue.length;
+        this._wiringComplete();
+    }
+
+    // ==================== Guided Wiring Mode ====================
+
+    /**
+     * Guided wiring — student drags each wire from Pico pin to component.
+     * Returns Promise that resolves when all wires are placed.
+     */
+    _executeGuidedWiring() {
+        return new Promise(resolve => {
+            const { circuitData, componentMetadata } = this._pendingWiringData;
+            const queue = this._buildWireQueue(circuitData);
+
+            this._wiringState = {
+                mode: 'guided',
+                active: true,
+                queue,
+                currentIndex: 0,
+                placedPaths: [],
+                circuitData,
+                componentMetadata,
+                resolveComplete: resolve,
+                strobeElements: [],
+                isDragging: false,
+                previewPath: null,
+                currentPicoPin: null,
+                currentTargetHole: null
+            };
+
+            // Bind drag handlers
+            this._guidedDragBound = (e) => this._guidedDrag(e);
+            this._guidedEndDragBound = (e) => this._guidedEndDrag(e);
+
+            this._wireToGroupPending = new Map();
+            this._updateWireProgress();
+            this._guidedShowNextTarget();
+        });
+    }
+
+    /** Show strobe on next Pico pin + target hole, attach mousedown for drag. */
+    _guidedShowNextTarget() {
+        this._clearWireStrobes();
+
+        const { queue, currentIndex } = this._wiringState;
+        if (currentIndex >= queue.length) {
+            this._wiringComplete();
+            return;
+        }
+
+        const entry = queue[currentIndex];
+        const { wire, group, pinKey, compPin } = entry;
+
+        if (this.bbRenderer) {
+            this.bbRenderer.setWireOverrides(this.wireOverrides);
+        }
+        const result = this.bbRenderer?.renderSingleWire(
+            wire, group,
+            this._wiringState.componentMetadata,
+            this.placementSystem
+        );
+        if (!result) {
+            console.warn(`[Wiring] Could not resolve wire ${wire.id}, skipping`);
+            this._wiringState.currentIndex++;
+            this._guidedShowNextTarget();
+            return;
+        }
+
+        entry.endpoints = result.endpoints;
+
+        // Strobe Pico pin
+        let pinEl = document.querySelector(`[data-pin-id="pico1.${pinKey}"]`);
+        if (!pinEl) {
+            pinEl = document.querySelector(`[data-pin-id^="pico1.${pinKey}_"]`);
+        }
+        if (pinEl) {
+            pinEl.classList.add('pin-strobe');
+            this._wiringState.strobeElements.push(pinEl);
+
+            const pinRect = pinEl.querySelector('rect');
+            if (pinRect) {
+                const px = parseFloat(pinRect.getAttribute('x')) + parseFloat(pinRect.getAttribute('width')) / 2;
+                const py = parseFloat(pinRect.getAttribute('y')) + parseFloat(pinRect.getAttribute('height')) / 2;
+                const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                ring.classList.add('pin-strobe-ring');
+                ring.setAttribute('cx', px);
+                ring.setAttribute('cy', py);
+                ring.setAttribute('r', '5');
+                pinEl.appendChild(ring);
+            }
+
+            this._wiringState.currentPicoPin = {
+                x: result.endpoints.startX,
+                y: result.endpoints.startY,
+                pinKey,
+                element: pinEl
+            };
+
+            // Mousedown → start drag
+            pinEl.style.cursor = 'pointer';
+            pinEl._guidedMousedown = (e) => this._guidedStartDrag(e);
+            pinEl.addEventListener('mousedown', pinEl._guidedMousedown);
+        }
+
+        // Strobe target hole
+        const targetX = result.endpoints.endX;
+        const targetY = result.endpoints.endY;
+        const strobeCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        strobeCircle.setAttribute('cx', targetX);
+        strobeCircle.setAttribute('cy', targetY);
+        strobeCircle.setAttribute('r', '3');
+        strobeCircle.classList.add('hole-strobe');
+        this.holesLayer.appendChild(strobeCircle);
+        this._wiringState.strobeElements.push(strobeCircle);
+
+        // Label
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.classList.add('hole-target-label');
+        label.setAttribute('x', targetX);
+        label.setAttribute('y', targetY - 5);
+        label.textContent = compPin;
+        this.holesLayer.appendChild(label);
+        this._wiringState.strobeElements.push(label);
+
+        this._wiringState.currentTargetHole = { x: targetX, y: targetY };
+        this._updateWireProgress();
+    }
+
+    /** Mousedown on Pico pin — start drag. */
+    _guidedStartDrag(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const { currentPicoPin, queue, currentIndex } = this._wiringState;
+        if (!currentPicoPin || currentIndex >= queue.length) return;
+
+        const entry = queue[currentIndex];
+        this._wiringState.isDragging = true;
+
+        const preview = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        preview.classList.add('wire-drag-preview');
+        preview.style.stroke = entry.wire.color || '#ffcc00';
+        this.wiresLayer.appendChild(preview);
+        this._wiringState.previewPath = preview;
+
+        this.svg.addEventListener('mousemove', this._guidedDragBound);
+        this.svg.addEventListener('mouseup', this._guidedEndDragBound);
+        window.addEventListener('mouseup', this._guidedEndDragBound);
+    }
+
+    /** Mousemove — update preview Bezier, blending into final curve near target. */
+    _guidedDrag(e) {
+        if (!this._wiringState.isDragging || !this._wiringState.previewPath) return;
+
+        const pt = this._svgPointFromEvent(e);
+        const pin = this._wiringState.currentPicoPin;
+        const target = this._wiringState.currentTargetHole;
+        const entry = this._wiringState.queue[this._wiringState.currentIndex];
+        const finalEp = entry?.endpoints;
+
+        const distToTarget = target
+            ? Math.sqrt((pt.x - target.x) ** 2 + (pt.y - target.y) ** 2)
+            : Infinity;
+
+        const BLEND_RADIUS = 25;
+        const t = target && finalEp
+            ? Math.max(0, Math.min(1, 1 - distToTarget / BLEND_RADIUS))
+            : 0;
+
+        const freeGap = Math.abs(pt.x - pin.x);
+        const freeCp1x = pin.x + freeGap * 0.4;
+        const freeCp1y = pin.y;
+        const freeCp2x = pt.x;
+        const freeCp2y = pt.y;
+        const freeEndX = pt.x;
+        const freeEndY = pt.y;
+
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const cp1x = finalEp ? lerp(freeCp1x, finalEp.cp1x, t) : freeCp1x;
+        const cp1y = finalEp ? lerp(freeCp1y, finalEp.cp1y, t) : freeCp1y;
+        const cp2x = finalEp ? lerp(freeCp2x, finalEp.cp2x, t) : freeCp2x;
+        const cp2y = finalEp ? lerp(freeCp2y, finalEp.cp2y, t) : freeCp2y;
+        const endX = finalEp ? lerp(freeEndX, finalEp.endX, t) : freeEndX;
+        const endY = finalEp ? lerp(freeEndY, finalEp.endY, t) : freeEndY;
+
+        const d = `M ${pin.x} ${pin.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endX} ${endY}`;
+        this._wiringState.previewPath.setAttribute('d', d);
+
+        this._wiringState.previewPath.style.opacity = 0.4 + t * 0.5;
+        if (t > 0.8) {
+            this._wiringState.previewPath.style.strokeDasharray = 'none';
+        } else {
+            this._wiringState.previewPath.style.strokeDasharray = '4 3';
+        }
+    }
+
+    /** Mouseup — check proximity to target, snap or retry. */
+    _guidedEndDrag(e) {
+        if (!this._wiringState.isDragging) return;
+
+        this.svg.removeEventListener('mousemove', this._guidedDragBound);
+        this.svg.removeEventListener('mouseup', this._guidedEndDragBound);
+        window.removeEventListener('mouseup', this._guidedEndDragBound);
+
+        this._wiringState.isDragging = false;
+
+        const pt = this._svgPointFromEvent(e);
+        const target = this._wiringState.currentTargetHole;
+        const SNAP_THRESHOLD = 8;
+
+        if (target) {
+            const dist = Math.sqrt((pt.x - target.x) ** 2 + (pt.y - target.y) ** 2);
+            if (dist <= SNAP_THRESHOLD) {
+                this._guidedSnapWire();
+                return;
+            }
+        }
+
+        // Miss — remove preview, keep strobing for retry
+        this._guidedRemovePreview();
+    }
+
+    /** Place the final wire, advance to next. */
+    _guidedSnapWire() {
+        this._guidedRemovePreview();
+
+        const { queue, currentIndex } = this._wiringState;
+        const entry = queue[currentIndex];
+
+        const result = this.bbRenderer?.renderSingleWire(
+            entry.wire, entry.group,
+            this._wiringState.componentMetadata,
+            this.placementSystem
+        );
+
+        if (result) {
+            result.path.classList.add('wire-just-placed');
+            // Disable pointer events on placed wires so they don't block
+            // mousedown on Pico pins below (e.g., 3V3_OUT shared by multiple wires)
+            result.path.style.pointerEvents = 'none';
+            this.wiresLayer.appendChild(result.path);
+            this._wiringState.placedPaths.push(result.path);
+            this._wireToGroupPending.set(entry.wire.id, entry.group.id);
+        }
+
+        this._wiringState.currentIndex++;
+        this._updateWireProgress();
+        this._guidedShowNextTarget();
+    }
+
+    /** Remove guided drag preview path. */
+    _guidedRemovePreview() {
+        if (this._wiringState.previewPath) {
+            this._wiringState.previewPath.remove();
+            this._wiringState.previewPath = null;
+        }
+    }
+
+    // ==================== Wiring State Shared Helpers ====================
+
+    /** Clear strobe markers + mousedown listeners. */
+    _clearWireStrobes() {
+        if (!this._wiringState?.strobeElements) return;
+
+        for (const el of this._wiringState.strobeElements) {
+            if (el.classList) {
+                el.classList.remove('pin-strobe');
+                const ring = el.querySelector?.('.pin-strobe-ring');
+                if (ring) ring.remove();
+            }
+            if (el._guidedMousedown) {
+                el.removeEventListener('mousedown', el._guidedMousedown);
+                delete el._guidedMousedown;
+                el.style.cursor = '';
+            }
+            if (el.classList?.contains('hole-strobe') || el.classList?.contains('hole-target-label')) {
+                el.remove();
+            }
+        }
+        this._wiringState.strobeElements = [];
+        if (this._wiringState.mode === 'guided') {
+            this._wiringState.currentPicoPin = null;
+            this._wiringState.currentTargetHole = null;
+        }
+    }
+
+    /** Update wire progress bar. */
+    _updateWireProgress() {
+        const bar = document.getElementById('wire-progress-bar');
+        const text = document.getElementById('wire-progress-text');
+        const hint = document.getElementById('wire-progress-hint');
+        if (!bar || !this._wiringState?.active) {
+            if (bar) bar.style.display = 'none';
+            return;
+        }
+
+        const { queue, currentIndex, mode } = this._wiringState;
+        bar.style.display = 'flex';
+        text.textContent = `Wire ${Math.min(currentIndex + 1, queue.length)} / ${queue.length}`;
+
+        if (mode === 'auto') {
+            hint.textContent = 'Press SPACE to place next wire \u00b7 ESC to render all';
+        } else if (mode === 'guided') {
+            hint.textContent = 'Drag from the strobing Pico pin to the target hole';
+        }
+    }
+
+    /** All wires placed — enable interactions, resolve Promise. */
+    _wiringComplete() {
+        console.log('[Explorer] Wiring complete');
+
+        this._clearWireStrobes();
+
+        // Hide progress bar
+        const bar = document.getElementById('wire-progress-bar');
+        if (bar) bar.style.display = 'none';
+
+        // Re-enable pointer events on placed wires (disabled during guided wiring)
+        if (this._wiringState?.placedPaths) {
+            for (const path of this._wiringState.placedPaths) {
+                path.style.pointerEvents = '';
+            }
+        }
+
+        // Transfer wireToGroup map
+        this.wireToGroup = this._wireToGroupPending || new Map();
+        this._wireToGroupPending = null;
+
+        // Enable full interactions
+        this.enableGroupInteraction();
+        this.enableWireInteraction();
+
+        // Mark inactive
+        const resolve = this._wiringState?.resolveComplete;
+        this._wiringState = null;
+        this._pendingWiringData = null;
+
+        // Resolve the Promise so loadFromLLMCall() returns
+        if (resolve) resolve();
+    }
+
+    /** Keyboard handler during active wiring (takes priority over tab dispatch). */
+    _wiringHandleKey(e) {
+        if (!this._wiringState?.active) return;
+
+        if (this._wiringState.mode === 'auto') {
+            if (e.key === ' ' || e.code === 'Space') {
+                e.preventDefault();
+                this._autoPlaceCurrentWire();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                this._autoRenderRemaining();
+            }
+        } else if (this._wiringState.mode === 'guided') {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (this._wiringState.isDragging) {
+                    // Cancel current drag
+                    this.svg.removeEventListener('mousemove', this._guidedDragBound);
+                    this.svg.removeEventListener('mouseup', this._guidedEndDragBound);
+                    window.removeEventListener('mouseup', this._guidedEndDragBound);
+                    this._wiringState.isDragging = false;
+                    this._guidedRemovePreview();
+                }
+            }
+        }
+    }
+
+    /**
      * Abstract layout rendering pipeline (fallback when breadboard system unavailable)
      */
     _renderAbstract(circuitData, componentMetadata) {
@@ -3013,14 +4043,29 @@ class ExplorerApp {
 
             // 3-7. Render on breadboard (Phase 3) or fall back to abstract layout
             if (this.bbRenderer && this.placementSystem?.loaded) {
-                this._renderOnBreadboard(parseResult.circuitData, componentMetadata);
+                // Render components first (no wires yet)
+                this._renderOnBreadboardComponentsOnly(parseResult.circuitData, componentMetadata);
+
+                // Show wiring mode modal — student chooses how wires appear
+                const wiringMode = await this._showWiringModeModal();
+                console.log('[Explorer] Wiring mode chosen:', wiringMode);
+
+                if (wiringMode === 'quick') {
+                    this._executeQuickWiring();
+                    this.enableGroupInteraction();
+                    this.enableWireInteraction();
+                } else if (wiringMode === 'auto') {
+                    await this._executeAutoWiring();
+                    // enableInteractions called by _wiringComplete()
+                } else if (wiringMode === 'guided') {
+                    await this._executeGuidedWiring();
+                    // enableInteractions called by _wiringComplete()
+                }
             } else {
                 this._renderAbstract(parseResult.circuitData, componentMetadata);
+                this.enableGroupInteraction();
+                this.enableWireInteraction();
             }
-
-            // 8. Enable interactions
-            this.enableGroupInteraction();
-            this.enableWireInteraction();
 
             return {
                 success: true,
@@ -3469,6 +4514,29 @@ class ExplorerApp {
         this.activeGroup = null;
         this.highlightedWire = null;
         this.highlightedComponent = null;
+        this._isolatedWireId = null;
+
+        // Clean up any in-progress wiring mode
+        if (this._wiringState?.active) {
+            this._clearWireStrobes();
+            if (this._wiringState.isDragging) {
+                this.svg?.removeEventListener('mousemove', this._guidedDragBound);
+                this.svg?.removeEventListener('mouseup', this._guidedEndDragBound);
+                window.removeEventListener('mouseup', this._guidedEndDragBound);
+            }
+            this._guidedRemovePreview?.();
+        }
+        this._wiringState = null;
+        this._pendingWiringData = null;
+        this._wireToGroupPending = null;
+
+        // Dismiss modal if visible
+        const modal = document.getElementById('wiring-mode-modal');
+        if (modal) modal.classList.remove('visible');
+
+        // Hide progress bar
+        const progressBar = document.getElementById('wire-progress-bar');
+        if (progressBar) progressBar.style.display = 'none';
     }
 
     // ==================== MicroPython UI Messages ====================
